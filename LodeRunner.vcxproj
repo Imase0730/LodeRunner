@@ -139,12 +139,14 @@
   <!-- ファイル -->
   <ItemGroup>
     <!-- プリコンパイル済みヘッダー -->
+    <ClCompile Include="Game\GameplayScene\Blink.cpp" />
     <ClCompile Include="Game\GameplayScene\GameplayScene.cpp" />
     <ClCompile Include="Game\GameplayScene\Stage.cpp" />
     <ClCompile Include="Game\GameplayScene\Tile.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
+    <ClInclude Include="Game\GameplayScene\Blink.h" />
     <ClInclude Include="Game\GameplayScene\GameplayScene.h" />
     <ClInclude Include="Game\GameplayScene\Stage.h" />
     <ClInclude Include="Game\GameplayScene\Tile.h" />

@@ -90,6 +90,9 @@
     <ClCompile Include="Game\GameplayScene\Tile.cpp">
       <Filter>Game\GamePlay</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GameplayScene\Blink.cpp">
+      <Filter>Game\GamePlay</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game\GameplayScene\GameplayScene.h">
@@ -99,6 +102,9 @@
       <Filter>Game\GamePlay</Filter>
     </ClInclude>
     <ClInclude Include="Game\GameplayScene\Tile.h">
+      <Filter>Game\GamePlay</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GameplayScene\Blink.h">
       <Filter>Game\GamePlay</Filter>
     </ClInclude>
   </ItemGroup>

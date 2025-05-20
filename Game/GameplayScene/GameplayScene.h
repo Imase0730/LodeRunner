@@ -6,6 +6,7 @@
 
 #include "Game/Screen.h"
 #include "Stage.h"
+#include "Blink.h"
 
 // クラスの前方宣言
 class Game;
@@ -26,7 +27,11 @@ public:
 // クラス定数の宣言 -------------------------------------------------
 private:
 	
-	static constexpr int REPEAT_INTEVAL = 10;
+	// キーリピートの間隔
+	static constexpr int KEY_REPEAT_INTEVAL = 10;
+
+	// 点滅の間隔
+	static constexpr int BLINK_INTEVAL = 60;
 
 // データメンバの宣言 -----------------------------------------------
 private:
@@ -42,6 +47,9 @@ private:
 
 	// グラフィックハンドル
 	int m_ghTileset;
+
+	// 点滅制御
+	Blink m_blink;
 
 // メンバ関数の宣言 -------------------------------------------------
 public:

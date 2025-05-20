@@ -13,6 +13,7 @@ GameplayScene::GameplayScene(Game* pGame)
 	, m_ghTileset{}
 	, m_cursorEdit{ 0, 0 }
 	, m_selectTile{ Tile::TileType::Blick }
+	, m_blink{ BLINK_INTEVAL }
 {
 	// 絵のロード
 	m_ghTileset = LoadGraph(L"Resources/Textures/tileset.png");
@@ -37,13 +38,15 @@ void GameplayScene::Update(int keyCondition, int keyTrigger)
 	static int elapseFrame = 0;
 	int keyRepeat = 0;
 
+	m_blink.Update();
+
 	if (m_mode == Mode::Edit)
 	{
 		// 簡易キーリピート
 		if (keyCondition)
 		{
 			elapseFrame++;
-			if (elapseFrame >= REPEAT_INTEVAL)
+			if (elapseFrame >= KEY_REPEAT_INTEVAL)
 			{
 				elapseFrame = 0;
 				keyRepeat = keyCondition;
@@ -89,6 +92,9 @@ void GameplayScene::Render()
 
 	if (m_mode == Mode::Edit)
 	{
+		int col = static_cast<int>(100.0f + 155.0f * m_blink.GetBlinkRate());
+		SetDrawBright(col, col, col);
+
 		// カーソルの描画
 		DrawRectGraph(m_cursorEdit.x * Tile::TILE_WIDTH, m_cursorEdit.y * Tile::TILE_HEIGHT
 			, Tile::TILE_WIDTH * 9, Tile::TILE_HEIGHT * 1
@@ -110,6 +116,8 @@ void GameplayScene::Render()
 		DrawRectGraph(pos[static_cast<int>(m_selectTile)].x, pos[static_cast<int>(m_selectTile)].y
 			, Tile::TILE_WIDTH * 9, Tile::TILE_HEIGHT * 1
 			, Tile::TILE_WIDTH, Tile::TILE_HEIGHT, m_ghTileset, TRUE);
+		
+		SetDrawBright(255, 255, 255);
 	}
 }
 
