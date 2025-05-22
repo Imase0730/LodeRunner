@@ -27,8 +27,11 @@
     <Filter Include="Resources\Textures">
       <UniqueIdentifier>{48aa4fce-5282-4008-afd6-7bfddd934eb5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\GamePlay">
+    <Filter Include="Game\GamePlayScene">
       <UniqueIdentifier>{df4b8b47-3705-4bcf-b23e-60139e568b6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Game\StageEditScene">
+      <UniqueIdentifier>{527ce41d-cf4a-40c2-9fd9-002c7c5ae1b6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <!-- ファイル -->
@@ -39,15 +42,6 @@
     <!-- メイン -->
     <ClCompile Include="WinMain.cpp" />
     <!-- ゲーム -->
-    <ClCompile Include="Game\Game.cpp">
-      <Filter>Game</Filter>
-    </ClCompile>
-    <ClInclude Include="Game\Game.h">
-      <Filter>Game</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\Screen.h">
-      <Filter>Game</Filter>
-    </ClInclude>
     <!-- ライブラリ -->
     <ClInclude Include="Library\DebugHelper.h">
       <Filter>Library</Filter>
@@ -81,34 +75,55 @@
     <Image Include="Resources\Textures\TridentLogo.png">
       <Filter>Resources\Textures</Filter>
     </Image>
-    <ClCompile Include="Game\GameplayScene\GameplayScene.cpp">
-      <Filter>Game\GamePlay</Filter>
+    <ClCompile Include="Game\GamePlayScene\GamePlayScene.cpp">
+      <Filter>Game\GamePlayScene</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameplayScene\Stage.cpp">
-      <Filter>Game\GamePlay</Filter>
+    <ClCompile Include="Game\Blink.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameplayScene\Tile.cpp">
-      <Filter>Game\GamePlay</Filter>
+    <ClCompile Include="Game\Number.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GameplayScene\Blink.cpp">
-      <Filter>Game\GamePlay</Filter>
+    <ClCompile Include="Game\Stage.cpp">
+      <Filter>Game</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Game\GameplayScene\GameplayScene.h">
-      <Filter>Game\GamePlay</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\GameplayScene\Stage.h">
-      <Filter>Game\GamePlay</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\GameplayScene\Tile.h">
-      <Filter>Game\GamePlay</Filter>
-    </ClInclude>
-    <ClInclude Include="Game\GameplayScene\Blink.h">
-      <Filter>Game\GamePlay</Filter>
-    </ClInclude>
+    <ClCompile Include="Game\Tile.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\StageEditScene\StageEditScene.cpp">
+      <Filter>Game\StageEditScene</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Game.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Game\GamePlayScene\GamePlayScene.h">
+      <Filter>Game\GamePlayScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Blink.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Number.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Stage.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Tile.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\StageEditScene\StageEditScene.h">
+      <Filter>Game\StageEditScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Game.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Screen.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

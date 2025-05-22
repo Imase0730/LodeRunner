@@ -31,22 +31,22 @@ void Tile::Render(int x, int y, int ghTileset) const
 	case TileType::Blick:			// レンガ
 		DrawRectGraph(x, y, TILE_WIDTH * 0, TILE_HEIGHT * 1, TILE_WIDTH, TILE_HEIGHT, ghTileset, TRUE);
 		break;
-	case TileType::Ladder:			// ハシゴ
+	case TileType::Block:			// 壊せないブロック
 		DrawRectGraph(x, y, TILE_WIDTH * 1, TILE_HEIGHT * 1, TILE_WIDTH, TILE_HEIGHT, ghTileset, TRUE);
 		break;
-	case TileType::Bar:				// バー
+	case TileType::Ladder:			// ハシゴ
 		DrawRectGraph(x, y, TILE_WIDTH * 2, TILE_HEIGHT * 1, TILE_WIDTH, TILE_HEIGHT, ghTileset, TRUE);
 		break;
-	case TileType::Block:			// 壊せないブロック
+	case TileType::Bar:				// バー
 		DrawRectGraph(x, y, TILE_WIDTH * 3, TILE_HEIGHT * 1, TILE_WIDTH, TILE_HEIGHT, ghTileset, TRUE);
 		break;
-	case TileType::Gold:			// 金塊
+	case TileType::Trap:			// トラップ
 		DrawRectGraph(x, y, TILE_WIDTH * 4, TILE_HEIGHT * 1, TILE_WIDTH, TILE_HEIGHT, ghTileset, TRUE);
 		break;
 	case TileType::HiddenLadder:	// 隠れハシゴ
 		DrawRectGraph(x, y, TILE_WIDTH * 5, TILE_HEIGHT * 1, TILE_WIDTH, TILE_HEIGHT, ghTileset, TRUE);
 		break;
-	case TileType::Trap:			// トラップ
+	case TileType::Gold:			// 金塊
 		DrawRectGraph(x, y, TILE_WIDTH * 6, TILE_HEIGHT * 1, TILE_WIDTH, TILE_HEIGHT, ghTileset, TRUE);
 		break;
 	case TileType::Enemy:			// 敵

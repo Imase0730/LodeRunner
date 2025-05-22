@@ -1,20 +1,30 @@
 //--------------------------------------------------------------------------------------
-// File: GamePlayScene.h
+// File: StageEditScene.h
 //
 //--------------------------------------------------------------------------------------
 #pragma once
 
 #include "Game/Screen.h"
 #include "Game/Stage.h"
+#include "Game/Blink.h"
 
 // クラスの前方宣言
 class Game;
 
 // ゲームプレイシーン
-class GamePlayScene
+class StageEditScene
 {
 	// 列挙型の定義 -----------------------------------------------------
 public:
+
+	// 画面下部のモード
+	enum class Mode
+	{
+		Tile,	// タイル選択
+		Save,	// セーブ
+		Load,	// ロード
+	};
+
 
 // クラス定数の宣言 -------------------------------------------------
 private:
@@ -25,11 +35,17 @@ private:
 	// 点滅の間隔
 	static constexpr int BLINK_INTEVAL = 60;
 
+	// ステージの最大値
+	static constexpr int STAGE_MAX = 999;
+
 // データメンバの宣言 -----------------------------------------------
 private:
 
 	// このシーンを含むゲームオブジェクトへのポインタ
 	Game* m_pGame;
+
+	// レベル
+	int m_level;
 
 	// ステージ
 	Stage m_stage;
@@ -37,14 +53,29 @@ private:
 	// グラフィックハンドル
 	int m_ghTileset;
 
+	// 点滅制御
+	Blink m_blink;
+
+	// レベル表示
+	Number m_levelNumber;
+
+	// 画面下部のモード
+	Mode m_mode;
+
+	// エディットモード用カーソル位置
+	POINT m_cursorEdit;
+
+	// 選択中のタイル
+	Tile::TileType m_selectTile;
+
 // メンバ関数の宣言 -------------------------------------------------
 public:
 
 	// コンストラクタ
-	GamePlayScene(Game* pGame);
+	StageEditScene(Game* pGame);
 
 	// デストラクタ
-	~GamePlayScene();
+	~StageEditScene();
 
 	// 初期化処理
 	void Initialize(int ghTileset);
@@ -60,8 +91,13 @@ public:
 
 private:
 
+	// タイル選択
+	void SelectTile(int keyCondition, int keyRepeat);
 
-public:
+	// セーブ
+	void Save(int keyTrigger, int keyRepeat);
 
+	// ロード
+	void Load(int keyTrigger, int keyRepeat);
 
 };

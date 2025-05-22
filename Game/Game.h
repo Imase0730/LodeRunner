@@ -16,7 +16,8 @@
 
 // ヘッダファイルの読み込み ===================================================
 
-#include "GameplayScene/GameplayScene.h"
+#include "GamePlayScene/GamePlayScene.h"
+#include "StageEditScene/StageEditScene.h"
 
 
 // クラスの宣言 ===============================================================
@@ -37,9 +38,10 @@ public:
 	enum class SceneID
 	{
 		None = -1,
-		GamePlay,	// ゲームプレイ中
+		GamePlay,	// ゲームプレイ
+		StageEdit,	// ステージエディット
 	};
-	
+
 // クラス定数の宣言 -------------------------------------------------
 public:
 	// システム関連
@@ -56,12 +58,16 @@ private:
 	SceneID m_requestedSceneID;	// 変更要求のシーンID
 
 	// シーンオブジェクト
-	GameplayScene m_gameplayScene;	// ゲームプレイシーン
+	GamePlayScene m_gamePlayScene;	// ゲームプレイシーン
+	StageEditScene m_stageEditScene;	// ステージエディットシーン
 
 	// 描画先のグラフィックハンドル
 	int m_ghScreen;
 
-// メンバ関数の宣言 -------------------------------------------------
+	// タイルセットのグラフィックハンドル
+	int m_ghTileset;
+
+	// メンバ関数の宣言 -------------------------------------------------
 // コンストラクタ/デストラクタ
 public:
 	// コンストラクタ

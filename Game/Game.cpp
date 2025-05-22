@@ -26,8 +26,10 @@ Game::Game()
 	, m_oldKey{ 0 }
 	, m_currentSceneID{ SceneID::None }
 	, m_requestedSceneID{ SceneID::None }
-	, m_gameplayScene{ this }
+	, m_gamePlayScene{ this }
+	, m_stageEditScene{ this }
 	, m_ghScreen{}
+	, m_ghTileset{}
 {
 	// 乱数の初期値を設定
 	SRand(static_cast<int>(time(nullptr)));
@@ -57,8 +59,11 @@ Game::~Game()
  */
 void Game::Initialize()
 {
+	// 絵のロード
+	m_ghTileset = LoadGraph(L"Resources/Textures/tileset.png");
+
 	// スタートシーンの設定
-	SetStartScene(SceneID::GamePlay);
+	SetStartScene(SceneID::StageEdit);
 }
 
 
@@ -164,8 +169,11 @@ void Game::InitializeCurrentScene()
 {
 	switch (m_currentSceneID)
 	{
-	case SceneID::GamePlay:	// ゲーム中
-		m_gameplayScene.Initialize();
+	case SceneID::GamePlay:		// ゲームプレイ
+		m_gamePlayScene.Initialize(m_ghTileset);
+		break;
+	case SceneID::StageEdit:	// ステージエディット
+		m_stageEditScene.Initialize(m_ghTileset);
 		break;
 	default:
 		break;
@@ -177,8 +185,11 @@ void Game::UpdateCurrentScene(int keyCondition, int keyTrigger)
 {
 	switch (m_currentSceneID)
 	{
-	case SceneID::GamePlay:	// ゲーム中
-		m_gameplayScene.Update(keyCondition, keyTrigger);
+	case SceneID::GamePlay:		// ゲームプレイ
+		m_gamePlayScene.Update(keyCondition, keyTrigger);
+		break;
+	case SceneID::StageEdit:	// ステージエディット
+		m_stageEditScene.Update(keyCondition, keyTrigger);
 		break;
 	default:
 		break;
@@ -190,8 +201,11 @@ void Game::RenderCurrentScene()
 {
 	switch (m_currentSceneID)
 	{
-	case SceneID::GamePlay:	// ゲーム中
-		m_gameplayScene.Render();
+	case SceneID::GamePlay:		// ゲームプレイ
+		m_gamePlayScene.Render();
+		break;
+	case SceneID::StageEdit:	// ステージエディット
+		m_stageEditScene.Render();
 		break;
 	default:
 		break;
@@ -204,8 +218,11 @@ void Game::FinalizeCurrentScene()
 {
 	switch (m_currentSceneID)
 	{
-	case SceneID::GamePlay:	// ゲーム中
-		m_gameplayScene.Finalize();
+	case SceneID::GamePlay:		// ゲームプレイ
+		m_gamePlayScene.Finalize();
+		break;
+	case SceneID::StageEdit:	// ステージエディット
+		m_stageEditScene.Finalize();
 		break;
 	default:
 		break;

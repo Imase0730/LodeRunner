@@ -14,12 +14,12 @@ public:
 	{
 		None,
 		Blick,			// レンガ
+		Block,			// 壊せないブロック
 		Ladder,			// ハシゴ
 		Bar,			// バー
-		Block,			// 壊せないブロック
-		Gold,			// 金塊
-		HiddenLadder,	// 隠れハシゴ
 		Trap,			// トラップ
+		HiddenLadder,	// 隠れハシゴ
+		Gold,			// 金塊
 		Enemy,			// 敵
 		Player,			// プレイヤー
 
