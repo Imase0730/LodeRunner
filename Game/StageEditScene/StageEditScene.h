@@ -20,9 +20,9 @@ public:
 	// 画面下部のモード
 	enum class Mode
 	{
-		Tile,	// タイル選択
-		Save,	// セーブ
-		Load,	// ロード
+		SelectTile,	// タイル選択
+		Save,		// セーブ
+		Load,		// ロード
 	};
 
 
@@ -90,6 +90,9 @@ public:
 	void Finalize();
 
 private:
+
+	// 簡易キーリピート
+	int KeyRepeat(int keyCondition);
 
 	// タイル選択
 	void SelectTile(int keyCondition, int keyRepeat);
