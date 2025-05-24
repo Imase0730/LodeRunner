@@ -5,7 +5,6 @@
 #pragma once
 
 #include "Tile.h"
-#include "Number.h"
 
 class Stage
 {
@@ -36,21 +35,8 @@ public:
 	// データメンバの宣言 -----------------------------------------------
 private:
 
-	// グラフィックハンドル
-	int m_ghGame_bottom;
-	int m_ghEdit_bottom;
-
 	// マップデータ
 	Tile m_tileMap[STAGE_HEIGHT][STAGE_WIDTH];
-
-	// スコア表示
-	Number m_scoreNumber;
-
-	// 残機数表示
-	Number m_menNumber;
-
-	// レベル表示
-	Number m_levelNumber;
 
 	// モード
 	Mode m_mode;

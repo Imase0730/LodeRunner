@@ -63,7 +63,7 @@ void Game::Initialize()
 	m_ghTileset = LoadGraph(L"Resources/Textures/tileset.png");
 
 	// スタートシーンの設定
-	SetStartScene(SceneID::StageEdit);
+	SetStartScene(SceneID::GamePlay);
 }
 
 

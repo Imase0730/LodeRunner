@@ -47,6 +47,8 @@ public:
 	// システム関連
 	static constexpr const wchar_t* TITLE = L"Lode Runner";   ///< ゲームタイトル
 
+	// 画面下部の情報ウインドウの縦の表示位置
+	static constexpr int INFOMATION_Y = Screen::GAME_HEIGHT - Tile::TILE_HEIGHT;
 
 // データメンバの宣言 -----------------------------------------------
 private:

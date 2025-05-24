@@ -6,6 +6,8 @@
 
 #include "Game/Screen.h"
 #include "Game/Stage.h"
+#include "Game/String.h"
+#include "Game/Number.h"
 
 // クラスの前方宣言
 class Game;
@@ -36,6 +38,24 @@ private:
 
 	// グラフィックハンドル
 	int m_ghTileset;
+
+	// SCOREの文字列
+	String m_scoreString;
+
+	// MENの文字列
+	String m_menString;
+
+	// LEVELの文字列
+	String m_levelString;
+
+	// スコア表示
+	Number m_scoreNumber;
+
+	// 残機数表示
+	Number m_menNumber;
+
+	// レベル表示
+	Number m_levelNumber;
 
 // メンバ関数の宣言 -------------------------------------------------
 public:

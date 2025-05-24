@@ -7,6 +7,8 @@
 #include "Game/Screen.h"
 #include "Game/Stage.h"
 #include "Game/Blink.h"
+#include "Game/Number.h"
+#include "Game/String.h"
 
 // クラスの前方宣言
 class Game;
@@ -24,7 +26,6 @@ public:
 		Save,		// セーブ
 		Load,		// ロード
 	};
-
 
 // クラス定数の宣言 -------------------------------------------------
 private:
@@ -56,9 +57,6 @@ private:
 	// 点滅制御
 	Blink m_blink;
 
-	// レベル表示
-	Number m_levelNumber;
-
 	// 画面下部のモード
 	Mode m_mode;
 
@@ -67,6 +65,18 @@ private:
 
 	// 選択中のタイル
 	Tile::TileType m_selectTile;
+
+	// SAVEの文字列
+	String m_saveString;
+
+	// LOADの文字列
+	String m_loadString;
+
+	// LEVELの文字列
+	String m_levelString;
+
+	// レベル表示
+	Number m_levelNumber;
 
 // メンバ関数の宣言 -------------------------------------------------
 public:
