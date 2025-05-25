@@ -28,8 +28,9 @@ Game::Game()
 	, m_requestedSceneID{ SceneID::None }
 	, m_gamePlayScene{ this }
 	, m_stageEditScene{ this }
-	, m_ghScreen{}
-	, m_ghTileset{}
+	, m_ghScreen{ -1 }
+	, m_ghTileset{ -1 }
+	, m_irisWipe{}
 {
 	// 乱数の初期値を設定
 	SRand(static_cast<int>(time(nullptr)));
@@ -90,6 +91,9 @@ void Game::Update(float elapsedTime)
 
 	// 現在のシーンを更新
 	UpdateCurrentScene(m_key, ~m_oldKey & m_key);
+	
+	// ワイプの更新処理
+	m_irisWipe.Update();
 }
 
 
@@ -103,14 +107,22 @@ void Game::Update(float elapsedTime)
  */
 void Game::Render()
 {
+	SetBackgroundColor(0, 0, 0);
+
 	// 作成した画像を描画対象にする
 	SetDrawScreen(m_ghScreen);
 
 	// 描画対象をクリア
 	ClearDrawScreen();
 
+	// ワイプの描画処理
+	m_irisWipe.Render();
+
 	// 現在のシーンを描画
 	RenderCurrentScene();
+
+	// マスク画面を黒色で塗りつぶす
+	FillMaskScreen(0);
 
 	// 描画対象を裏画面にする
 	SetDrawScreen(DX_SCREEN_BACK);

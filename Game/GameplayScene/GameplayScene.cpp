@@ -28,6 +28,9 @@ GamePlayScene::~GamePlayScene()
 void GamePlayScene::Initialize(int ghTileset)
 {
 	m_ghTileset = ghTileset;
+
+	// ステージのロード
+	m_stage.LoadLevel(1);
 }
 
 // 更新処理

@@ -32,6 +32,10 @@ public:
 	static constexpr int STAGE_WIDTH = 28;
 	static constexpr int STAGE_HEIGHT = 16;
 
+	// ステージサイズ
+	static constexpr int STAGE_SCREEN_WIDTH = STAGE_WIDTH * Tile::TILE_WIDTH;
+	static constexpr int STAGE_SCREEN_HEIGHT = STAGE_HEIGHT * Tile::TILE_HEIGHT;
+
 	// データメンバの宣言 -----------------------------------------------
 private:
 

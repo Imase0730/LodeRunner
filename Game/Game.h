@@ -19,6 +19,7 @@
 #include "GamePlayScene/GamePlayScene.h"
 #include "StageEditScene/StageEditScene.h"
 
+#include "Game/IrisWipe.h"
 
 // クラスの宣言 ===============================================================
 
@@ -69,6 +70,9 @@ private:
 	// タイルセットのグラフィックハンドル
 	int m_ghTileset;
 
+	// アイリスワイプ
+	IrisWipe m_irisWipe;
+
 	// メンバ関数の宣言 -------------------------------------------------
 // コンストラクタ/デストラクタ
 public:
@@ -117,5 +121,8 @@ public:
 
 	// 現在のシーンの終了処理
 	void FinalizeCurrentScene();
+
+	// アイリスワイプを取得する関数
+	IrisWipe* GetIrisWipe() { return &m_irisWipe; }
 
 };

@@ -99,6 +99,9 @@
     <ClCompile Include="Game\String.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="Game\IrisWipe.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -129,6 +132,9 @@
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Game\String.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\IrisWipe.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

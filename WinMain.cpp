@@ -106,6 +106,7 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
 #endif
 
         ScreenFlip();               // 裏画面の内容を表画面に反映
+        SetBackgroundColor(100, 100, 100);// クリア色を設定
         ClearDrawScreen();          // 裏画面の消去
     }
 

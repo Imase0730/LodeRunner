@@ -20,6 +20,7 @@ StageEditScene::StageEditScene(Game* pGame)
 	, m_levelString{ POINT{ Tile::TILE_WIDTH * 20 , Game::INFOMATION_Y }, "LEVEL" }
 	, m_levelNumber{ POINT{ Tile::TILE_WIDTH * 25, Game::INFOMATION_Y }, 3 }
 {
+
 }
 
 // デストラクタ
@@ -36,11 +37,27 @@ void StageEditScene::Initialize(int ghTileset)
 	m_levelNumber.SetNumber(m_level);
 	// ステージのロード
 	m_stage.LoadLevel(m_level);
+
+	IrisWipe* wipe = m_pGame->GetIrisWipe();
+	wipe->Initialize(IrisWipe::Mode::Open);
 }
 
 // 更新処理
 void StageEditScene::Update(int keyCondition, int keyTrigger)
 {
+	if (keyTrigger & PAD_INPUT_10)
+	{
+		IrisWipe* wipe = m_pGame->GetIrisWipe();
+		wipe->Initialize(IrisWipe::Mode::Open);
+		wipe->Start();
+	}
+	if (keyTrigger & PAD_INPUT_4)
+	{
+		IrisWipe* wipe = m_pGame->GetIrisWipe();
+		wipe->Initialize(IrisWipe::Mode::Close);
+		wipe->Start();
+	}
+
 	// 簡易キーリピート
 	int keyRepeat = KeyRepeat(keyCondition);
 
