@@ -13,6 +13,7 @@ TitleScene::TitleScene(Game* pGame)
 	, m_editString{ EDIT_POSITION, "EDIT" }
 	, m_mode{ Mode::Game }
 	, m_blink{ BLINK_INTEVAL }
+	, m_irisWipe{ nullptr }
 {
 }
 
@@ -24,6 +25,9 @@ TitleScene::~TitleScene()
 // 初期化処理
 void TitleScene::Initialize()
 {
+	// 各変数の初期化
+	m_mode = Mode::Game;
+	m_irisWipe = nullptr;
 }
 
 // 更新処理
@@ -32,21 +36,34 @@ void TitleScene::Update(int keyCondition, int keyTrigger)
 	// 点滅の更新
 	m_blink.Update();
 
-	// 上下キーでモードを選択
-	if (keyTrigger & PAD_INPUT_UP) m_mode = Mode::Game;
-	if (keyTrigger & PAD_INPUT_DOWN) m_mode = Mode::Edit;
-
-	// Enterキーで決定
-	if (CheckHitKey(KEY_INPUT_RETURN))
+	if (!m_irisWipe)
 	{
-		// 各シーンへ
-		if (m_mode == Mode::Game)
+		// 上下キーでモードを選択
+		if (keyTrigger & PAD_INPUT_UP) m_mode = Mode::Game;
+		if (keyTrigger & PAD_INPUT_DOWN) m_mode = Mode::Edit;
+
+		// Enterキーで決定
+		if (CheckHitKey(KEY_INPUT_RETURN))
 		{
-			m_pGame->RequestSceneChange(Game::SceneID::GamePlay);
-		} 
-		else if(m_mode == Mode::Edit)
+			// 画面をクローズする
+			m_irisWipe = m_pGame->GetIrisWipe();
+			m_irisWipe->Initialize(IrisWipe::Mode::Close);
+			m_irisWipe->Start();
+		}
+	}
+	else {
+		// クローズするまで待つ
+		if (!m_irisWipe->IsActive())
 		{
-			m_pGame->RequestSceneChange(Game::SceneID::StageEdit);
+			// 各シーンへ
+			if (m_mode == Mode::Game)
+			{
+				m_pGame->RequestSceneChange(Game::SceneID::GamePlay);
+			}
+			else if (m_mode == Mode::Edit)
+			{
+				m_pGame->RequestSceneChange(Game::SceneID::StageEdit);
+			}
 		}
 	}
 }

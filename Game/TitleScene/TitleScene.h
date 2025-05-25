@@ -11,6 +11,7 @@
 
 // クラスの前方宣言
 class Game;
+class IrisWipe;
 
 // ゲームプレイシーン
 class TitleScene
@@ -39,6 +40,9 @@ private:
 
 	// 点滅の間隔
 	static constexpr int BLINK_INTEVAL = 60;
+
+	// アイリスワイプへのポインタ
+	IrisWipe* m_irisWipe;
 
 // データメンバの宣言 -----------------------------------------------
 private:
