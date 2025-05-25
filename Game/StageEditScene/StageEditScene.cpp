@@ -9,7 +9,6 @@
 StageEditScene::StageEditScene(Game* pGame)
 	: m_pGame{ pGame }
 	, m_stage{ Stage::Mode::StageEdit }
-	, m_ghTileset{ -1 }
 	, m_cursorEdit{ 0, 0 }
 	, m_selectTile{ Tile::TileType::Blick }
 	, m_blink{ BLINK_INTEVAL }
@@ -29,33 +28,29 @@ StageEditScene::~StageEditScene()
 }
 
 // 初期化処理
-void StageEditScene::Initialize(int ghTileset)
+void StageEditScene::Initialize()
 {
-	// タイルセットのグラフィックハンドル
-	m_ghTileset = ghTileset;
+	// 各変数の初期化
+	m_cursorEdit = POINT{ 0, 0 };
+	m_selectTile = Tile::TileType::Blick;
+	m_level = 1;
+	m_mode = Mode::SelectTile;
+
 	// レベルの設定
 	m_levelNumber.SetNumber(m_level);
+
 	// ステージのロード
 	m_stage.LoadLevel(m_level);
-
-	IrisWipe* wipe = m_pGame->GetIrisWipe();
-	wipe->Initialize(IrisWipe::Mode::Open);
 }
 
 // 更新処理
 void StageEditScene::Update(int keyCondition, int keyTrigger)
 {
-	if (keyTrigger & PAD_INPUT_10)
+	// Qキーでタイトルへ
+	if (keyTrigger & PAD_INPUT_7)
 	{
-		IrisWipe* wipe = m_pGame->GetIrisWipe();
-		wipe->Initialize(IrisWipe::Mode::Open);
-		wipe->Start();
-	}
-	if (keyTrigger & PAD_INPUT_4)
-	{
-		IrisWipe* wipe = m_pGame->GetIrisWipe();
-		wipe->Initialize(IrisWipe::Mode::Close);
-		wipe->Start();
+		m_pGame->RequestSceneChange(Game::SceneID::Title);
+		return;
 	}
 
 	// 簡易キーリピート
@@ -64,8 +59,8 @@ void StageEditScene::Update(int keyCondition, int keyTrigger)
 	// 点滅の更新
 	m_blink.Update();
 
-	// Qキーでモード変更
-	if (keyTrigger & PAD_INPUT_7)
+	// スペースキーでモード変更
+	if (keyTrigger & PAD_INPUT_10)
 	{
 		switch (m_mode)
 		{
@@ -101,21 +96,21 @@ void StageEditScene::Update(int keyCondition, int keyTrigger)
 }
 
 // 描画処理
-void StageEditScene::Render()
+void StageEditScene::Render(int ghTileset)
 {
 	// ステージの描画
-	m_stage.Render(m_ghTileset);
+	m_stage.Render(ghTileset);
 
 	// 選択用タイルの描画
 	DrawRectGraph(0, Game::INFOMATION_Y
 		, Tile::TILE_WIDTH * 1, Tile::TILE_HEIGHT * 4
-		, Tile::TILE_WIDTH * 9, Tile::TILE_HEIGHT, m_ghTileset, TRUE);
+		, Tile::TILE_WIDTH * 9, Tile::TILE_HEIGHT, ghTileset, TRUE);
 
 	// 各文字列の描画
-	if (m_mode != Mode::Save) m_saveString.Render(m_ghTileset);			// SAVE
-	if (m_mode != Mode::Load) m_loadString.Render(m_ghTileset);			// LOAD
-	m_levelString.Render(m_ghTileset);									// LEVEL
-	if (m_mode == Mode::SelectTile) m_levelNumber.Render(m_ghTileset);	// 000
+	if (m_mode != Mode::Save) m_saveString.Render(ghTileset);			// SAVE
+	if (m_mode != Mode::Load) m_loadString.Render(ghTileset);			// LOAD
+	m_levelString.Render(ghTileset);									// LEVEL
+	if (m_mode == Mode::SelectTile) m_levelNumber.Render(ghTileset);	// 000
 
 	// ----- ここから点滅 ----- //
 	int col = static_cast<int>(100.0f + 155.0f * m_blink.GetBlinkRate());
@@ -127,20 +122,20 @@ void StageEditScene::Render()
 		// カーソルの描画（上部）
 		DrawRectGraph(m_cursorEdit.x * Tile::TILE_WIDTH, m_cursorEdit.y * Tile::TILE_HEIGHT
 			, Tile::TILE_WIDTH * 6, Tile::TILE_HEIGHT * 3
-			, Tile::TILE_WIDTH, Tile::TILE_HEIGHT, m_ghTileset, TRUE);
+			, Tile::TILE_WIDTH, Tile::TILE_HEIGHT, ghTileset, TRUE);
 
 		// カーソルの描画（下部）
 		DrawRectGraph(Tile::TILE_WIDTH * (static_cast<int>(m_selectTile) - 1), Game::INFOMATION_Y
 			, Tile::TILE_WIDTH * 6, Tile::TILE_HEIGHT * 3
-			, Tile::TILE_WIDTH, Tile::TILE_HEIGHT, m_ghTileset, TRUE);
+			, Tile::TILE_WIDTH, Tile::TILE_HEIGHT, ghTileset, TRUE);
 		break;
 	case Mode::Save:
-		m_saveString.Render(m_ghTileset);	// SAVE
-		m_levelNumber.Render(m_ghTileset);	// 000
+		m_saveString.Render(ghTileset);	// SAVE
+		m_levelNumber.Render(ghTileset);	// 000
 		break;
 	case Mode::Load:
-		m_loadString.Render(m_ghTileset);	// LOAD
-		m_levelNumber.Render(m_ghTileset);	// 000
+		m_loadString.Render(ghTileset);	// LOAD
+		m_levelNumber.Render(ghTileset);	// 000
 		break;
 	default:
 		break;
@@ -236,8 +231,8 @@ void StageEditScene::SelectTile(int keyCondition, int keyRepeat)
 // セーブ
 void StageEditScene::Save(int keyTrigger, int keyRepeat)
 {
-	// スペースキーでセーブ
-	if (keyTrigger & PAD_INPUT_10)
+	// Zキーでセーブ
+	if (keyTrigger & PAD_INPUT_1)
 	{
 		m_stage.SaveLevel(m_level);
 	}
@@ -258,10 +253,10 @@ void StageEditScene::Save(int keyTrigger, int keyRepeat)
 // ロード
 void StageEditScene::Load(int keyTrigger, int keyRepeat)
 {
-	// スペースキーでロード
-	if (keyTrigger & PAD_INPUT_10)
+	// Zキーでロード
+	if (keyTrigger & PAD_INPUT_1)
 	{
-		m_stage.LoadLevel(m_level);
+		if (m_level != m_stage.GetLevel()) m_stage.LoadLevel(m_level);
 	}
 	// 上キーまたはWキーでレベル加算
 	if ((keyRepeat & PAD_INPUT_UP) || (keyRepeat & PAD_INPUT_8))

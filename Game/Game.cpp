@@ -26,6 +26,7 @@ Game::Game()
 	, m_oldKey{ 0 }
 	, m_currentSceneID{ SceneID::None }
 	, m_requestedSceneID{ SceneID::None }
+	, m_titleScene{ this }
 	, m_gamePlayScene{ this }
 	, m_stageEditScene{ this }
 	, m_ghScreen{ -1 }
@@ -64,7 +65,7 @@ void Game::Initialize()
 	m_ghTileset = LoadGraph(L"Resources/Textures/tileset.png");
 
 	// スタートシーンの設定
-	SetStartScene(SceneID::GamePlay);
+	SetStartScene(SceneID::Title);
 }
 
 
@@ -181,11 +182,14 @@ void Game::InitializeCurrentScene()
 {
 	switch (m_currentSceneID)
 	{
+	case SceneID::Title:		// タイトル
+		m_titleScene.Initialize();
+		break;
 	case SceneID::GamePlay:		// ゲームプレイ
-		m_gamePlayScene.Initialize(m_ghTileset);
+		m_gamePlayScene.Initialize();
 		break;
 	case SceneID::StageEdit:	// ステージエディット
-		m_stageEditScene.Initialize(m_ghTileset);
+		m_stageEditScene.Initialize();
 		break;
 	default:
 		break;
@@ -197,6 +201,9 @@ void Game::UpdateCurrentScene(int keyCondition, int keyTrigger)
 {
 	switch (m_currentSceneID)
 	{
+	case SceneID::Title:		// タイトル
+		m_titleScene.Update(keyCondition, keyTrigger);
+		break;
 	case SceneID::GamePlay:		// ゲームプレイ
 		m_gamePlayScene.Update(keyCondition, keyTrigger);
 		break;
@@ -213,11 +220,14 @@ void Game::RenderCurrentScene()
 {
 	switch (m_currentSceneID)
 	{
+	case SceneID::Title:		// タイトル
+		m_titleScene.Render(m_ghTileset);
+		break;
 	case SceneID::GamePlay:		// ゲームプレイ
-		m_gamePlayScene.Render();
+		m_gamePlayScene.Render(m_ghTileset);
 		break;
 	case SceneID::StageEdit:	// ステージエディット
-		m_stageEditScene.Render();
+		m_stageEditScene.Render(m_ghTileset);
 		break;
 	default:
 		break;
@@ -230,6 +240,9 @@ void Game::FinalizeCurrentScene()
 {
 	switch (m_currentSceneID)
 	{
+	case SceneID::Title:		// タイトル
+		m_titleScene.Finalize();
+		break;
 	case SceneID::GamePlay:		// ゲームプレイ
 		m_gamePlayScene.Finalize();
 		break;

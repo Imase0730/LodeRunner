@@ -36,9 +36,6 @@ private:
 	// ステージ
 	Stage m_stage;
 
-	// グラフィックハンドル
-	int m_ghTileset;
-
 	// SCOREの文字列
 	String m_scoreString;
 
@@ -67,13 +64,13 @@ public:
 	~GamePlayScene();
 
 	// 初期化処理
-	void Initialize(int ghTileset);
+	void Initialize();
 
 	// 更新処理
 	void Update(int keyCondition, int keyTrigger);
 
 	// 描画処理
-	void Render();
+	void Render(int ghTileset);
 
 	// 終了処理
 	void Finalize();

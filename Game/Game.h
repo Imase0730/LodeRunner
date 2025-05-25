@@ -16,6 +16,7 @@
 
 // ヘッダファイルの読み込み ===================================================
 
+#include "TitleScene/TitleScene.h"
 #include "GamePlayScene/GamePlayScene.h"
 #include "StageEditScene/StageEditScene.h"
 
@@ -39,6 +40,7 @@ public:
 	enum class SceneID
 	{
 		None = -1,
+		Title,		// タイトル
 		GamePlay,	// ゲームプレイ
 		StageEdit,	// ステージエディット
 	};
@@ -61,7 +63,8 @@ private:
 	SceneID m_requestedSceneID;	// 変更要求のシーンID
 
 	// シーンオブジェクト
-	GamePlayScene m_gamePlayScene;	// ゲームプレイシーン
+	TitleScene m_titleScene;			// タイトルシーン
+	GamePlayScene m_gamePlayScene;		// ゲームプレイシーン
 	StageEditScene m_stageEditScene;	// ステージエディットシーン
 
 	// 描画先のグラフィックハンドル
@@ -97,12 +100,13 @@ public:
 	// 終了処理
 	void Finalize();
 
-private:
-
 	// シーン変更の要求
 	void RequestSceneChange(SceneID nextSceneID);
 
-public:
+	// アイリスワイプを取得する関数
+	IrisWipe* GetIrisWipe() { return &m_irisWipe; }
+
+private:
 
 	// 開始シーンの設定
 	void SetStartScene(SceneID startSceneID);
@@ -121,8 +125,5 @@ public:
 
 	// 現在のシーンの終了処理
 	void FinalizeCurrentScene();
-
-	// アイリスワイプを取得する関数
-	IrisWipe* GetIrisWipe() { return &m_irisWipe; }
 
 };

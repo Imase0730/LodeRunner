@@ -78,5 +78,8 @@ public:
 	// 指定レベルをロードする関数
 	bool LoadLevel(int level);
 
+	// レベルを取得する関数
+	int GetLevel() const { return m_level; }
+
 };
 
