@@ -20,7 +20,7 @@ public:
 	// コンストラクタ
 	Blink(int intervalFrame);
 
-	// 更新関数
+	// 更新処理
 	void Update();
 
 	// 点滅の割合を取得する関数

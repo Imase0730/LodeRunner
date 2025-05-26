@@ -11,6 +11,7 @@
 
 // クラスの前方宣言
 class Game;
+class IrisWipe;
 
 // ゲームプレイシーン
 class GamePlayScene

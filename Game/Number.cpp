@@ -21,7 +21,7 @@ Number::Number(POINT position, int digit)
 	m_max -= 1;
 }
 
-// •`‰æŠÖ”
+// •`‰æˆ—
 void Number::Render(int ghTileset) const
 {
 	int number = m_number;

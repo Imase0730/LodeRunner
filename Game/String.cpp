@@ -12,7 +12,7 @@ String::String(POINT position, const char* string)
 {
 }
 
-// •`‰æŠÖ”
+// •`‰æˆ—
 void String::Render(int ghTileset) const
 {
 	// ”š‚Ì•\¦

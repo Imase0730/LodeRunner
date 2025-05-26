@@ -18,7 +18,6 @@ StageEditScene::StageEditScene(Game* pGame)
 	, m_loadString{ POINT{ Tile::TILE_WIDTH * 15 , Game::INFOMATION_Y }, "LOAD" }
 	, m_levelString{ POINT{ Tile::TILE_WIDTH * 20 , Game::INFOMATION_Y }, "LEVEL" }
 	, m_levelNumber{ POINT{ Tile::TILE_WIDTH * 25, Game::INFOMATION_Y }, 3 }
-	, m_irisWipe{ nullptr }
 {
 
 }
@@ -42,11 +41,6 @@ void StageEditScene::Initialize()
 
 	// ステージのロード
 	m_stage.LoadLevel(m_level);
-
-	// 画面をオープンする
-	m_irisWipe = m_pGame->GetIrisWipe();
-	m_irisWipe->Initialize(IrisWipe::Mode::Open);
-	m_irisWipe->Start();
 }
 
 // 更新処理

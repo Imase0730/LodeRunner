@@ -12,9 +12,9 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	, m_scoreString{ POINT{ Tile::TILE_WIDTH * 0 , Game::INFOMATION_Y }, "SCORE" }
 	, m_menString{ POINT{ Tile::TILE_WIDTH * 13 , Game::INFOMATION_Y }, "MEN" }
 	, m_levelString{ POINT{ Tile::TILE_WIDTH * 20 , Game::INFOMATION_Y }, "LEVEL" }
-	, m_scoreNumber{ POINT{ 5 * Tile::TILE_WIDTH, Screen::GAME_HEIGHT - Tile::TILE_HEIGHT }, 7 }
-	, m_menNumber{ POINT{ 16 * Tile::TILE_WIDTH, Screen::GAME_HEIGHT - Tile::TILE_HEIGHT }, 3 }
-	, m_levelNumber{ POINT{ 25 * Tile::TILE_WIDTH, Screen::GAME_HEIGHT - Tile::TILE_HEIGHT }, 3 }
+	, m_scoreNumber{ POINT{ 5 * Tile::TILE_WIDTH, Game::INFOMATION_Y }, 7 }
+	, m_menNumber{ POINT{ 16 * Tile::TILE_WIDTH, Game::INFOMATION_Y }, 3 }
+	, m_levelNumber{ POINT{ 25 * Tile::TILE_WIDTH, Game::INFOMATION_Y }, 3 }
 {
 }
 
@@ -28,11 +28,16 @@ void GamePlayScene::Initialize()
 {
 	// ステージのロード
 	m_stage.LoadLevel(1);
+
+	// アイリスワイプオープン準備
+	m_pGame->GetIrisWipe()->Initialize(IrisWipe::Mode::Open);
+	m_pGame->GetIrisWipe()->Start();
 }
 
 // 更新処理
 void GamePlayScene::Update(int keyCondition, int keyTrigger)
 {
+	
 }
 
 // 描画処理

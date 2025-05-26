@@ -28,7 +28,7 @@ public:
 	// コンストラクタ
 	Number(POINT position, int digit);
 
-	// 描画関数
+	// 描画処理
 	void Render(int ghTileset) const;
 
 	// 数字の設定関数

@@ -11,7 +11,7 @@ Blink::Blink(int intervalFrame)
 {
 }
 
-// 更新関数
+// 更新処理
 void Blink::Update()
 {
 	if (++m_timer > m_intervalFrame)

@@ -22,7 +22,7 @@ public:
 	// コンストラクタ
 	String(POINT position, const char* string);
 
-	// 描画関数
+	// 描画処理
 	void Render(int ghTileset) const;
 
 };

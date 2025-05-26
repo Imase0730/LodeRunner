@@ -12,7 +12,6 @@
 
 // クラスの前方宣言
 class Game;
-class IrisWipe;
 
 // ゲームプレイシーン
 class StageEditScene
@@ -75,9 +74,6 @@ private:
 
 	// レベル表示
 	Number m_levelNumber;
-
-	// アイリスワイプへのポインタ
-	IrisWipe* m_irisWipe;
 
 // メンバ関数の宣言 -------------------------------------------------
 public:
