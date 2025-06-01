@@ -80,7 +80,7 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
 
 
     // フレームタイマーの生成
-    GameLib::FrameTimer frameTimer{ 60 };    // 60FPSを指定
+    GameLib::FrameTimer frameTimer{ 50 };    // 60FPSを指定
 
 
     // ゲームオブジェクトの生成

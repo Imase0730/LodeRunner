@@ -36,17 +36,32 @@ public:
 	static constexpr int STAGE_SCREEN_WIDTH = STAGE_WIDTH * Tile::TILE_WIDTH;
 	static constexpr int STAGE_SCREEN_HEIGHT = STAGE_HEIGHT * Tile::TILE_HEIGHT;
 
+	// ステージ上に置ける敵の最大数
+	static constexpr int ENEMY_MAX = 5;
+
 	// データメンバの宣言 -----------------------------------------------
 private:
 
-	// マップデータ
-	Tile m_tileMap[STAGE_HEIGHT][STAGE_WIDTH];
+	// 読み込んだステージデータ
+	Tile::TileType m_loadData[STAGE_HEIGHT][STAGE_WIDTH];
+
+	// ステージデータ
+	Tile m_stageData[STAGE_HEIGHT][STAGE_WIDTH];
 
 	// モード
 	Mode m_mode;
 
 	// 表示中のレベル
 	int m_level;
+
+	// ステージ上の敵の数
+	int m_enemyCount;
+
+	// プレイヤーの初期位置
+	POINT m_playerPosition;
+
+	// 敵の初期位置
+	POINT m_enemyPosition[ENEMY_MAX];
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
@@ -58,7 +73,7 @@ public:
 	~Stage();
 
 	// 初期化
-	void Initialize();
+	void Initialize(Mode mode);
 
 	// 更新処理
 	void Update();
@@ -67,19 +82,25 @@ public:
 	void Render(int ghTileset) const;
 
 	// 指定場所のタイルを設定する関数
-	void SetTileType(int x, int y, Tile::TileType type) { m_tileMap[y][x].SetTileType(type); }
+	void SetTileType(int x, int y, Tile::TileType type) { m_stageData[y][x].SetTileType(type); }
 
 	// 指定場所のタイルを取得する関数
-	Tile::TileType GetTileType(int x, int y) { return m_tileMap[y][x].GetTileType(); }
+	Tile::TileType GetTileType(int x, int y);
 
 	// 指定レベルをセーブする関数
 	bool SaveLevel(int level);
 
 	// 指定レベルをロードする関数
-	bool LoadLevel(int level);
+	bool LoadLevel(int level, Mode mode);
 
 	// レベルを取得する関数
 	int GetLevel() const { return m_level; }
+
+	// ハシゴを出現する関数
+	void AppearLadder();
+
+	// プレイヤーの位置を取得する関数
+	POINT GetPlayerPosition() const { return m_playerPosition; }
 
 };
 

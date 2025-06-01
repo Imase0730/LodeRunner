@@ -12,16 +12,16 @@ public:
 	// タイルタイプ
 	enum class TileType
 	{
-		None,
-		Blick,			// レンガ
-		Block,			// 壊せないブロック
-		Ladder,			// ハシゴ
-		Bar,			// バー
-		Trap,			// トラップ
-		HiddenLadder,	// 隠れハシゴ
-		Gold,			// 金塊
-		Enemy,			// 敵
-		Player,			// プレイヤー
+		Empty,				// なし
+		Blick,				// レンガ
+		Stone,				// 壊せないブロック
+		Ladder,				// ハシゴ
+		Rope,				// ロープ
+		Trap,				// トラップ
+		InvisibleLadder,	// 隠れハシゴ
+		Gold,				// 金塊
+		Enemy,				// 敵
+		Player,				// プレイヤー
 
 		TileTypeMax,
 	};
@@ -36,6 +36,10 @@ public:
 	// タイルのサイズ
 	static constexpr int TILE_WIDTH = 10;
 	static constexpr int TILE_HEIGHT = 11;
+
+	// タイルの中心までの距離
+	static constexpr int CENTER_OFFSET_X = TILE_WIDTH / 2;
+	static constexpr int CENTER_OFFSET_Y = TILE_HEIGHT / 2;
 
 	// データメンバの宣言 -----------------------------------------------
 private:
@@ -66,6 +70,9 @@ public:
 
 	// タイルタイプの取得関数
 	TileType GetTileType() const { return m_tileType; }
+
+	// タイルが移動可能か調べる関数
+	static bool IsMovableTile(TileType tileType);
 
 };
 

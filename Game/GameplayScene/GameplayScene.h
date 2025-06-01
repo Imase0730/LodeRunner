@@ -8,6 +8,7 @@
 #include "Game/Stage.h"
 #include "Game/String.h"
 #include "Game/Number.h"
+#include "Player.h"
 
 // クラスの前方宣言
 class Game;
@@ -22,17 +23,20 @@ public:
 // クラス定数の宣言 -------------------------------------------------
 private:
 	
-	// キーリピートの間隔
-	static constexpr int KEY_REPEAT_INTEVAL = 10;
+	// プレイヤーの数
+	static constexpr int MEN_COUNT = 5;
 
-	// 点滅の間隔
-	static constexpr int BLINK_INTEVAL = 60;
+	// 更新間隔（２フレームに１回更新）
+	static constexpr int UPDATE_INTERVAL = 2;
 
 // データメンバの宣言 -----------------------------------------------
 private:
 
 	// このシーンを含むゲームオブジェクトへのポインタ
 	Game* m_pGame;
+
+	// 更新カウンター
+	int m_updateCounter;
 
 	// ステージ
 	Stage m_stage;
@@ -54,6 +58,18 @@ private:
 
 	// レベル表示
 	Number m_levelNumber;
+
+	// スコア
+	int m_score;
+
+	// 残機数
+	int m_men;
+
+	// レベル
+	int m_level;
+
+	// プレイヤー
+	Player m_player;
 
 // メンバ関数の宣言 -------------------------------------------------
 public:

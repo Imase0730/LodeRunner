@@ -8,24 +8,72 @@
 #include <fstream>
 #include <sstream>
 
+// コンストラクタ
 Stage::Stage(Mode mode)
-	: m_mode{ mode }
+	: m_loadData{}
+	, m_stageData{}
+	, m_mode{ mode }
 	, m_level{ 0 }
+	, m_enemyCount{ 0 }
+	, m_playerPosition{ 0, 0 }
+	, m_enemyPosition{}
 {
 }
 
+// デストラクタ
 Stage::~Stage()
 {
 }
 
-void Stage::Initialize()
+// 初期化処理
+void Stage::Initialize(Mode mode)
 {
+	// モードを設定
+	m_mode = mode;
+
+	// 敵の数を初期化
+	m_enemyCount = 0;
+
+	// ロードしたデータからステージデータを作成
+	for (int i = 0; i < STAGE_HEIGHT; i++)
+	{
+		for (int j = 0; j < STAGE_WIDTH; j++)
+		{
+			Tile::TileType type = m_loadData[i][j];
+
+			// プレイヤーなら位置を取得
+			if (type == Tile::TileType::Player) m_playerPosition = POINT{ j, i };
+
+			// 敵なら位置を取得
+			if ((m_enemyCount < ENEMY_MAX - 1) && (type == Tile::TileType::Enemy))
+			{
+				m_enemyPosition[m_enemyCount] = POINT{ j, i };
+				m_enemyCount++;
+			}
+
+			// ステージデータを作成
+			if ( (m_mode == Mode::GamePlay)				// ゲームプレイの場合は下記オブジェクトは別途表示
+			  && ( (type == Tile::TileType::Player)		// プレイヤー
+				|| (type == Tile::TileType::Enemy)		// 敵
+				 )
+			   )
+			{
+				m_stageData[i][j].SetTileType(Tile::TileType::Empty);
+			}
+			else
+			{
+				m_stageData[i][j].SetTileType(type);
+			}
+		}
+	}
 }
 
+// 更新処理
 void Stage::Update()
 {
 }
 
+// 描画処理
 void Stage::Render(int ghTileset) const
 {
 	// ステージの描画
@@ -33,7 +81,12 @@ void Stage::Render(int ghTileset) const
 	{
 		for (int j = 0; j < STAGE_WIDTH; j++)
 		{
-			m_tileMap[i][j].Render(j * Tile::TILE_WIDTH, i * Tile::TILE_HEIGHT, ghTileset);
+			// ゲームプレイでは隠れハシゴは表示しない
+			if ((m_mode != Mode::GamePlay) || (m_stageData[i][j].GetTileType() != Tile::TileType::InvisibleLadder))
+			{
+				// タイルを描画
+				m_stageData[i][j].Render(j * Tile::TILE_WIDTH, i * Tile::TILE_HEIGHT, ghTileset);
+			}
 		}
 	}
 	// ステージの下部の描画
@@ -42,6 +95,19 @@ void Stage::Render(int ghTileset) const
 		DrawRectGraph(j * Tile::TILE_WIDTH, STAGE_HEIGHT * Tile::TILE_HEIGHT
 			, Tile::TILE_WIDTH * 2, Tile::TILE_HEIGHT * 4, Tile::TILE_WIDTH, 4, ghTileset, FALSE);
 	}
+}
+
+// 指定場所のタイルを取得する関数
+Tile::TileType Stage::GetTileType(int x, int y)
+{
+	if ( (x < 0) || (x >= Stage::STAGE_WIDTH)
+	  || (y < 0) || (y >= Stage::STAGE_HEIGHT)
+	   )
+	{
+		// ステージ外の場合、石を返す
+		return Tile::TileType::Stone;
+	}
+	return m_stageData[y][x].GetTileType();
 }
 
 // 指定レベルをセーブする関数
@@ -62,7 +128,7 @@ bool Stage::SaveLevel(int level)
 	{
 		for (int j = 0; j < STAGE_WIDTH; j++)
 		{
-			Tile::TileType tileType = m_tileMap[i][j].GetTileType();
+			Tile::TileType tileType = m_stageData[i][j].GetTileType();
 			ofs << static_cast<int>(tileType) << ",";
 		}
 		ofs << std::endl;
@@ -75,7 +141,7 @@ bool Stage::SaveLevel(int level)
 }
 
 // 指定レベルをロードする関数
-bool Stage::LoadLevel(int level)
+bool Stage::LoadLevel(int level, Mode mode)
 {
 	char fileName[MAX_PATH];
 
@@ -98,7 +164,7 @@ bool Stage::LoadLevel(int level)
 		for (int j = 0; j < STAGE_WIDTH; j++)
 		{
 			std::getline(ss, item, ',');
-			m_tileMap[i][j].SetTileType(static_cast<Tile::TileType>(std::stoi(item)));
+			m_loadData[i][j] = static_cast<Tile::TileType>(std::stoi(item));
 		}
 	}
 
@@ -108,6 +174,24 @@ bool Stage::LoadLevel(int level)
 	// レベルを設定
 	m_level = level;
 
+	// ステージデータの初期化
+	Initialize(mode);
+
 	return false;
+}
+
+// ハシゴを出現する関数
+void Stage::AppearLadder()
+{
+	for (int i = 0; i < STAGE_HEIGHT; i++)
+	{
+		for (int j = 0; j < STAGE_WIDTH; j++)
+		{
+			if (m_stageData[i][j].GetTileType() == Tile::TileType::InvisibleLadder)
+			{
+				m_stageData[i][j].SetTileType(Tile::TileType::Ladder);
+			}
+		}
+	}
 }
 

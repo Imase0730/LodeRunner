@@ -40,7 +40,7 @@ void StageEditScene::Initialize()
 	m_levelNumber.SetNumber(m_level);
 
 	// ステージのロード
-	m_stage.LoadLevel(m_level);
+	m_stage.LoadLevel(m_level, Stage::Mode::StageEdit);
 }
 
 // 更新処理
@@ -182,6 +182,7 @@ int StageEditScene::KeyRepeat(int keyCondition)
 	return keyRepeat;
 }
 
+// タイル選択
 void StageEditScene::SelectTile(int keyCondition, int keyRepeat)
 {
 	// Cキーと左右キーで選択タイルの変更
@@ -224,7 +225,7 @@ void StageEditScene::SelectTile(int keyCondition, int keyRepeat)
 	// Sキーでカーソル位置のタイルを消す
 	if (keyCondition & PAD_INPUT_2)
 	{
-		m_stage.SetTileType(m_cursorEdit.x, m_cursorEdit.y, Tile::TileType::None);
+		m_stage.SetTileType(m_cursorEdit.x, m_cursorEdit.y, Tile::TileType::Empty);
 	}
 }
 
@@ -256,7 +257,10 @@ void StageEditScene::Load(int keyTrigger, int keyRepeat)
 	// Zキーでロード
 	if (keyTrigger & PAD_INPUT_1)
 	{
-		if (m_level != m_stage.GetLevel()) m_stage.LoadLevel(m_level);
+		if (m_level != m_stage.GetLevel())
+		{
+			m_stage.LoadLevel(m_level, Stage::Mode::StageEdit);
+		}
 	}
 	// 上キーまたはWキーでレベル加算
 	if ((keyRepeat & PAD_INPUT_UP) || (keyRepeat & PAD_INPUT_8))
