@@ -76,24 +76,42 @@ void Stage::Update()
 // 描画処理
 void Stage::Render(int ghTileset) const
 {
+	// 罠をレンガに変更するためのタイル
+	Tile trapTile;
+	trapTile.SetTileType(Tile::TileType::Blick);
+
 	// ステージの描画
 	for (int i = 0; i < STAGE_HEIGHT; i++)
 	{
 		for (int j = 0; j < STAGE_WIDTH; j++)
 		{
-			// ゲームプレイでは隠れハシゴは表示しない
-			if ((m_mode != Mode::GamePlay) || (m_stageData[i][j].GetTileType() != Tile::TileType::InvisibleLadder))
+			// 描画位置
+			int x = j * Tile::TILE_PIXEL_WIDTH;
+			int y = i * Tile::TILE_PIXEL_HEIGHT;
+
+			// ゲームプレイなら
+			if (m_mode == Mode::GamePlay)
 			{
-				// タイルを描画
-				m_stageData[i][j].Render(j * Tile::TILE_WIDTH, i * Tile::TILE_HEIGHT, ghTileset);
+				// 隠れハシゴは表示しない
+				if (m_stageData[i][j].GetTileType() == Tile::TileType::InvisibleLadder) continue;
+
+				// 罠はレンガで表示する
+				if (m_stageData[i][j].GetTileType() == Tile::TileType::Trap)
+				{
+					trapTile.Render(x, y, ghTileset);
+					continue;
+				}
 			}
+			// タイルを描画
+			m_stageData[i][j].Render(x, y, ghTileset);
 		}
 	}
+
 	// ステージの下部の描画
 	for (int j = 0; j < STAGE_WIDTH; j++)
 	{
-		DrawRectGraph(j * Tile::TILE_WIDTH, STAGE_HEIGHT * Tile::TILE_HEIGHT
-			, Tile::TILE_WIDTH * 2, Tile::TILE_HEIGHT * 4, Tile::TILE_WIDTH, 4, ghTileset, FALSE);
+		DrawRectGraph(j * Tile::TILE_PIXEL_WIDTH, STAGE_HEIGHT * Tile::TILE_PIXEL_HEIGHT
+			, Tile::TILE_PIXEL_WIDTH * 2, Tile::TILE_PIXEL_HEIGHT * 4, Tile::TILE_PIXEL_WIDTH, 4, ghTileset, FALSE);
 	}
 }
 

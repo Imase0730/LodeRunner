@@ -32,8 +32,8 @@ void Number::Render(int ghTileset) const
 	// ”š‚Ì•\¦
 	for (int i = 0; i < m_digit; i++)
 	{
-		DrawRectGraph( m_position.x + ((m_digit - 1) - i) * Tile::TILE_WIDTH, m_position.y
-					 , (number % 10) * Tile::TILE_WIDTH, 0, Tile::TILE_WIDTH, Tile::TILE_HEIGHT
+		DrawRectGraph( m_position.x + ((m_digit - 1) - i) * Tile::TILE_PIXEL_WIDTH, m_position.y
+					 , (number % 10) * Tile::TILE_PIXEL_WIDTH, 0, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT
 					 , ghTileset, TRUE);
 		number /= 10;
 	}

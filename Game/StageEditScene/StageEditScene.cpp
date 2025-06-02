@@ -14,10 +14,10 @@ StageEditScene::StageEditScene(Game* pGame)
 	, m_blink{ BLINK_INTEVAL }
 	, m_level{ 1 }
 	, m_mode{ Mode::SelectTile }
-	, m_saveString{ POINT{ Tile::TILE_WIDTH * 10 , Game::INFOMATION_Y }, "SAVE" }
-	, m_loadString{ POINT{ Tile::TILE_WIDTH * 15 , Game::INFOMATION_Y }, "LOAD" }
-	, m_levelString{ POINT{ Tile::TILE_WIDTH * 20 , Game::INFOMATION_Y }, "LEVEL" }
-	, m_levelNumber{ POINT{ Tile::TILE_WIDTH * 25, Game::INFOMATION_Y }, 3 }
+	, m_saveString{ POINT{ Tile::TILE_PIXEL_WIDTH * 10 , Game::INFOMATION_Y }, "SAVE" }
+	, m_loadString{ POINT{ Tile::TILE_PIXEL_WIDTH * 15 , Game::INFOMATION_Y }, "LOAD" }
+	, m_levelString{ POINT{ Tile::TILE_PIXEL_WIDTH * 20 , Game::INFOMATION_Y }, "LEVEL" }
+	, m_levelNumber{ POINT{ Tile::TILE_PIXEL_WIDTH * 25, Game::INFOMATION_Y }, 3 }
 {
 
 }
@@ -103,8 +103,8 @@ void StageEditScene::Render(int ghTileset)
 
 	// 選択用タイルの描画
 	DrawRectGraph(0, Game::INFOMATION_Y
-		, Tile::TILE_WIDTH * 1, Tile::TILE_HEIGHT * 4
-		, Tile::TILE_WIDTH * 9, Tile::TILE_HEIGHT, ghTileset, TRUE);
+		, Tile::TILE_PIXEL_WIDTH * 1, Tile::TILE_PIXEL_HEIGHT * 4
+		, Tile::TILE_PIXEL_WIDTH * 9, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 
 	// 各文字列の描画
 	if (m_mode != Mode::Save) m_saveString.Render(ghTileset);			// SAVE
@@ -120,14 +120,14 @@ void StageEditScene::Render(int ghTileset)
 	{
 	case Mode::SelectTile:
 		// カーソルの描画（上部）
-		DrawRectGraph(m_cursorEdit.x * Tile::TILE_WIDTH, m_cursorEdit.y * Tile::TILE_HEIGHT
-			, Tile::TILE_WIDTH * 6, Tile::TILE_HEIGHT * 3
-			, Tile::TILE_WIDTH, Tile::TILE_HEIGHT, ghTileset, TRUE);
+		DrawRectGraph(m_cursorEdit.x * Tile::TILE_PIXEL_WIDTH, m_cursorEdit.y * Tile::TILE_PIXEL_HEIGHT
+			, Tile::TILE_PIXEL_WIDTH * 6, Tile::TILE_PIXEL_HEIGHT * 3
+			, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 
 		// カーソルの描画（下部）
-		DrawRectGraph(Tile::TILE_WIDTH * (static_cast<int>(m_selectTile) - 1), Game::INFOMATION_Y
-			, Tile::TILE_WIDTH * 6, Tile::TILE_HEIGHT * 3
-			, Tile::TILE_WIDTH, Tile::TILE_HEIGHT, ghTileset, TRUE);
+		DrawRectGraph(Tile::TILE_PIXEL_WIDTH * (static_cast<int>(m_selectTile) - 1), Game::INFOMATION_Y
+			, Tile::TILE_PIXEL_WIDTH * 6, Tile::TILE_PIXEL_HEIGHT * 3
+			, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 		break;
 	case Mode::Save:
 		m_saveString.Render(ghTileset);	// SAVE

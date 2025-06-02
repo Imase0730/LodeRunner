@@ -33,8 +33,8 @@ public:
 	static constexpr int STAGE_HEIGHT = 16;
 
 	// ステージサイズ
-	static constexpr int STAGE_SCREEN_WIDTH = STAGE_WIDTH * Tile::TILE_WIDTH;
-	static constexpr int STAGE_SCREEN_HEIGHT = STAGE_HEIGHT * Tile::TILE_HEIGHT;
+	static constexpr int STAGE_SCREEN_WIDTH = STAGE_WIDTH * Tile::TILE_PIXEL_WIDTH;
+	static constexpr int STAGE_SCREEN_HEIGHT = STAGE_HEIGHT * Tile::TILE_PIXEL_HEIGHT;
 
 	// ステージ上に置ける敵の最大数
 	static constexpr int ENEMY_MAX = 5;

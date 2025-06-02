@@ -73,12 +73,12 @@ void TitleScene::Render(int ghTileset)
 	if (m_mode == Mode::Game)
 	{
 		DrawRectGraph(GAME_POSITION.x - 18, GAME_POSITION.y + 1
-			, Tile::TILE_WIDTH * 9, Tile::TILE_HEIGHT * 4, Tile::TILE_WIDTH, Tile::TILE_HEIGHT, ghTileset, TRUE);
+			, Tile::TILE_PIXEL_WIDTH * 9, Tile::TILE_PIXEL_HEIGHT * 4, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 	}
 	else
 	{
 		DrawRectGraph(EDIT_POSITION.x - 18, EDIT_POSITION.y + 1
-			, Tile::TILE_WIDTH * 9, Tile::TILE_HEIGHT * 4, Tile::TILE_WIDTH, Tile::TILE_HEIGHT, ghTileset, TRUE);
+			, Tile::TILE_PIXEL_WIDTH * 9, Tile::TILE_PIXEL_HEIGHT * 4, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 	}
 
 	// ----- “_–Å‚ðŽ~‚ß‚é ----- //

@@ -83,8 +83,11 @@ private:
 	// アクティブならtrueを設定
 	bool m_isActive;
 
-	// 位置
-	POINT m_position;
+	// タイル上の位置
+	POINT m_tilePosition;
+
+	// タイル内の調整用の位置
+	POINT m_ajustPosition;
 
 	// 顔の向き
 	FaceDirection m_faceDirection;
@@ -102,7 +105,7 @@ public:
 	~Player();
 
 	// 初期化関数
-	void Initialize(POINT position);
+	void Initialize(POINT tilePosition, POINT ajustPosition);
 
 	// 更新処理
 	void Update(int keyCondition, int keyTrigger, Stage* pStage);
@@ -124,8 +127,14 @@ private:
 	// 位置を行に調整する関数
 	void AjustRow();
 
+	// 移動可能か調べる関数
+	bool IsMovable(Stage* pStage) const;
+
 	// 上に移動可能か調べる関数
 	bool IsMovableUp(Stage* pStage) const;
+
+	// 下に移動可能か調べる関数
+	bool IsMovableDown(Stage* pStage) const;
 
 	// 左に移動可能か調べる関数
 	bool IsMovableLeft(Stage* pStage) const;

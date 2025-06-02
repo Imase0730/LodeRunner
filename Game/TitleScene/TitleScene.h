@@ -29,13 +29,13 @@ public:
 private:
 	
 	// タイトルの位置
-	static constexpr POINT TITLE_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_WIDTH * 11) / 2, Tile::TILE_HEIGHT * 2 };
+	static constexpr POINT TITLE_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 11) / 2, Tile::TILE_PIXEL_HEIGHT * 2 };
 
 	// GAMEの位置
-	static constexpr POINT GAME_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_WIDTH * 4) / 2, Tile::TILE_HEIGHT * 7 };
+	static constexpr POINT GAME_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 4) / 2, Tile::TILE_PIXEL_HEIGHT * 7 };
 
 	// EDITの位置
-	static constexpr POINT EDIT_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_WIDTH * 4) / 2, Tile::TILE_HEIGHT * 10 };
+	static constexpr POINT EDIT_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 4) / 2, Tile::TILE_PIXEL_HEIGHT * 10 };
 
 	// 点滅の間隔
 	static constexpr int BLINK_INTEVAL = 60;
