@@ -34,11 +34,52 @@ public:
 		Climb01, Climb02,				// ハシゴを登って
 	};
 
+	// 掘っている向き
+	enum class DigDirection
+	{
+		NotDigging,	// 掘っていない
+		Right,		// 右
+		Left,		// 左
+	};
+
 	// クラス定数の宣言 -------------------------------------------------
 private:
 
-	// スプライト上の絵の位置
-	static constexpr POINT SPRITE_POSITION[] =
+	// 掘っている最中のプレイヤー横のレンガの破片の位置（左向き）
+	static constexpr POINT DIG_DEBRIS_LEFT_SPRITES[] =
+	{
+		{ 1, 9 }, { 1, 9 },
+		{ 2, 9 }, { 2, 9 },
+		{ 3, 9 }, { 3, 9 },
+		{ 4, 9 }, { 4, 9 },
+		{ -1, -1 }, { -1, -1 },
+		{ -1, -1 }, { -1, -1 },
+	};
+
+	// 掘っている最中のプレイヤー横のレンガの破片の位置（右向き）
+	static constexpr POINT DIG_DEBRIS_RIGHT_SPRITES[] =
+	{
+		{ 6, 9 }, { 6, 9 },
+		{ 7, 9 }, { 7, 9 },
+		{ 8, 9 }, { 8, 9 },
+		{ 9, 9 }, { 9, 9 },
+		{ -1, -1 }, { -1, -1 },
+		{ -1, -1 }, { -1, -1 },
+	};
+
+	// 掘っている最中のプレイヤー斜め下のレンガの位置
+	static constexpr POINT DIG_BRICK_SPRITES[] =
+	{
+		{ 0, 10 }, { 0, 10 },
+		{ 1, 10 }, { 1, 10 },
+		{ 2, 10 }, { 2, 10 },
+		{ 3, 10 }, { 3, 10 },
+		{ 4, 10 }, { 4, 10 },
+		{ 5, 10 }, { 5, 10 },
+	};
+
+	// プレイヤーの位置
+	static constexpr POINT PLAYER_SPRITES[] =
 	{
 		// 走り（左向き）
 		{ 0, 5 },
@@ -94,6 +135,9 @@ private:
 
 	// アニメーションステート
 	AnimationState m_animationState;
+
+	// 掘っている方向
+	DigDirection m_digDirection;
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:

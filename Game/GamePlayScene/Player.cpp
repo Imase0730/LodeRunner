@@ -12,6 +12,7 @@ Player::Player()
 	, m_ajustPosition{ 0, 0 }
 	, m_faceDirection{ FaceDirection::Right }
 	, m_animationState{ AnimationState::Run01_R }
+	, m_digDirection{ DigDirection::NotDigging }
 {
 }
 
@@ -107,6 +108,41 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 		}
 	}
 
+	// Zキーが押された
+	if (keyTrigger & PAD_INPUT_1)
+	{
+		// 左方向に掘る
+		m_digDirection = DigDirection::Left;
+
+		// 一番下の行なら掘れない
+		if (m_tilePosition.y == Stage::STAGE_HEIGHT - 1);
+
+		// 一番右の列なら掘れない
+		if (m_tilePosition.x == 0);
+
+		// 左下がブロックでないと掘れない
+
+		// 左が空ではないと掘れない
+
+
+
+
+
+
+
+
+
+
+	}
+
+	// Cキーが押された
+	if (keyTrigger & PAD_INPUT_3)
+	{
+		// 右方向に掘る
+		m_digDirection = DigDirection::Right;
+
+	}
+
 	// 左キーが押された
 	if (keyCondition & PAD_INPUT_LEFT)
 	{
@@ -179,7 +215,7 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 // 描画処理
 void Player::Render(int ghTileset) const
 {
-	POINT pos = SPRITE_POSITION[static_cast<int>(m_animationState)];
+	POINT pos = PLAYER_SPRITES[static_cast<int>(m_animationState)];
 	DrawRectGraph( m_tilePosition.x * Tile::TILE_PIXEL_WIDTH + (m_ajustPosition.x - Tile::TILE_CENTER_X) * 2
 				 , m_tilePosition.y * Tile::TILE_PIXEL_HEIGHT + (m_ajustPosition.y - Tile::TILE_CENTER_Y) * 2
 				 , Tile::TILE_PIXEL_WIDTH * pos.x, Tile::TILE_PIXEL_HEIGHT * pos.y

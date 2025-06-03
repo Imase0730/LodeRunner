@@ -76,13 +76,13 @@ void GamePlayScene::Render(int ghTileset)
 	// プレイヤーの描画
 	m_player.Render(ghTileset);
 
-	// スコアの表示
+	// 『SCORE』の文字の表示
 	m_scoreString.Render(ghTileset);
 
-	// 残機数の表示
+	// 『MEN』の文字の表示
 	m_menString.Render(ghTileset);
 
-	// レベルの表示
+	// 『LEVEL』の文字の表示
 	m_levelString.Render(ghTileset);
 
 	// スコアの表示
