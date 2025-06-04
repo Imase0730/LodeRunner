@@ -63,8 +63,12 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	if (++m_updateCounter < UPDATE_INTERVAL) return;
 	m_updateCounter = 0;
 
+	static int oldKey = 0;
+
 	// プレイヤーの更新
-	m_player.Update(keyCondition, keyTrigger, &m_stage);
+	m_player.Update(keyCondition, ~oldKey & keyCondition, &m_stage);
+
+	oldKey = keyCondition;
 }
 
 // 描画処理

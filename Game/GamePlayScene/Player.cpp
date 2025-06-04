@@ -11,8 +11,9 @@ Player::Player()
 	, m_tilePosition{ 0, 0 }
 	, m_ajustPosition{ 0, 0 }
 	, m_faceDirection{ FaceDirection::Right }
-	, m_animationState{ AnimationState::Run01_R }
+	, m_playerAnimationState{ PlayerAnimationState::Run01_R }
 	, m_digDirection{ DigDirection::NotDigging }
+	, m_digAnimationState{ Tile::DigAnimationState::NotDigging }
 {
 }
 
@@ -55,11 +56,11 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 		// 落下アニメーション
 		if (m_faceDirection == FaceDirection::Left)
 		{
-			m_animationState = AnimationState::Fall_L;
+			m_playerAnimationState = PlayerAnimationState::Fall_L;
 		}
 		else
 		{
-			m_animationState = AnimationState::Fall_R;
+			m_playerAnimationState = PlayerAnimationState::Fall_R;
 		}
 		return;
 	}
@@ -82,7 +83,7 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 			}
 
 			// ハシゴを登るアニメーション
-			SetAnimationState(AnimationState::Climb01, AnimationState::Climb02);
+			SetPlayerAnimationState(PlayerAnimationState::Climb01, PlayerAnimationState::Climb02);
 		}
 	}
 
@@ -104,35 +105,58 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 			}
 
 			// ハシゴを登るアニメーション
-			SetAnimationState(AnimationState::Climb01, AnimationState::Climb02);
+			SetPlayerAnimationState(PlayerAnimationState::Climb01, PlayerAnimationState::Climb02);
 		}
 	}
 
-	// Zキーが押された
-	if (keyTrigger & PAD_INPUT_1)
+	// Zキーが押されたまたは左向きに掘っている
+	if ((keyTrigger & PAD_INPUT_1) && (m_digDirection == DigDirection::NotDigging))
 	{
 		// 左方向に掘る
 		m_digDirection = DigDirection::Left;
+		// 掘りアニメーション設定
+		m_digAnimationState = Tile::DigAnimationState::Dig01;
+	}
 
-		// 一番下の行なら掘れない
-		if (m_tilePosition.y == Stage::STAGE_HEIGHT - 1);
+	// 左向きに掘っている最中
+	if (m_digDirection == DigDirection::Left)
+	{
+		// 左下が掘ることが可能か？
+		if (IsDiggableLeft(pStage))
+		{
+			// 列に合わせるようにX座標を調整する
+			AjustCloumn();
+			// 行に合わせるようにY座標を調整する
+			AjustRow();
 
-		// 一番右の列なら掘れない
-		if (m_tilePosition.x == 0);
+			// プレイヤーのアニメーションを設定
+			if (m_digAnimationState == Tile::DigAnimationState::Dig01) m_playerAnimationState = PlayerAnimationState::Dig_L;
+			if (m_digAnimationState == Tile::DigAnimationState::Dig06) m_playerAnimationState = PlayerAnimationState::Run01_L;
 
-		// 左下がブロックでないと掘れない
+			// 掘りアニメーションの更新
+			pStage->SetTileDigAnimationState(m_tilePosition.x - 1, m_tilePosition.y + 1, m_digAnimationState);
 
-		// 左が空ではないと掘れない
+			// 掘り終わった？
+			if (m_digAnimationState != Tile::DigAnimationState::Dig12)
+			{
+				// 次の掘りアニメーションへ
+				m_digAnimationState = static_cast<Tile::DigAnimationState>(static_cast<int>(m_digAnimationState) + 1);
+			}
+			else
+			{
+				// 掘ることは終了
+				m_digDirection = DigDirection::NotDigging;
+				m_digAnimationState = Tile::DigAnimationState::NotDigging;
+			}
 
-
-
-
-
-
-
-
-
-
+		}
+		else
+		{
+			// 掘る事をキャンセル
+			m_digDirection = DigDirection::NotDigging;
+			m_digAnimationState = Tile::DigAnimationState::NotDigging;
+			pStage->SetTileDigAnimationState(m_tilePosition.x - 1, m_tilePosition.y + 1, Tile::DigAnimationState::NotDigging);
+		}
 	}
 
 	// Cキーが押された
@@ -167,12 +191,12 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 			if (pStage->GetTileType(m_tilePosition.x, m_tilePosition.y) == Tile::TileType::Rope)
 			{
 				// ロープで移動するアニメーション
-				SetAnimationState(AnimationState::Rope01_L, AnimationState::Rope03_L);
+				SetPlayerAnimationState(PlayerAnimationState::Rope01_L, PlayerAnimationState::Rope03_L);
 			}
 			else
 			{
 				// 走るアニメーション
-				SetAnimationState(AnimationState::Run01_L, AnimationState::Run03_L);
+				SetPlayerAnimationState(PlayerAnimationState::Run01_L, PlayerAnimationState::Run03_L);
 			}
 		}
 	}
@@ -201,12 +225,12 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 			if (pStage->GetTileType(m_tilePosition.x, m_tilePosition.y) == Tile::TileType::Rope)
 			{
 				// ロープで移動するアニメーション
-				SetAnimationState(AnimationState::Rope01_R, AnimationState::Rope03_R);
+				SetPlayerAnimationState(PlayerAnimationState::Rope01_R, PlayerAnimationState::Rope03_R);
 			}
 			else
 			{
 				// 走るアニメーション
-				SetAnimationState(AnimationState::Run01_R, AnimationState::Run03_R);
+				SetPlayerAnimationState(PlayerAnimationState::Run01_R, PlayerAnimationState::Run03_R);
 			}
 		}
 	}
@@ -215,11 +239,43 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 // 描画処理
 void Player::Render(int ghTileset) const
 {
-	POINT pos = PLAYER_SPRITES[static_cast<int>(m_animationState)];
+	// プレイヤーの描画
+	POINT pos = PLAYER_SPRITES[static_cast<int>(m_playerAnimationState)];
 	DrawRectGraph( m_tilePosition.x * Tile::TILE_PIXEL_WIDTH + (m_ajustPosition.x - Tile::TILE_CENTER_X) * 2
 				 , m_tilePosition.y * Tile::TILE_PIXEL_HEIGHT + (m_ajustPosition.y - Tile::TILE_CENTER_Y) * 2
 				 , Tile::TILE_PIXEL_WIDTH * pos.x, Tile::TILE_PIXEL_HEIGHT * pos.y
 				 , Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+
+	// 掘っている時の破片の描画
+	if (m_digAnimationState != Tile::DigAnimationState::NotDigging)
+	{
+		const POINT* SPRITES = nullptr;
+		int x = 0;
+
+		// 掘っている向きに応じて絵を変える
+		if (m_digDirection == DigDirection::Left)
+		{
+			x = -1;
+			SPRITES = DIG_DEBRIS_LEFT_SPRITES;
+		}
+		else
+		{
+			x = 1;
+			SPRITES = DIG_DEBRIS_RIGHT_SPRITES;
+		}
+
+		POINT pos = SPRITES[static_cast<int>(m_digAnimationState)];
+		// 表示する破片があるなら
+		if (pos.x >= 0)
+		{
+			// 掘っている時の破片の描画
+			DrawRectGraph((m_tilePosition.x + x) * Tile::TILE_PIXEL_WIDTH, m_tilePosition.y * Tile::TILE_PIXEL_HEIGHT
+				, Tile::TILE_PIXEL_WIDTH * pos.x, Tile::TILE_PIXEL_HEIGHT * pos.y
+				, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+		}
+	}
+
+
 }
 
 // 位置を列に調整する関数
@@ -318,6 +374,25 @@ bool Player::IsMovableDown(Stage* pStage) const
 	return false;
 }
 
+// 左に掘れるか調べる関数
+bool Player::IsDiggableLeft(Stage* pStage) const
+{
+	// 一番下の行なら掘れない
+	if (m_tilePosition.y == Stage::STAGE_HEIGHT - 1) return false;
+
+	// 一番右の列なら掘れない
+	if (m_tilePosition.x == 0) return false;
+
+	// 左が空白か隠しハシゴでない
+	Tile::TileType tileType = pStage->GetTileType(m_tilePosition.x - 1, m_tilePosition.y);
+	if ((tileType != Tile::TileType::Empty) && (tileType != Tile::TileType::InvisibleLadder)) return false;
+
+	// 左下がブロックでない
+	if (pStage->GetTileType(m_tilePosition.x - 1, m_tilePosition.y + 1) != Tile::TileType::Blick) return false;
+
+	return true;
+}
+
 // 左に移動可能か調べる関数
 bool Player::IsMovableLeft(Stage* pStage) const
 {
@@ -344,12 +419,12 @@ bool Player::IsMovableRight(Stage* pStage) const
 	return Tile::IsMovableTileULR(pStage->GetTileType(m_tilePosition.x + 1, m_tilePosition.y));
 }
 
-// アニメーションステートの設定
-void Player::SetAnimationState(AnimationState beginAnimState, AnimationState endAnimState)
+// プレイヤーアニメーションステートの設定
+void Player::SetPlayerAnimationState(PlayerAnimationState beginAnimState, PlayerAnimationState endAnimState)
 {
 	int begin = static_cast<int>(beginAnimState);
 	int end = static_cast<int>(endAnimState);
-	int animState = static_cast<int>(m_animationState);
+	int animState = static_cast<int>(m_playerAnimationState);
 
 	// 次のアニメーションへ最後まで終わったら始めに戻る
 	animState++;
@@ -364,5 +439,6 @@ void Player::SetAnimationState(AnimationState beginAnimState, AnimationState end
 		animState = begin;
 	}
 
-	m_animationState = static_cast<AnimationState>(animState);
+	m_playerAnimationState = static_cast<PlayerAnimationState>(animState);
 }
+

@@ -10,6 +10,7 @@
 // コンストラクタ
 Tile::Tile()
 	: m_tileType{ TileType::Empty }
+	, m_digAnimationState{ DigAnimationState::NotDigging }
 {
 }
 
@@ -34,10 +35,24 @@ void Tile::Render(int x, int y, int ghTileset) const
 	// 空の場合は表示しない
 	if (m_tileType == TileType::Empty) return;
 
-	// タイルの描画
-	DrawRectGraph(x, y
-		, TILE_PIXEL_WIDTH * static_cast<int>(m_tileType), TILE_PIXEL_HEIGHT * 4
-		, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+	if (m_digAnimationState == DigAnimationState::NotDigging)
+	{
+		// 掘っているブロックの描画
+		POINT pos = TILE_SPRITES[static_cast<int>(m_tileType)];
+		// タイルの描画
+		DrawRectGraph(x, y
+			, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
+			, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+	}
+	else
+	{
+		// 掘っているブロックの描画
+		POINT pos = DIG_BRICK_SPRITES[static_cast<int>(m_digAnimationState)];
+		// タイルの描画
+		DrawRectGraph(x, y
+			, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
+			, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+	}
 }
 
 // タイルが移動可能か調べる関数（上左右）

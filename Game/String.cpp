@@ -16,7 +16,7 @@ String::String(POINT position, const char* string)
 void String::Render(int ghTileset) const
 {
 	// ”š‚Ì•\¦
-	for (size_t i = 0; i < m_string.length(); i++)
+	for (int i = 0; i < m_string.length(); i++)
 	{
 		if ((m_string[i] >= 'A') && (m_string[i] <= 'Z'))
 		{

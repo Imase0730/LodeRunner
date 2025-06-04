@@ -19,7 +19,7 @@ public:
 	};
 
 	// アニメーションインデックス
-	enum class AnimationState
+	enum class PlayerAnimationState
 	{
 		Run01_L, Run02_L, Run03_L,		// 走り（左向き）
 		Rope01_L, Rope02_L, Rope03_L,	// ロープで移動（左向き）
@@ -45,40 +45,7 @@ public:
 	// クラス定数の宣言 -------------------------------------------------
 private:
 
-	// 掘っている最中のプレイヤー横のレンガの破片の位置（左向き）
-	static constexpr POINT DIG_DEBRIS_LEFT_SPRITES[] =
-	{
-		{ 1, 9 }, { 1, 9 },
-		{ 2, 9 }, { 2, 9 },
-		{ 3, 9 }, { 3, 9 },
-		{ 4, 9 }, { 4, 9 },
-		{ -1, -1 }, { -1, -1 },
-		{ -1, -1 }, { -1, -1 },
-	};
-
-	// 掘っている最中のプレイヤー横のレンガの破片の位置（右向き）
-	static constexpr POINT DIG_DEBRIS_RIGHT_SPRITES[] =
-	{
-		{ 6, 9 }, { 6, 9 },
-		{ 7, 9 }, { 7, 9 },
-		{ 8, 9 }, { 8, 9 },
-		{ 9, 9 }, { 9, 9 },
-		{ -1, -1 }, { -1, -1 },
-		{ -1, -1 }, { -1, -1 },
-	};
-
-	// 掘っている最中のプレイヤー斜め下のレンガの位置
-	static constexpr POINT DIG_BRICK_SPRITES[] =
-	{
-		{ 0, 10 }, { 0, 10 },
-		{ 1, 10 }, { 1, 10 },
-		{ 2, 10 }, { 2, 10 },
-		{ 3, 10 }, { 3, 10 },
-		{ 4, 10 }, { 4, 10 },
-		{ 5, 10 }, { 5, 10 },
-	};
-
-	// プレイヤーの位置
+	// プレイヤーの絵の位置
 	static constexpr POINT PLAYER_SPRITES[] =
 	{
 		// 走り（左向き）
@@ -118,6 +85,28 @@ private:
 		{ 7, 5 },
 	};
 
+	// 掘っている最中のレンガの破片の絵の位置（左向き）
+	static constexpr POINT DIG_DEBRIS_LEFT_SPRITES[] =
+	{
+		{ 1, 9 }, { 1, 9 },
+		{ 2, 9 }, { 2, 9 },
+		{ 3, 9 }, { 3, 9 },
+		{ 4, 9 }, { 4, 9 },
+		{ -1, -1 }, { -1, -1 },
+		{ -1, -1 }, { -1, -1 },
+	};
+
+	// 掘っている最中のレンガの破片の絵の位置（右向き）
+	static constexpr POINT DIG_DEBRIS_RIGHT_SPRITES[] =
+	{
+		{ 6, 9 }, { 6, 9 },
+		{ 7, 9 }, { 7, 9 },
+		{ 8, 9 }, { 8, 9 },
+		{ 9, 9 }, { 9, 9 },
+		{ -1, -1 }, { -1, -1 },
+		{ -1, -1 }, { -1, -1 },
+	};
+
 	// データメンバの宣言 -----------------------------------------------
 private:
 
@@ -134,10 +123,13 @@ private:
 	FaceDirection m_faceDirection;
 
 	// アニメーションステート
-	AnimationState m_animationState;
+	PlayerAnimationState m_playerAnimationState;
 
-	// 掘っている方向
+	// 掘る方向
 	DigDirection m_digDirection;
+
+	// 掘るアニメーションステート
+	Tile::DigAnimationState m_digAnimationState;
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
@@ -180,13 +172,16 @@ private:
 	// 下に移動可能か調べる関数
 	bool IsMovableDown(Stage* pStage) const;
 
+	// 左に掘れるか調べる関数
+	bool IsDiggableLeft(Stage* pStage) const;
+
 	// 左に移動可能か調べる関数
 	bool IsMovableLeft(Stage* pStage) const;
 
 	// 右に移動可能か調べる関数
 	bool IsMovableRight(Stage* pStage) const;
 
-	// アニメーションステートの設定
-	void SetAnimationState(AnimationState start, AnimationState end);
+	// プレイヤーアニメーションステートの設定
+	void SetPlayerAnimationState(PlayerAnimationState start, PlayerAnimationState end);
 
 };

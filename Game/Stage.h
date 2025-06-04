@@ -84,6 +84,9 @@ public:
 	// 指定場所のタイルを設定する関数
 	void SetTileType(int x, int y, Tile::TileType type) { m_stageData[y][x].SetTileType(type); }
 
+	// 指定場所のタイルの掘るアニメーションを設定する関数
+	void SetTileDigAnimationState(int x, int y, Tile::DigAnimationState state) { m_stageData[y][x].SetDigAnimationState(state); }
+
 	// 指定場所のタイルを取得する関数
 	Tile::TileType GetTileType(int x, int y);
 
