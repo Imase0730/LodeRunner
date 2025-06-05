@@ -22,7 +22,8 @@ void String::Render(int ghTileset) const
 		{
 			int pos = m_string[i] - 'A';
 			DrawRectGraph(m_position.x + i * Tile::TILE_PIXEL_WIDTH, m_position.y
-				, (pos % 10) * Tile::TILE_PIXEL_WIDTH, ((pos / 10) + 1) * Tile::TILE_PIXEL_HEIGHT, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT
+				, (pos % 10) * Tile::TILE_PIXEL_WIDTH, ((pos / 10) + 1) * Tile::TILE_PIXEL_HEIGHT
+				, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT
 				, ghTileset, TRUE);
 
 		}

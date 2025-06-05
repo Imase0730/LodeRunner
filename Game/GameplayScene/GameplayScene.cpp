@@ -65,6 +65,9 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 
 	static int oldKey = 0;
 
+	// ステージの更新
+	m_stage.Update();
+
 	// プレイヤーの更新
 	m_player.Update(keyCondition, ~oldKey & keyCondition, &m_stage);
 

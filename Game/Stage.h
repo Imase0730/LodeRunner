@@ -19,8 +19,14 @@ public:
 	};
 
 	// 構造体の宣言 -------------------------------------------------
-public:
+private:
 
+	// 掘ったレンガの情報
+	struct DigBrick
+	{
+		POINT position;	// 位置
+		int timer;		// 復元タイマー
+	};
 
 	// クラス定数の宣言 -------------------------------------------------
 public:
@@ -38,6 +44,16 @@ public:
 
 	// ステージ上に置ける敵の最大数
 	static constexpr int ENEMY_MAX = 5;
+
+	// 掘ったレンガ情報を記憶するワークの最大数
+	static constexpr int DIG_BRICK_MAX = 30;
+
+	// 掘ったレンガの復元するまでのフレーム数
+	static constexpr int BRICK_FILL_FRAME = 180;
+
+	// レンガの復元アニメーション用
+	static constexpr int BRICK_ANIME_TIME_FILL01 = 20;
+	static constexpr int BRICK_ANIME_TIME_FILL02 = 10;
 
 	// データメンバの宣言 -----------------------------------------------
 private:
@@ -62,6 +78,9 @@ private:
 
 	// 敵の初期位置
 	POINT m_enemyPosition[ENEMY_MAX];
+
+	// 掘ったレンガの情報記録用
+	DigBrick m_digBrick[DIG_BRICK_MAX];
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
@@ -104,6 +123,9 @@ public:
 
 	// プレイヤーの位置を取得する関数
 	POINT GetPlayerPosition() const { return m_playerPosition; }
+
+	// 指定位置のレンガを復元する
+	void SetFillBrick(int x, int y);
 
 };
 

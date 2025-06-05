@@ -17,6 +17,7 @@ Stage::Stage(Mode mode)
 	, m_enemyCount{ 0 }
 	, m_playerPosition{ 0, 0 }
 	, m_enemyPosition{}
+	, m_digBrick{}
 {
 }
 
@@ -71,6 +72,26 @@ void Stage::Initialize(Mode mode)
 // 更新処理
 void Stage::Update()
 {
+	// 掘ったブロックを元に戻す
+	for (int i = 0; i < DIG_BRICK_MAX; i++)
+	{
+		// 復元タイマーが０でない
+		if (m_digBrick[i].timer != 0)
+		{
+			// 復元タイマーを減算する
+			m_digBrick[i].timer--;
+
+			// 復元するレンガの位置
+			int x = m_digBrick[i].position.x;
+			int y = m_digBrick[i].position.y;
+
+			// レンガの復元アニメーション
+			if (m_digBrick[i].timer == BRICK_ANIME_TIME_FILL01) m_stageData[y][x].SetDigAnimationState(Tile::DigAnimationState::Fill01);
+			if (m_digBrick[i].timer == BRICK_ANIME_TIME_FILL02) m_stageData[y][x].SetDigAnimationState(Tile::DigAnimationState::Fill02);
+			if (m_digBrick[i].timer == 0) m_stageData[y][x].SetDigAnimationState(Tile::DigAnimationState::NotDigging);
+			if (m_digBrick[i].timer == 0) m_stageData[y][x].SetTileType(Tile::TileType::Blick);
+		}
+	}
 }
 
 // 描画処理
@@ -209,6 +230,23 @@ void Stage::AppearLadder()
 			{
 				m_stageData[i][j].SetTileType(Tile::TileType::Ladder);
 			}
+		}
+	}
+}
+
+// 指定位置のレンガを復元する
+void Stage::SetFillBrick(int x, int y)
+{
+	for (int i = 0; i < DIG_BRICK_MAX; i++)
+	{
+		// 未使用のワークなら
+		if (m_digBrick[i].timer == 0)
+		{
+			// レンガの復元情報を設定
+			m_digBrick[i].position.x = x;
+			m_digBrick[i].position.y = y;
+			m_digBrick[i].timer = BRICK_FILL_FRAME;
+			return;
 		}
 	}
 }

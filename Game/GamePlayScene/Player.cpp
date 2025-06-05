@@ -109,7 +109,7 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 		}
 	}
 
-	// Zキーが押されたまたは掘っていないなら左側を掘る
+	// Zキーが押されたかつ掘っていないなら左側を掘る
 	if ((keyTrigger & PAD_INPUT_1) && (m_digDirection == DigDirection::NotDigging))
 	{
 		// 左方向に掘る
@@ -133,7 +133,7 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 			if (m_digAnimationState == Tile::DigAnimationState::Dig01) m_playerAnimationState = PlayerAnimationState::Dig_L;
 			if (m_digAnimationState == Tile::DigAnimationState::Dig06) m_playerAnimationState = PlayerAnimationState::Run01_L;
 
-			// ステージ側のブロックの掘りアニメーションの更新
+			// ステージ側のレンガの掘りアニメーションの更新
 			pStage->SetTileDigAnimationState(m_tilePosition.x - 1, m_tilePosition.y + 1, m_digAnimationState);
 
 			// 掘り終わった？
@@ -144,7 +144,8 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 				m_digAnimationState = Tile::DigAnimationState::NotDigging;
 				// 掘った場所を空白に設定
 				pStage->SetTileType(m_tilePosition.x - 1, m_tilePosition.y + 1, Tile::TileType::Empty);
-				// 穴の復活タイマーを設定
+				// 掘った場所のレンガの復元設定
+				pStage->SetFillBrick(m_tilePosition.x - 1, m_tilePosition.y + 1);
 			}
 			else
 			{
@@ -162,7 +163,7 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 		return;
 	}
 
-	// Xキーが押されたまたは掘っていないなら右側を掘る
+	// Xキーが押されたかつ掘っていないなら右側を掘る
 	if ((keyTrigger & PAD_INPUT_2) && (m_digDirection == DigDirection::NotDigging))
 	{
 		// 右方向に掘る
@@ -197,7 +198,8 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 				m_digAnimationState = Tile::DigAnimationState::NotDigging;
 				// 掘った場所を空白に設定
 				pStage->SetTileType(m_tilePosition.x + 1, m_tilePosition.y + 1, Tile::TileType::Empty);
-				// 穴の復活タイマーを設定
+				// 掘った場所のレンガの復元設定
+				pStage->SetFillBrick(m_tilePosition.x + 1, m_tilePosition.y + 1);
 			}
 			else
 			{

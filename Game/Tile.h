@@ -32,6 +32,7 @@ public:
 		NotDigging = -1,
 		Dig01, Dig02, Dig03, Dig04, Dig05, Dig06,
 		Dig07, Dig08, Dig09, Dig10, Dig11, Dig12,
+		Fill01, Fill02,
 	};
 
 	// 構造体の宣言 -------------------------------------------------
@@ -41,15 +42,15 @@ public:
 	// クラス定数の宣言 -------------------------------------------------
 public:
 
-	// タイルのピクセルサイズ
+	// タイルのピクセルサイズ（表示用）
 	static constexpr int TILE_PIXEL_WIDTH = 10;
 	static constexpr int TILE_PIXEL_HEIGHT = 11;
 
-	// タイルのサイズ
+	// タイルのサイズ（プログラム上での座標計算用）
 	static constexpr int TILE_WIDTH = 5;
 	static constexpr int TILE_HEIGHT = 5;
 
-	// タイルの中心までの距離
+	// タイルの中心までの距離（プログラム上での座標計算用）
 	static constexpr int TILE_CENTER_X = 2;
 	static constexpr int TILE_CENTER_Y = 2;
 
@@ -77,6 +78,8 @@ public:
 		{ 3, 10 }, { 3, 10 },
 		{ 4, 10 }, { 4, 10 },
 		{ 5, 10 }, { 5, 10 },
+
+		{ 6, 10 }, { 7, 10 },
 	};
 
 	// データメンバの宣言 -----------------------------------------------
@@ -94,15 +97,6 @@ public:
 	// コンストラクタ
 	Tile();
 
-	// デストラクタ
-	~Tile();
-
-	// 初期化
-	void Initialize();
-
-	// 更新処理
-	void Update();
-
 	// 描画処理
 	void Render(int x, int y, int ghTileset) const;
 
@@ -118,13 +112,13 @@ public:
 	// 掘るアニメーションステートの設定関数
 	void SetDigAnimationState(DigAnimationState state) { m_digAnimationState = state; }
 
-	// タイルが移動可能か調べる関数（上左右）
+	// 移動可能なタイルか調べる関数（上左右）
 	static bool IsMovableTileULR(TileType tileType);
 
-	// タイルが移動可能か調べる関数（下）
+	// 移動可能なタイルか調べる関数（下）
 	static bool IsMovableTileDown(TileType tileType);
 
-	// タイルが落下可能か調べる関数（落下）
+	// 移動可能なタイルか調べる関数（落下）
 	static bool IsMovableTileFall(TileType tileType);
 
 };
