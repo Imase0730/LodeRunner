@@ -116,10 +116,7 @@ public:
 	DigAnimationState GetDigAnimationState() const { return m_digAnimationState; }
 
 	// 掘るアニメーションステートの設定関数
-	void SetDigAnimationState(DigAnimationState state)
-	{
-		m_digAnimationState = state;
-	}
+	void SetDigAnimationState(DigAnimationState state) { m_digAnimationState = state; }
 
 	// タイルが移動可能か調べる関数（上左右）
 	static bool IsMovableTileULR(TileType tileType);

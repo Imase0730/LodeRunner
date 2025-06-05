@@ -175,6 +175,9 @@ private:
 	// 左に掘れるか調べる関数
 	bool IsDiggableLeft(Stage* pStage) const;
 
+	// 右に掘れるか調べる関数
+	bool IsDiggableRight(Stage* pStage) const;
+
 	// 左に移動可能か調べる関数
 	bool IsMovableLeft(Stage* pStage) const;
 
@@ -183,5 +186,8 @@ private:
 
 	// プレイヤーアニメーションステートの設定
 	void SetPlayerAnimationState(PlayerAnimationState start, PlayerAnimationState end);
+
+	// 掘るアニメーションステートの設定
+	void SetDigAnimationState();
 
 };
