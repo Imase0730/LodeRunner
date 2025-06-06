@@ -75,7 +75,10 @@ public:
 	void Finalize();
 
 	// ワイプを開始する関数
-	void Start();
+	void Start(Mode mode);
+
+	// ワープのモードを取得する関数
+	Mode GetMode() const { return m_mode; }
 
 	// ワイプ動作中か調べる関数
 	bool IsActive() const { return m_isActive; }

@@ -113,6 +113,12 @@ private:
 	// アクティブならtrueを設定
 	bool m_isActive;
 
+	// 生存フラグ
+	bool m_isAlive;
+
+	// 表示フラグ
+	bool m_isDisplay;
+
 	// タイル上の位置
 	POINT m_tilePosition;
 
@@ -154,6 +160,9 @@ public:
 
 	// アクティブか調べる関数
 	bool IsActive() const { return m_isActive; }
+
+	// 生存しているか調べる関数
+	bool IsAlive() const { return m_isAlive; }
 
 private:
 

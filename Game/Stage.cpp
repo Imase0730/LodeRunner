@@ -27,8 +27,11 @@ Stage::~Stage()
 }
 
 // 初期化処理
-void Stage::Initialize(Mode mode)
+void Stage::Initialize(int level, Mode mode)
 {
+	// レベルが違っていればレベルをロードする
+	if (level != m_level) LoadLevel(level, mode);
+
 	// モードを設定
 	m_mode = mode;
 
@@ -66,6 +69,13 @@ void Stage::Initialize(Mode mode)
 				m_stageData[i][j].SetTileType(type);
 			}
 		}
+	}
+
+	// 掘ったレンガの情報の初期化
+	for (int i = 0; i < DIG_BRICK_MAX; i++)
+	{
+		m_digBrick[i].position = POINT{0, 0};
+		m_digBrick[i].timer = 0;
 	}
 }
 
@@ -212,9 +222,6 @@ bool Stage::LoadLevel(int level, Mode mode)
 
 	// レベルを設定
 	m_level = level;
-
-	// ステージデータの初期化
-	Initialize(mode);
 
 	return false;
 }

@@ -31,6 +31,13 @@ void Tile::Render(int x, int y, int ghTileset) const
 		, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 }
 
+// タイルタイプの設定関数
+void Tile::SetTileType(TileType type)
+{
+	m_tileType = type;
+	m_digAnimationState = DigAnimationState::NotDigging;
+}
+
 // 移動可能なタイルか調べる関数（上左右）
 bool Tile::IsMovableTileULR(TileType tileType)
 {

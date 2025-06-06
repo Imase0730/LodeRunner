@@ -101,7 +101,7 @@ public:
 	void Render(int x, int y, int ghTileset) const;
 
 	// タイルタイプの設定関数
-	void SetTileType(TileType type) { m_tileType = type; }
+	void SetTileType(TileType type);
 
 	// タイルタイプの取得関数
 	TileType GetTileType() const { return m_tileType; }

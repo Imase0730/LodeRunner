@@ -8,6 +8,8 @@
 // コンストラクタ
 Player::Player()
 	: m_isActive{ false }
+	, m_isAlive{ false }
+	, m_isDisplay{ false }
 	, m_tilePosition{ 0, 0 }
 	, m_ajustPosition{ 0, 0 }
 	, m_faceDirection{ FaceDirection::Right }
@@ -28,17 +30,35 @@ void Player::Initialize(POINT tilePosition, POINT ajustPosition)
 	// アクティブにする
 	m_isActive = true;
 
+	// 生存フラグ初期化
+	m_isAlive = true;
+
+	// 表示(ON)
+	m_isDisplay = true;
+
 	// 位置を初期化する
 	m_tilePosition = tilePosition;
 	m_ajustPosition = ajustPosition;
 
-	// プレイヤーの向き
+	// 各変数の初期化
 	m_faceDirection = FaceDirection::Right;
+	m_playerAnimationState = PlayerAnimationState::Run01_R;
+	m_digDirection = DigDirection::NotDigging;
+	m_digAnimationState = Tile::DigAnimationState::NotDigging;
 }
 
 // 更新処理
 void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 {
+	// 今いる場所がレンガなら死亡
+	if (pStage->GetTileType(m_tilePosition.x, m_tilePosition.y) == Tile::TileType::Blick)
+	{
+		// 死亡
+		m_isAlive = false;
+		// 表示(OFF)
+		m_isDisplay = false;
+	}
+
 	// 移動可能じゃない
 	if (!IsMovable(pStage))
 	{
@@ -289,6 +309,9 @@ void Player::Update(int keyCondition, int keyTrigger, Stage* pStage)
 // 描画処理
 void Player::Render(int ghTileset) const
 {
+	// 表示(OFF)
+	if (!m_isDisplay) return;
+
 	// プレイヤーの描画
 	POINT pos = PLAYER_SPRITES[static_cast<int>(m_playerAnimationState)];
 	DrawRectGraph( m_tilePosition.x * Tile::TILE_PIXEL_WIDTH + (m_ajustPosition.x - Tile::TILE_CENTER_X) * 2

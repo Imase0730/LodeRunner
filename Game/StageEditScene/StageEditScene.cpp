@@ -39,8 +39,8 @@ void StageEditScene::Initialize()
 	// レベルの設定
 	m_levelNumber.SetNumber(m_level);
 
-	// ステージのロード
-	m_stage.LoadLevel(m_level, Stage::Mode::StageEdit);
+	// ステージの初期化
+	m_stage.Initialize(m_level, Stage::Mode::StageEdit);
 }
 
 // 更新処理
@@ -185,24 +185,31 @@ int StageEditScene::KeyRepeat(int keyCondition)
 // タイル選択
 void StageEditScene::SelectTile(int keyCondition, int keyRepeat)
 {
-	// Cキーと左右キーで選択タイルの変更
-	if (keyCondition & PAD_INPUT_3)
+	// Dキーと左右キーで選択タイルの変更
+	if (keyCondition & PAD_INPUT_6)
 	{
 		if (keyRepeat & PAD_INPUT_LEFT)
 		{
 			if (m_selectTile != Tile::TileType::Blick)
 			{
-				m_selectTile = static_cast<Tile::TileType>((static_cast<int>(m_selectTile) - 1));
+				m_selectTile = static_cast<Tile::TileType>(static_cast<int>(m_selectTile) - 1);
 			}
 		}
 		if (keyRepeat & PAD_INPUT_RIGHT)
 		{
 			if (m_selectTile != Tile::TileType::Player)
 			{
-				m_selectTile = static_cast<Tile::TileType>((static_cast<int>(m_selectTile) + 1));
+				m_selectTile = static_cast<Tile::TileType>(static_cast<int>(m_selectTile) + 1);
 			}
 		}
 		return;
+	}
+
+	// Wキーで選択タイルの変更（ループ）
+	if (keyRepeat & PAD_INPUT_8)
+	{
+		m_selectTile = static_cast<Tile::TileType>((static_cast<int>(m_selectTile) + 1) % static_cast<int>(Tile::TileType::TileTypeMax));
+		if (m_selectTile == Tile::TileType::Empty) m_selectTile = Tile::TileType::Blick;
 	}
 
 	// 上部カーソルの移動
@@ -218,12 +225,12 @@ void StageEditScene::SelectTile(int keyCondition, int keyRepeat)
 	if (m_cursorEdit.y > Stage::STAGE_HEIGHT - 1) m_cursorEdit.y = Stage::STAGE_HEIGHT - 1;
 
 	// Aキーでカーソル位置にタイルを置く
-	if (keyCondition & PAD_INPUT_1)
+	if (keyCondition & PAD_INPUT_4)
 	{
 		m_stage.SetTileType(m_cursorEdit.x, m_cursorEdit.y, m_selectTile);
 	}
 	// Sキーでカーソル位置のタイルを消す
-	if (keyCondition & PAD_INPUT_2)
+	if (keyCondition & PAD_INPUT_5)
 	{
 		m_stage.SetTileType(m_cursorEdit.x, m_cursorEdit.y, Tile::TileType::Empty);
 	}
@@ -259,7 +266,7 @@ void StageEditScene::Load(int keyTrigger, int keyRepeat)
 	{
 		if (m_level != m_stage.GetLevel())
 		{
-			m_stage.LoadLevel(m_level, Stage::Mode::StageEdit);
+			m_stage.Initialize(m_level, Stage::Mode::StageEdit);
 		}
 	}
 	// 上キーまたはWキーでレベル加算

@@ -38,8 +38,8 @@ void TitleScene::Update(int keyCondition, int keyTrigger)
 	if (keyTrigger & PAD_INPUT_UP) m_mode = Mode::Game;
 	if (keyTrigger & PAD_INPUT_DOWN) m_mode = Mode::Edit;
 
-	// Enterキーで決定
-	if (CheckHitKey(KEY_INPUT_RETURN))
+	// Zキーで決定
+	if (keyTrigger & PAD_INPUT_1)
 	{
 		// 各シーンへ
 		if (m_mode == Mode::Game)

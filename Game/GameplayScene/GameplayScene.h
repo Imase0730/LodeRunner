@@ -24,7 +24,7 @@ public:
 private:
 	
 	// プレイヤーの数
-	static constexpr int MEN_COUNT = 5;
+	static constexpr int MEN_COUNT = 2;
 
 	// 更新間隔（２フレームに１回更新）
 	static constexpr int UPDATE_INTERVAL = 2;
@@ -94,8 +94,7 @@ public:
 
 private:
 
-
-public:
-
+	// ゲームスタート時の初期化
+	void GameInitialize();
 
 };

@@ -43,17 +43,8 @@ void GamePlayScene::Initialize()
 	m_level = 1;
 	m_levelNumber.SetNumber(m_level);
 
-	// ステージのロード
-	m_stage.LoadLevel(m_level, Stage::Mode::GamePlay);
-
-	// プレイヤーの初期化
-	POINT pos = m_stage.GetPlayerPosition();
-	m_player.Initialize( POINT{ pos.x, pos.y }
-					   , POINT{ Tile::TILE_CENTER_X, Tile::TILE_CENTER_Y });
-
-	// アイリスワイプオープン
-	m_pGame->GetIrisWipe()->Initialize(IrisWipe::Mode::Open);
-	m_pGame->GetIrisWipe()->Start();
+	// ゲームスタート時の初期化
+	GameInitialize();
 }
 
 // 更新処理
@@ -65,11 +56,41 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 
 	static int oldKey = 0;
 
+	// ワイプ動作中
+	if (m_pGame->GetIrisWipe()->IsActive()) return;
+
+	// ワイプが閉じたら
+	if (m_pGame->GetIrisWipe()->GetMode() == IrisWipe::Mode::Close)
+	{
+		// ゲームを初期化してワイプオープン
+		GameInitialize();
+	}
+
 	// ステージの更新
 	m_stage.Update();
 
 	// プレイヤーの更新
 	m_player.Update(keyCondition, ~oldKey & keyCondition, &m_stage);
+
+	// プレイヤーが死んだら
+	if (!m_player.IsAlive())
+	{
+		// 残機数を減らす
+		m_men--;
+		m_menNumber.SetNumber(m_men);
+
+		// 残機数が０なら
+		if (m_men == 0)
+		{
+			// タイトルへ
+			m_pGame->RequestSceneChange(Game::SceneID::Title);
+		}
+		else
+		{
+			// ワイプクローズしてやり直し
+			m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Close);
+		}
+	}
 
 	oldKey = keyCondition;
 }
@@ -105,6 +126,21 @@ void GamePlayScene::Render(int ghTileset)
 // 終了処理
 void GamePlayScene::Finalize()
 {
+}
+
+// ゲームスタート時の初期化
+void GamePlayScene::GameInitialize()
+{
+	// ステージのロード
+	m_stage.Initialize(m_level, Stage::Mode::GamePlay);
+
+	// プレイヤーの初期化
+	POINT pos = m_stage.GetPlayerPosition();
+	m_player.Initialize(POINT{ pos.x, pos.y }
+	, POINT{ Tile::TILE_CENTER_X, Tile::TILE_CENTER_Y });
+
+	// ワイプオープン
+	m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Open);
 }
 
 

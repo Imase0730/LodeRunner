@@ -116,8 +116,9 @@ void IrisWipe::Finalize()
 }
 
 // ワイプを開始する関数
-void IrisWipe::Start()
+void IrisWipe::Start(Mode mode)
 {
+	Initialize(mode);
 	m_isActive = true;
 }
 

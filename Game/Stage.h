@@ -92,7 +92,7 @@ public:
 	~Stage();
 
 	// ‰Šú‰»
-	void Initialize(Mode mode);
+	void Initialize(int level, Mode mode);
 
 	// XVˆ—
 	void Update();
