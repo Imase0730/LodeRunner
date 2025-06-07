@@ -42,8 +42,8 @@ public:
 	static constexpr int STAGE_SCREEN_WIDTH = STAGE_WIDTH * Tile::TILE_PIXEL_WIDTH;
 	static constexpr int STAGE_SCREEN_HEIGHT = STAGE_HEIGHT * Tile::TILE_PIXEL_HEIGHT;
 
-	// ステージ上に置ける敵の最大数
-	static constexpr int ENEMY_MAX = 5;
+	// ステージ上に置けるガードの最大数
+	static constexpr int GUARD_MAX = 5;
 
 	// 掘ったレンガ情報を記憶するワークの最大数
 	static constexpr int DIG_BRICK_MAX = 30;
@@ -70,14 +70,17 @@ private:
 	// 表示中のレベル
 	int m_level;
 
-	// ステージ上の敵の数
-	int m_enemyCount;
+	// ステージ上のガードの数
+	int m_guardCount;
+
+	// ステージ上の金塊の数
+	int m_goldCount;
 
 	// プレイヤーの初期位置
 	POINT m_playerPosition;
 
-	// 敵の初期位置
-	POINT m_enemyPosition[ENEMY_MAX];
+	// ガードの初期位置
+	POINT m_guardPosition[GUARD_MAX];
 
 	// 掘ったレンガの情報記録用
 	DigBrick m_digBrick[DIG_BRICK_MAX];
@@ -101,7 +104,7 @@ public:
 	void Render(int ghTileset) const;
 
 	// 指定場所のタイルを設定する関数
-	void SetTileType(int x, int y, Tile::TileType type) { m_stageData[y][x].SetTileType(type); }
+	void SetTileType(int x, int y, Tile::TileType type);
 
 	// 指定場所のタイルの掘るアニメーションを設定する関数
 	void SetTileDigAnimationState(int x, int y, Tile::DigAnimationState state) { m_stageData[y][x].SetDigAnimationState(state); }
@@ -126,6 +129,15 @@ public:
 
 	// 指定位置のレンガを復元する
 	void SetFillBrick(int x, int y);
+
+	// ステージ上の金塊の数を取得する関数
+	int GetGoldCount() const { return m_goldCount; }
+
+	// ステージ上のガードの数を取得する関数
+	int GetGuardCount() const { return m_guardCount; }
+
+	// ガードの位置を取得する関数
+	POINT GetGuardPosition(int index) const { return m_guardPosition[index]; }
 
 };
 

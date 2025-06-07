@@ -14,9 +14,10 @@ Stage::Stage(Mode mode)
 	, m_stageData{}
 	, m_mode{ mode }
 	, m_level{ 0 }
-	, m_enemyCount{ 0 }
+	, m_guardCount{ 0 }
+	, m_goldCount{ 0 }
 	, m_playerPosition{ 0, 0 }
-	, m_enemyPosition{}
+	, m_guardPosition{}
 	, m_digBrick{}
 {
 }
@@ -32,11 +33,23 @@ void Stage::Initialize(int level, Mode mode)
 	// レベルが違っていればレベルをロードする
 	if (level != m_level) LoadLevel(level, mode);
 
+	// ステージデータの初期化
+	for (int i = 0; i < STAGE_HEIGHT; i++)
+	{
+		for (int j = 0; j < STAGE_WIDTH; j++)
+		{
+			m_stageData[i][j].SetTileType(Tile::TileType::Empty);
+		}
+	}
+
 	// モードを設定
 	m_mode = mode;
 
-	// 敵の数を初期化
-	m_enemyCount = 0;
+	// ガードの数を初期化
+	m_guardCount = 0;
+
+	// 金塊の数を初期化
+	m_goldCount = 0;
 
 	// ロードしたデータからステージデータを作成
 	for (int i = 0; i < STAGE_HEIGHT; i++)
@@ -48,30 +61,27 @@ void Stage::Initialize(int level, Mode mode)
 			// プレイヤーなら位置を取得
 			if (type == Tile::TileType::Player) m_playerPosition = POINT{ j, i };
 
-			// 敵なら位置を取得
-			if ((m_enemyCount < ENEMY_MAX - 1) && (type == Tile::TileType::Enemy))
+			// ガードなら位置を取得
+			if ((m_guardCount < GUARD_MAX - 1) && (type == Tile::TileType::Guard))
 			{
-				m_enemyPosition[m_enemyCount] = POINT{ j, i };
-				m_enemyCount++;
+				m_guardPosition[m_guardCount] = POINT{ j, i };
+				m_guardCount++;
 			}
 
+			// 金塊なら金塊の数を加算
+			if (type == Tile::TileType::Gold) m_goldCount++;
+
 			// ステージデータを作成
-			if ( (m_mode == Mode::GamePlay)				// ゲームプレイの場合は下記オブジェクトは別途表示
-			  && ( (type == Tile::TileType::Player)		// プレイヤー
-				|| (type == Tile::TileType::Enemy)		// 敵
-				 )
+			if ( (m_mode != Mode::GamePlay)
+			  || ((type != Tile::TileType::Player) && (type != Tile::TileType::Guard))
 			   )
-			{
-				m_stageData[i][j].SetTileType(Tile::TileType::Empty);
-			}
-			else
 			{
 				m_stageData[i][j].SetTileType(type);
 			}
 		}
 	}
 
-	// 掘ったレンガの情報の初期化
+	// 掘ったレンガを情報の初期化
 	for (int i = 0; i < DIG_BRICK_MAX; i++)
 	{
 		m_digBrick[i].position = POINT{0, 0};
@@ -102,6 +112,15 @@ void Stage::Update()
 			if (m_digBrick[i].timer == 0) m_stageData[y][x].SetTileType(Tile::TileType::Blick);
 		}
 	}
+
+	// 金塊が全てなくなったら隠れハシゴを出現させる
+	if (m_goldCount == 0)
+	{
+		// 何度も出現処理をしないように、金塊の数を引いておく
+		m_goldCount--;
+		AppearLadder();
+	}
+
 }
 
 // 描画処理
@@ -144,6 +163,16 @@ void Stage::Render(int ghTileset) const
 		DrawRectGraph(j * Tile::TILE_PIXEL_WIDTH, STAGE_HEIGHT * Tile::TILE_PIXEL_HEIGHT
 			, Tile::TILE_PIXEL_WIDTH * 2, Tile::TILE_PIXEL_HEIGHT * 4, Tile::TILE_PIXEL_WIDTH, 4, ghTileset, FALSE);
 	}
+}
+
+// 指定場所のタイルを設定する関数
+void Stage::SetTileType(int x, int y, Tile::TileType type)
+{
+	// 金塊がある場合は金塊の数を減らす
+	if (m_stageData[y][x].GetTileType() == Tile::TileType::Gold) m_goldCount--;
+
+	// タイルを設定する
+	m_stageData[y][x].SetTileType(type);
 }
 
 // 指定場所のタイルを取得する関数

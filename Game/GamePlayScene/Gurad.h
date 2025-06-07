@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-// File: Player.h
+// File: Gurad.h
 //
 //--------------------------------------------------------------------------------------
 #pragma once
@@ -9,8 +9,8 @@
 class GamePlayScene;
 class Stage;
 
-// プレイヤークラス
-class Player
+// ガードクラス
+class Gurad
 {
 public:
 
@@ -22,92 +22,54 @@ public:
 	};
 
 	// アニメーションインデックス
-	enum class PlayerAnimationState
+	enum class GuradAnimationState
 	{
 		Run01_L, Run02_L, Run03_L,		// 走り（左向き）
 		Rope01_L, Rope02_L, Rope03_L,	// ロープで移動（左向き）
-		Dig_L,							// 穴掘り（左向き）
 		Fall_L,							// 落下中（左向き）
 
 		Run01_R, Run02_R, Run03_R,		// 走り（右向き）
 		Rope01_R, Rope02_R, Rope03_R,	// ロープで移動（右向き）
-		Dig_R,							// 穴掘り（右向き）
 		Fall_R,							// 落下中（右向き）
 
 		Climb01, Climb02,				// ハシゴを登って
 	};
 
-	// 掘っている向き
-	enum class DigDirection
-	{
-		NotDigging,	// 掘っていない
-		Right,		// 右
-		Left,		// 左
-	};
-
 	// クラス定数の宣言 -------------------------------------------------
 private:
 
-	// プレイヤーの絵の位置
-	static constexpr POINT PLAYER_SPRITES[] =
+	// ガードの絵の位置
+	static constexpr POINT GUARD_SPRITES[] =
 	{
 		// 走り（左向き）
-		{ 0, 5 },
-		{ 1, 5 },
-		{ 2, 5 },
+		{ 0, 7 },
+		{ 1, 7 },
+		{ 2, 7 },
 
 		// ロープで移動（左向き）
-		{ 0, 6 },
-		{ 1, 6 },
-		{ 2, 6 },
-
-		// 穴掘り（左向き）
-		{ 0, 9 },
+		{ 0, 8 },
+		{ 1, 8 },
+		{ 2, 8 },
 
 		// 落下中（左向き）
-		{ 8, 5 },
+		{ 8, 7 },
 
 		// 走り（右向き）
-		{ 3, 5 },
-		{ 4, 5 },
-		{ 5, 5 },
+		{ 3, 7 },
+		{ 4, 7 },
+		{ 5, 7 },
 
 		// ロープで移動（右向き）
-		{ 3, 6 },
-		{ 4, 6 },
-		{ 5, 6 },
-
-		// 穴掘り（右向き）
-		{ 5, 9 },
+		{ 3, 8 },
+		{ 4, 8 },
+		{ 5, 8 },
 
 		// 落下中（右向き）
-		{ 9, 5 },
+		{ 9, 7 },
 
 		// ハシゴを上っている
-		{ 6, 5 },
-		{ 7, 5 },
-	};
-
-	// 掘っている最中のレンガの破片の絵の位置（左向き）
-	static constexpr POINT DIG_DEBRIS_LEFT_SPRITES[] =
-	{
-		{ 1, 9 }, { 1, 9 },
-		{ 2, 9 }, { 2, 9 },
-		{ 3, 9 }, { 3, 9 },
-		{ 4, 9 }, { 4, 9 },
-		{ -1, -1 }, { -1, -1 },
-		{ -1, -1 }, { -1, -1 },
-	};
-
-	// 掘っている最中のレンガの破片の絵の位置（右向き）
-	static constexpr POINT DIG_DEBRIS_RIGHT_SPRITES[] =
-	{
-		{ 6, 9 }, { 6, 9 },
-		{ 7, 9 }, { 7, 9 },
-		{ 8, 9 }, { 8, 9 },
-		{ 9, 9 }, { 9, 9 },
-		{ -1, -1 }, { -1, -1 },
-		{ -1, -1 }, { -1, -1 },
+		{ 6, 7 },
+		{ 7, 7 },
 	};
 
 	// データメンバの宣言 -----------------------------------------------
@@ -138,28 +100,28 @@ private:
 	FaceDirection m_faceDirection;
 
 	// アニメーションステート
-	PlayerAnimationState m_playerAnimationState;
+	GuradAnimationState m_guardAnimationState;
 
-	// 掘る方向
-	DigDirection m_digDirection;
+	// 金塊保持タイマー
+	int m_goldTimer;
 
-	// 掘るアニメーションステート
-	Tile::DigAnimationState m_digAnimationState;
+	// 復活タイマー
+	int m_resurrectionTimer;
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
 
 	// コンストラクタ
-	Player(GamePlayScene* pScene, Stage* pStage);
+	Gurad(GamePlayScene* pScene, Stage* pStage);
 
 	// デストラクタ
-	~Player();
+	~Gurad();
 
 	// 初期化関数
 	void Initialize(POINT tilePosition, POINT ajustPosition);
 
 	// 更新処理
-	void Update(int keyCondition, int keyTrigger);
+	void Update();
 
 	// 描画関数
 	void Render(int ghTileset) const;
@@ -196,23 +158,11 @@ private:
 	// 下に移動可能か調べる関数
 	bool IsMovableDown() const;
 
-	// 左に掘れるか調べる関数
-	bool IsDiggableLeft() const;
-
-	// 右に掘れるか調べる関数
-	bool IsDiggableRight() const;
-
 	// 左に移動可能か調べる関数
 	bool IsMovableLeft() const;
 
 	// 右に移動可能か調べる関数
 	bool IsMovableRight() const;
-
-	// 左に掘る
-	void DigLeft();
-
-	// 右に掘る
-	void DigRight();
 
 	// 落下中
 	void Falling();
@@ -229,11 +179,8 @@ private:
 	// 右に移動
 	void MoveRight();
 
-	// プレイヤーアニメーションステートの設定
-	void SetPlayerAnimationState(PlayerAnimationState start, PlayerAnimationState end);
-
-	// 掘るアニメーションステートの設定
-	void SetDigAnimationState();
+	// ガードアニメーションステートの設定
+	void SetGuradAnimationState(GuradAnimationState start, GuradAnimationState end);
 
 	// 金塊が拾えるか調べる関数
 	void CheckGoldPickedUp();

@@ -19,13 +19,27 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	, m_score{ 0 }
 	, m_men{ 0 }
 	, m_level{ 0 }
-	, m_player{}
+	, m_player{ this, &m_stage }
+	, m_pGurad{}
+	, m_guradPattern{ 0, 0, 0 }
+	, m_guradPhase{ 0 }
+	, m_guradNumber{ 0 }
 {
+	// ガードを生成
+	for (int i = 0; i < Stage::GUARD_MAX; i++)
+	{
+		m_pGurad[i] = new Gurad(this, &m_stage);
+	}
 }
 
 // デストラクタ
 GamePlayScene::~GamePlayScene()
 {
+	// メモリを解放
+	for (int i = 0; i < Stage::GUARD_MAX; i++)
+	{
+		delete m_pGurad[i];
+	}
 }
 
 // 初期化処理
@@ -45,6 +59,9 @@ void GamePlayScene::Initialize()
 
 	// ゲームスタート時の初期化
 	GameInitialize();
+
+	// ワイプオープン
+	m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Open);
 }
 
 // 更新処理
@@ -56,28 +73,39 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 
 	static int oldKey = 0;
 
-	// ワイプ動作中
+	keyTrigger = ~oldKey & keyCondition;
+
+	// ワイプ動作中なら何もしない
 	if (m_pGame->GetIrisWipe()->IsActive()) return;
 
 	// ワイプが閉じたら
 	if (m_pGame->GetIrisWipe()->GetMode() == IrisWipe::Mode::Close)
 	{
-		// ゲームを初期化してワイプオープン
+		// ゲームを初期化
 		GameInitialize();
+		// ワイプオープン
+		m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Open);
 	}
 
 	// ステージの更新
 	m_stage.Update();
 
 	// プレイヤーの更新
-	m_player.Update(keyCondition, ~oldKey & keyCondition, &m_stage);
+	m_player.Update(keyCondition, keyTrigger);
 
-	// プレイヤーが死んだら
-	if (!m_player.IsAlive())
+	// ガードの更新
+	GuradsUpdate();
+
+	// プレイヤーが生きているなら
+	if (m_player.IsAlive())
+	{
+		// ステージクリアならワイプを閉じる
+		if (IsLevelCleared()) m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Close);
+	}
+	else
 	{
 		// 残機数を減らす
-		m_men--;
-		m_menNumber.SetNumber(m_men);
+		m_menNumber.SetNumber(--m_men);
 
 		// 残機数が０なら
 		if (m_men == 0)
@@ -87,7 +115,7 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 		}
 		else
 		{
-			// ワイプクローズしてやり直し
+			// ワイプクローズ
 			m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Close);
 		}
 	}
@@ -103,6 +131,12 @@ void GamePlayScene::Render(int ghTileset)
 
 	// プレイヤーの描画
 	m_player.Render(ghTileset);
+
+	// ガードの描画
+	for (int i = 0; i < m_stage.GetGuardCount(); i++)
+	{
+		m_pGurad[i]->Render(ghTileset);
+	}
 
 	// 『SCORE』の文字の表示
 	m_scoreString.Render(ghTileset);
@@ -131,6 +165,13 @@ void GamePlayScene::Finalize()
 // ゲームスタート時の初期化
 void GamePlayScene::GameInitialize()
 {
+	// プレイヤーが生きている
+	if (m_player.IsAlive())
+	{
+		// 次のレベルへ
+		m_levelNumber.SetNumber(++m_level);
+	}
+
 	// ステージのロード
 	m_stage.Initialize(m_level, Stage::Mode::GamePlay);
 
@@ -139,8 +180,55 @@ void GamePlayScene::GameInitialize()
 	m_player.Initialize(POINT{ pos.x, pos.y }
 	, POINT{ Tile::TILE_CENTER_X, Tile::TILE_CENTER_Y });
 
-	// ワイプオープン
-	m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Open);
+	// ----- ガードの初期化 ----- //
+
+	// ガードの人数に応じて行動可能人数のテーブルを設定する
+	for (int i = 0; i < 3; i++)
+	{
+		m_guradPattern[i] = GUARD_PATTERNS_LIST[m_stage.GetGuardCount() * 3 + i];
+	}
+
+	// ガードの位置を設定
+	for (int i = 0; i < m_stage.GetGuardCount(); i++)
+	{
+		POINT pos = m_stage.GetGuardPosition(i);
+		m_pGurad[i]->Initialize(POINT{ pos.x, pos.y }
+		, POINT{ Tile::TILE_CENTER_X, Tile::TILE_CENTER_Y });
+	}
+}
+
+// レベルクリアか調べる関数
+bool GamePlayScene::IsLevelCleared()
+{
+	if ( (m_stage.GetGoldCount() < 0)								// 隠しハシゴ出現済み
+	  && (m_player.GetTilePosition().y == 0)						// 一番上の行？
+	  && (m_player.GetAdjustPosition().y == Tile::TILE_CENTER_Y)	// タイル上の位置も中心？
+	   )
+	{
+		return true;
+	}
+	return false;
+}
+
+// ガードの更新処理
+void GamePlayScene::GuradsUpdate()
+{
+	for (int i = 0; i < m_guradPattern[m_guradPhase]; i++)
+	{
+		// ガードがアクティブなら更新
+		if (m_pGurad[m_guradNumber]->IsActive()) m_pGurad[m_guradNumber]->Update();
+		// 次の行動するガード番号へ
+		m_guradNumber = (m_guradNumber + 1) % m_stage.GetGuardCount();
+	}
+	// 次のフレームの行動可能人数へ
+	m_guradPhase = (m_guradPhase + 1) % 3;
+}
+
+// 得点を加算する関数
+void GamePlayScene::AddScore(int score)
+{
+	m_score += score;
+	m_scoreNumber.SetNumber(m_score);
 }
 
 

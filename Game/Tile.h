@@ -20,7 +20,7 @@ public:
 		Trap,				// トラップ
 		InvisibleLadder,	// 隠れハシゴ
 		Gold,				// 金塊
-		Enemy,				// 敵
+		Guard,				// ガード
 		Player,				// プレイヤー
 
 		TileTypeMax,
@@ -65,7 +65,7 @@ public:
 		{ 5, 4 },	// トラップ
 		{ 6, 4 },	// 隠れハシゴ
 		{ 7, 4 },	// 金塊
-		{ 8, 4 },	// 敵
+		{ 8, 4 },	// ガード
 		{ 9, 4 },	// プレイヤー
 	};
 

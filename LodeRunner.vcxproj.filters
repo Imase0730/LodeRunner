@@ -111,6 +111,9 @@
     <ClCompile Include="Game\GamePlayScene\Player.cpp">
       <Filter>Game\GamePlayScene</Filter>
     </ClCompile>
+    <ClCompile Include="Game\GamePlayScene\Gurad.cpp">
+      <Filter>Game\GamePlayScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -150,6 +153,9 @@
       <Filter>Game\TitleScene</Filter>
     </ClInclude>
     <ClInclude Include="Game\GamePlayScene\Player.h">
+      <Filter>Game\GamePlayScene</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GamePlayScene\Gurad.h">
       <Filter>Game\GamePlayScene</Filter>
     </ClInclude>
   </ItemGroup>
