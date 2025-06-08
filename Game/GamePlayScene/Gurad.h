@@ -15,7 +15,7 @@ class Gurad
 public:
 
 	// 向き
-	enum class FaceDirection
+	enum class Direction
 	{
 		Right,	// 右
 		Left,	// 左
@@ -97,7 +97,7 @@ private:
 	POINT m_adjustPosition;
 
 	// 顔の向き
-	FaceDirection m_faceDirection;
+	Direction m_faceDirection;
 
 	// アニメーションステート
 	GuradAnimationState m_guardAnimationState;
@@ -184,5 +184,26 @@ private:
 
 	// 金塊が拾えるか調べる関数
 	void CheckGoldPickedUp();
+
+	// 指定した行まで移動可能か調べる関数
+	bool IsMovableColumn(int column) const;
+	
+	// 左右どこまで移動できるか取得する関数
+	void GetLeftRightLimits(int* colmun, Direction direction, int limit);
+
+	// 下方向に移動な最適な行を見つける関数
+	int FindCandidateRowBelow(int colmun, int row);
+
+	// 上方向に移動な最適な行を見つける関数
+	int FindCandidateRowAbove(int colmun, int row);
+
+	// 左右に移動できそうか調べる関数
+	bool CheckLeftRightMove(int colmun, int row, Direction direction);
+
+	// プレイヤーとの疑似距離を求める関数
+	int GetPseudoDistance(int colmun, int row);
+
+	// 上下へ移動するか評価して選択する関数
+	void SelectMoveUpAndDown(int* bestGuradDistance);
 
 };

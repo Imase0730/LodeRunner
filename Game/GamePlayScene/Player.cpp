@@ -523,11 +523,11 @@ void Player::MoveLeft()
 	// 左に移動可能か？
 	if (IsMovableLeft())
 	{
-		// 左向きに
-		m_faceDirection = FaceDirection::Left;
-
 		// 行に合わせるようにY座標を調整する
 		AjustRow();
+
+		// 左向きに
+		m_faceDirection = FaceDirection::Left;
 
 		// 左に移動する
 		m_adjustPosition.x--;
@@ -560,11 +560,11 @@ void Player::MoveRight()
 	// 右に移動可能か？
 	if (IsMovableRight())
 	{
-		// 右向きに
-		m_faceDirection = FaceDirection::Right;
-
 		// 行に合わせるようにY座標を調整する
 		AjustRow();
+
+		// 右向きに
+		m_faceDirection = FaceDirection::Right;
 
 		// 右移動する
 		m_adjustPosition.x++;

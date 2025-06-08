@@ -30,8 +30,11 @@ private:
 	// 更新間隔（２フレームに１回更新）
 	static constexpr int UPDATE_INTERVAL = 2;
 
+	// ガードの行動フェーズの数
+	static constexpr int GUARD_PHASE_COUNT = 3;
+
 	// ガードの１フレームに行動する人数のパターンのリスト
-	static constexpr int GUARD_PATTERNS_LIST[] =
+	static constexpr int GUARD_PATTERNS_LIST[GUARD_PHASE_COUNT * (Stage::GUARD_MAX + 1)] =
 	{
 		0, 0, 0,	// ガードの人数（0人）
 		0, 1, 1,	// ガードの人数（1人）
@@ -92,7 +95,7 @@ private:
 	Gurad* m_pGurad[Stage::GUARD_MAX];
 
 	// ガードの行動人数のパターン
-	int m_guradPattern[3];
+	int m_guradPattern[GUARD_PHASE_COUNT];
 
 	// ガードの行動人数のフェーズ（0～2）
 	int m_guradPhase;
@@ -136,5 +139,8 @@ public:
 
 	// 得点を加算する関数
 	void AddScore(int score);
+
+	// プレイヤーを取得する関数
+	Player* GetPlayer() { return &m_player; }
 
 };

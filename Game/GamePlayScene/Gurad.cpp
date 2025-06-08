@@ -5,6 +5,7 @@
 #include "Gurad.h"
 #include "GamePlayScene.h"
 #include "Game/Tile.h"
+#include "Player.h"
 
 // コンストラクタ
 Gurad::Gurad(GamePlayScene* pScene, Stage* pStage)
@@ -15,7 +16,7 @@ Gurad::Gurad(GamePlayScene* pScene, Stage* pStage)
 	, m_isDisplay{ false }
 	, m_tilePosition{ 0, 0 }
 	, m_adjustPosition{ 0, 0 }
-	, m_faceDirection{ FaceDirection::Left }
+	, m_faceDirection{ Direction::Left }
 	, m_guardAnimationState{ GuradAnimationState::Run01_L }
 	, m_goldTimer{ 0 }
 	, m_resurrectionTimer{ 0 }
@@ -44,13 +45,17 @@ void Gurad::Initialize(POINT tilePosition, POINT ajustPosition)
 	m_adjustPosition = ajustPosition;
 
 	// 各変数の初期化
-	m_faceDirection = FaceDirection::Left;
+	m_faceDirection = Direction::Left;
 	m_guardAnimationState = GuradAnimationState::Run01_L;
 }
 
 // 更新処理
 void Gurad::Update()
 {
+	// プレイヤーを取得
+	Player* pPlayer = m_pGamePlayScene->GetPlayer();
+	int playerColumn = pPlayer->GetTilePosition().x;
+	int playerRow = pPlayer->GetTilePosition().y;
 
 	// 上下方向は はしごやロープがあれば上下移動可能
 	// 左右は 障害物がなければ近づくように移動
@@ -61,15 +66,27 @@ void Gurad::Update()
 	// MAX_ROW(行）
 
 	// プレイヤーと同じ行にいる場合
-	// 左右へ移動　ハシゴやロープは移動可なので無視
-	// 一番下の行でなく、一つ下が空白または罠があるなら移動しない
-	// 条件を満たせば移動する
+	if (m_tilePosition.y == playerRow)
+	{
+		// プレイヤーの位置まで移動可能か？
+		if (IsMovableColumn(playerColumn))
+		{
+			// 左右どちらにプレイヤーがいるかチェックする
+			if (m_tilePosition.x > playerColumn)
+			{
+				// 左に移動
+				MoveLeft();
+				return;
+			}
+			else
+			{
+				// 右に移動
+				MoveRight();
+				return;
+			}
+		}
+	}
 
-
-
-		// 左に移動
-		MoveLeft();
-		return;
 
 
 
@@ -284,7 +301,7 @@ void Gurad::Falling()
 	CheckGoldPickedUp();
 
 	// 落下アニメーション
-	if (m_faceDirection == FaceDirection::Left)
+	if (m_faceDirection == Direction::Left)
 	{
 		m_guardAnimationState = GuradAnimationState::Fall_L;
 	}
@@ -350,11 +367,11 @@ void Gurad::MoveLeft()
 	// 左に移動可能か？
 	if (IsMovableLeft())
 	{
-		// 左向きに
-		m_faceDirection = FaceDirection::Left;
-
 		// 行に合わせるようにY座標を調整する
 		AjustRow();
+
+		// 左向きに
+		m_faceDirection = Direction::Left;
 
 		// 左に移動する
 		m_adjustPosition.x--;
@@ -387,11 +404,11 @@ void Gurad::MoveRight()
 	// 右に移動可能か？
 	if (IsMovableRight())
 	{
-		// 右向きに
-		m_faceDirection = FaceDirection::Right;
-
 		// 行に合わせるようにY座標を調整する
 		AjustRow();
+
+		// 右向きに
+		m_faceDirection = Direction::Right;
 
 		// 右移動する
 		m_adjustPosition.x++;
@@ -455,4 +472,265 @@ void Gurad::CheckGoldPickedUp()
 		m_pStage->SetTileType(m_tilePosition.x, m_tilePosition.y, Tile::TileType::Empty);
 	}
 }
+
+// 指定した行まで移動可能か調べる関数
+bool Gurad::IsMovableColumn(int column) const
+{
+	int guardColumn = m_tilePosition.x;
+	int guardRow = m_tilePosition.y;
+	int move = 0;
+
+	// 調べていく方向を設定
+	if (guardColumn > column)
+	{
+		// 左へ
+		move = -1;
+	}
+	else
+	{
+		// 右へ
+		move = 1;
+	}
+	while (guardColumn != column)
+	{
+		// 次の行へ
+		guardColumn += move;
+		// ハシゴまたはロープなら下が何であっても移動可能
+		if ( (m_pStage->GetTileType(guardColumn, guardRow) == Tile::TileType::Ladder)
+		  || (m_pStage->GetTileType(guardColumn, guardRow) == Tile::TileType::Rope)
+		   )
+		{
+			continue;
+		}
+		// 床が空白か罠でないなら移動可能
+		if ( (m_pStage->GetTileType(guardColumn, guardRow + 1) != Tile::TileType::Empty)
+		  || (m_pStage->GetTileType(guardColumn, guardRow + 1) != Tile::TileType::Trap)
+		   )
+		{
+			continue;
+		}
+		// 移動不可
+		return false;
+	}
+	// 移動可能
+	return true;
+}
+
+// 左右どこまで移動できるか取得する関数
+void Gurad::GetLeftRightLimits(int* colmun, Direction direction, int limit)
+{
+	*colmun = m_tilePosition.x;
+	int row = m_tilePosition.y;
+
+	int move = 1;
+	if (direction == Direction::Left) move = -1;
+
+	while (true)
+	{
+		// 調べるリミット値に達したら終了
+		if (*colmun == limit) break;
+
+		// レンガまたは石なら終了
+		if ( (m_pStage->GetTileType(*colmun + move, row) == Tile::TileType::Blick)		// レンガ
+		  || (m_pStage->GetTileType(*colmun + move, row) == Tile::TileType::Stone)		// 石
+		   )
+		{
+			break;
+		}
+
+		// ハシゴまたはロープでない
+		if ( (m_pStage->GetTileType(*colmun + move, row) != Tile::TileType::Ladder)		// ハシゴ
+		  && (m_pStage->GetTileType(*colmun + move, row) != Tile::TileType::Rope)		// ロープ
+		   )
+		{
+			// 行が一番下でない
+			if (row != Stage::STAGE_HEIGHT - 1)
+			{
+				// 床がレンガ、石、ハシゴでないなら終了
+				if ( (m_pStage->GetTileType(*colmun + move, row + 1) != Tile::TileType::Blick)	// レンガ
+				  && (m_pStage->GetTileType(*colmun + move, row + 1) != Tile::TileType::Stone)	// 石
+				  && (m_pStage->GetTileType(*colmun + move, row + 1) != Tile::TileType::Ladder)	// ハシゴ
+				   )
+				{
+					// 一応１つ先までは移動可能
+					*colmun += move;
+					break;
+				}
+			}
+		}
+		// 次へ
+		*colmun += move;
+	}
+}
+
+// 下方向に移動な最適な行を見つける関数
+int Gurad::FindCandidateRowBelow(int colmun, int row)
+{
+	// プレイヤーのいる行
+	int playerRow = m_pGamePlayScene->GetPlayer()->GetTilePosition().y;
+
+	// 一番したの行まで調べる
+	while (row == Stage::STAGE_HEIGHT - 1)
+	{
+		// １つ下の行がレンガか石なら終了
+		if ( (m_pStage->GetTileType(colmun, row + 1) == Tile::TileType::Blick)	// レンガ
+		  || (m_pStage->GetTileType(colmun, row + 1) == Tile::TileType::Stone)	// 石
+			)
+		{
+			return row;
+		}
+		// １行下へ
+		row++;
+		// 空白でない
+		if (m_pStage->GetTileType(colmun, row) != Tile::TileType::Empty)
+		{
+			// 左側は移動可能なら
+			if (CheckLeftRightMove(colmun, row, Direction::Left))
+			{
+				// プレイヤーの方が同じ行か下の行なら
+				if (row >= playerRow) return row;
+			}
+			// 右側は移動可能なら
+			if (CheckLeftRightMove(colmun, row, Direction::Right))
+			{
+				// プレイヤーの方が同じ行か下の行なら
+				if (row >= playerRow) return row;
+			}
+		}
+	}
+	return row;
+}
+
+// 上方向に移動な最適な行を見つける関数
+int Gurad::FindCandidateRowAbove(int colmun, int row)
+{
+	// プレイヤーのいる行
+	int playerRow = m_pGamePlayScene->GetPlayer()->GetTilePosition().y;
+
+	// 一番上の行まで調べる
+	while (row == 0)
+	{
+		// ハシゴでないので上に移動できないので終了
+		if (m_pStage->GetTileType(colmun, row) != Tile::TileType::Ladder)
+		{
+			return row;
+		}
+		// １つ上の行をチェック
+		row--;
+		// 左側は移動可能なら
+		if (CheckLeftRightMove(colmun, row, Direction::Left))
+		{
+			// プレイヤーの方が同じ行か下の行なら
+			if (row >= playerRow) return row;
+		}
+		// 右側は移動可能なら
+		if (CheckLeftRightMove(colmun, row, Direction::Right))
+		{
+			// プレイヤーの方が同じ行か下の行なら
+			if (row >= playerRow) return row;
+		}
+	}
+	return row;
+}
+
+// 左右に移動できそうか調べる関数
+bool Gurad::CheckLeftRightMove(int colmun, int row, Direction direction)
+{
+	// 指定方向の列を調べる
+	if (direction == Direction::Left)
+	{
+		colmun--;
+	}
+	else if (direction == Direction::Right)
+	{
+		colmun++;
+	}
+
+	// 画面外ならチェックしない
+	if ((colmun < 0) || (colmun > Stage::STAGE_WIDTH - 1)) return false;
+
+	if (m_pStage->GetTileType(colmun, row) == Tile::TileType::Rope)	// ロープ
+	{
+		return true;
+	}
+	else
+	{
+		// 左下がレンガ、石、ハシゴなら
+		if ( (m_pStage->GetTileType(colmun, row + 1) == Tile::TileType::Blick)	// レンガ
+		  || (m_pStage->GetTileType(colmun, row + 1) == Tile::TileType::Stone)	// 石
+		  || (m_pStage->GetTileType(colmun, row + 1) == Tile::TileType::Ladder)	// ハシゴ
+		   )
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+// 上下へ移動するか評価して選択する関数
+void Gurad::SelectMoveUpAndDown(int* bestGuradDistance)
+{
+	// ガードの位置
+	int colmun = m_tilePosition.x;
+	int row = m_tilePosition.y;
+
+	// 一番下の行でないなら
+	if (row != Stage::STAGE_HEIGHT - 1)
+	{
+		// １つ下の行がレンガか石でなく下へ移動可能なら
+		if ( (m_pStage->GetTileType(colmun, row + 1) != Tile::TileType::Blick)	// レンガ
+		  && (m_pStage->GetTileType(colmun, row + 1) != Tile::TileType::Stone)	// 石
+		   )
+		{
+			// 下に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
+			int distance = GetPseudoDistance(colmun, FindCandidateRowBelow(colmun, row));
+			// 最も近い場合は
+			if (distance < *bestGuradDistance)
+			{
+				// プレイヤーとの疑似距離を更新
+				*bestGuradDistance = distance;
+				// 行動を下へ移動へ
+			}
+		}
+	}
+	// 一番上でないなら
+	if (row != 0)
+	{
+		// ハシゴがあり上へ移動可能なら
+		if (m_pStage->GetTileType(colmun, row) == Tile::TileType::Ladder)	// ハシゴ
+		{
+			// 上に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
+			int distance = GetPseudoDistance(colmun, FindCandidateRowAbove(colmun, row));
+			// 最も近い場合は
+			if (distance < *bestGuradDistance)
+			{
+				// プレイヤーとの疑似距離を更新
+				*bestGuradDistance = distance;
+				// 行動を上へ移動へ
+			}
+		}
+	}
+}
+
+// プレイヤーとの疑似距離を求める関数
+int Gurad::GetPseudoDistance(int colmun, int row)
+{
+	int playerColmun = m_pGamePlayScene->GetPlayer()->GetTilePosition().x;
+	int playerRow = m_pGamePlayScene->GetPlayer()->GetTilePosition().y;
+
+	// 同じ行にいる場合
+	if (row == playerRow)
+	{
+		// プレイヤーとの距離を返す
+		return abs(playerColmun - colmun);
+	}
+	// プレイヤーが上にいる
+	else if(row > playerRow)
+	{
+		return 200 + (row - playerRow);
+	}
+	// プレイヤーが下にいる
+	return 100 + (playerRow - row);
+}
+
 

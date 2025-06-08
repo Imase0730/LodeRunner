@@ -183,9 +183,9 @@ void GamePlayScene::GameInitialize()
 	// ----- ガードの初期化 ----- //
 
 	// ガードの人数に応じて行動可能人数のテーブルを設定する
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < GUARD_PHASE_COUNT; i++)
 	{
-		m_guradPattern[i] = GUARD_PATTERNS_LIST[m_stage.GetGuardCount() * 3 + i];
+		m_guradPattern[i] = GUARD_PATTERNS_LIST[m_stage.GetGuardCount() * GUARD_PHASE_COUNT + i];
 	}
 
 	// ガードの位置を設定
@@ -213,6 +213,7 @@ bool GamePlayScene::IsLevelCleared()
 // ガードの更新処理
 void GamePlayScene::GuradsUpdate()
 {
+	// １フレームに行動できるガードの人数分ループ
 	for (int i = 0; i < m_guradPattern[m_guradPhase]; i++)
 	{
 		// ガードがアクティブなら更新
@@ -220,8 +221,8 @@ void GamePlayScene::GuradsUpdate()
 		// 次の行動するガード番号へ
 		m_guradNumber = (m_guradNumber + 1) % m_stage.GetGuardCount();
 	}
-	// 次のフレームの行動可能人数へ
-	m_guradPhase = (m_guradPhase + 1) % 3;
+	// 次の行動可能人数へ
+	m_guradPhase = (m_guradPhase + 1) % GUARD_PHASE_COUNT;
 }
 
 // 得点を加算する関数
