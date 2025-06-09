@@ -14,6 +14,16 @@ class Gurad
 {
 public:
 
+	// 移動方向
+	enum class MoveDirection
+	{
+		None,
+		UP,
+		Down,
+		Left,
+		Right,
+	};
+
 	// 向き
 	enum class Direction
 	{
@@ -107,6 +117,9 @@ private:
 
 	// 復活タイマー
 	int m_resurrectionTimer;
+
+	// 移動方向
+	MoveDirection m_moveDirection;
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
@@ -203,7 +216,16 @@ private:
 	// プレイヤーとの疑似距離を求める関数
 	int GetPseudoDistance(int colmun, int row);
 
-	// 上下へ移動するか評価して選択する関数
+	// 上下へ移動するか調べる関数
 	void SelectMoveUpAndDown(int* bestGuradDistance);
+
+	// 左へ移動するか調べる関数
+	void SelectMoveLeftAndRight(int* bestGuradDistance, int leftColmunLimit, Direction direction);
+
+	// 下に移動可能なタイルか調べる関数
+	bool IsMovableDown(int colmun, int row);
+
+	// 上に移動可能なタイルか調べる関数
+	bool IsMovableUp(int colmun, int row);
 
 };
