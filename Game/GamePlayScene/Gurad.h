@@ -214,7 +214,7 @@ private:
 	bool CheckLeftRightMove(int colmun, int row, Direction direction);
 
 	// ƒvƒŒƒCƒ„[‚Æ‚Ì‹^—‹——£‚ğ‹‚ß‚éŠÖ”
-	int GetPseudoDistance(int colmun, int row);
+	int GetPsuedoDistance(int colmun, int row);
 
 	// ã‰º‚ÖˆÚ“®‚·‚é‚©’²‚×‚éŠÖ”
 	void SelectMoveUpAndDown(int* bestGuradDistance);

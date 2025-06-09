@@ -94,7 +94,6 @@ void Gurad::Update()
 				return;
 			}
 		}
-		return;
 	}
 
 	// 移動方向をリセット
@@ -495,7 +494,7 @@ bool Gurad::IsMovableColumn(int column) const
 		}
 		// 床が空白か罠でないなら移動可能
 		if ( (m_pStage->GetTileType(guardColumn, guardRow + 1) != Tile::TileType::Empty)
-		  || (m_pStage->GetTileType(guardColumn, guardRow + 1) != Tile::TileType::Trap)
+		  && (m_pStage->GetTileType(guardColumn, guardRow + 1) != Tile::TileType::Trap)
 		   )
 		{
 			continue;
@@ -516,11 +515,8 @@ void Gurad::GetLeftRightLimits(int* colmun, Direction direction, int limit)
 	int move = 1;
 	if (direction == Direction::Left) move = -1;
 
-	while (true)
+	while (*colmun != limit)
 	{
-		// 調べるリミット値に達したら終了
-		if (*colmun == limit) break;
-
 		// レンガまたは石なら終了
 		if ( (m_pStage->GetTileType(*colmun + move, row) == Tile::TileType::Blick)		// レンガ
 		  || (m_pStage->GetTileType(*colmun + move, row) == Tile::TileType::Stone)		// 石
@@ -659,6 +655,8 @@ bool Gurad::CheckLeftRightMove(int colmun, int row, Direction direction)
 }
 
 // 上下へ移動するか調べる関数
+//
+// ガードの現在いる位置の上下を調べ最も疑似距離の近い方向へ移動する
 void Gurad::SelectMoveUpAndDown(int* bestGuradDistance)
 {
 	// ガードの位置
@@ -669,7 +667,7 @@ void Gurad::SelectMoveUpAndDown(int* bestGuradDistance)
 	if (IsMovableDown(colmun, row))
 	{
 		// 下に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
-		int distance = GetPseudoDistance(colmun, FindCandidateRowBelow(colmun, row));
+		int distance = GetPsuedoDistance(colmun, FindCandidateRowBelow(colmun, row));
 		// 最も近い場合は
 		if (distance < *bestGuradDistance)
 		{
@@ -683,7 +681,7 @@ void Gurad::SelectMoveUpAndDown(int* bestGuradDistance)
 	if (IsMovableUp(colmun, row))
 	{
 		// 上に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
-		int distance = GetPseudoDistance(colmun, FindCandidateRowAbove(colmun, row));
+		int distance = GetPsuedoDistance(colmun, FindCandidateRowAbove(colmun, row));
 		// 最も近い場合は
 		if (distance < *bestGuradDistance)
 		{
@@ -696,6 +694,8 @@ void Gurad::SelectMoveUpAndDown(int* bestGuradDistance)
 }
 
 // 左へ移動するか調べる関数
+//
+// 移動可能な各行の上下方向を最もプレイヤーとの疑似距離が近い方向へ移動する
 void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Direction direction)
 {
 	// ガードの位置
@@ -709,7 +709,7 @@ void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Dire
 		if (IsMovableDown(colmunLimit, row))
 		{
 			// 下に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
-			int distance = GetPseudoDistance(colmunLimit, FindCandidateRowBelow(colmunLimit, row));
+			int distance = GetPsuedoDistance(colmunLimit, FindCandidateRowBelow(colmunLimit, row));
 			// 最も近い場合は
 			if (distance < *bestGuradDistance)
 			{
@@ -732,7 +732,7 @@ void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Dire
 		if (IsMovableUp(colmunLimit,row))
 		{
 			// 上に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
-			int distance = GetPseudoDistance(colmunLimit, FindCandidateRowAbove(colmunLimit, row));
+			int distance = GetPsuedoDistance(colmunLimit, FindCandidateRowAbove(colmunLimit, row));
 			// 最も近い場合は
 			if (distance < *bestGuradDistance)
 			{
@@ -765,6 +765,8 @@ void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Dire
 }
 
 // 下に移動可能なタイルか調べる関数
+//
+// 下に移動可能：true
 bool Gurad::IsMovableDown(int colmun, int row)
 {
 	if ( (row != Stage::STAGE_HEIGHT - 1)	// １番下の行ではなく
@@ -778,6 +780,8 @@ bool Gurad::IsMovableDown(int colmun, int row)
 }
 
 // 上に移動可能なタイルか調べる関数
+//
+// 上に移動可能：true
 bool Gurad::IsMovableUp(int colmun, int row)
 {
 	if ( (row != 0)	// 一番上の行でなく
@@ -790,8 +794,15 @@ bool Gurad::IsMovableUp(int colmun, int row)
 }
 
 // プレイヤーとの疑似距離を求める関数
-int Gurad::GetPseudoDistance(int colmun, int row)
+//
+// 距離が近いほど選択されやすくなる
+// 選択されやすい順序
+//   １・プレイヤーが同じ行
+//   ２・プレイヤーが下 (+100)
+//   ３・プレイヤーが上 (+200)
+int Gurad::GetPsuedoDistance(int colmun, int row)
 {
+	// プレイヤーの位置
 	int playerColmun = m_pGamePlayScene->GetPlayer()->GetTilePosition().x;
 	int playerRow = m_pGamePlayScene->GetPlayer()->GetTilePosition().y;
 
