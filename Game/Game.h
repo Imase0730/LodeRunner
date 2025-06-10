@@ -18,7 +18,7 @@
 
 #include "TitleScene/TitleScene.h"
 #include "GamePlayScene/GamePlayScene.h"
-#include "StageEditScene/StageEditScene.h"
+#include "LevelEditScene/LevelEditScene.h"
 
 #include "Game/IrisWipe.h"
 
@@ -42,7 +42,7 @@ public:
 		None = -1,
 		Title,		// タイトル
 		GamePlay,	// ゲームプレイ
-		StageEdit,	// ステージエディット
+		LevelEdit,	// レベルエディット
 	};
 
 // クラス定数の宣言 -------------------------------------------------
@@ -51,7 +51,7 @@ public:
 	static constexpr const wchar_t* TITLE = L"Lode Runner";   ///< ゲームタイトル
 
 	// 画面下部の情報ウインドウの縦の表示位置
-	static constexpr int INFOMATION_Y = Screen::GAME_HEIGHT - Tile::TILE_PIXEL_HEIGHT;
+	static constexpr int INFOMATION_Y = Screen::GAME_HEIGHT - Level::TILE_PIXEL_HEIGHT;
 
 // データメンバの宣言 -----------------------------------------------
 private:
@@ -65,7 +65,7 @@ private:
 	// シーンオブジェクト
 	TitleScene m_titleScene;			// タイトルシーン
 	GamePlayScene m_gamePlayScene;		// ゲームプレイシーン
-	StageEditScene m_stageEditScene;	// ステージエディットシーン
+	LevelEditScene m_levelEditScene;	// レベルエディットシーン
 
 	// 描画先のグラフィックハンドル
 	int m_ghScreen;

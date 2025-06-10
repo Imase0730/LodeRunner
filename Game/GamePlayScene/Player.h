@@ -4,10 +4,9 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
-#include "Game/Stage.h"
+#include "Game/Level.h"
 
 class GamePlayScene;
-class Stage;
 
 // プレイヤークラス
 class Player
@@ -15,7 +14,7 @@ class Player
 public:
 
 	// 向き
-	enum class FaceDirection
+	enum class Direction
 	{
 		Right,	// 右
 		Left,	// 左
@@ -116,8 +115,8 @@ private:
 	// ゲームプレイシーンへのポインタ
 	GamePlayScene* m_pGamePlayScene;
 
-	// ステージへのポインタ
-	Stage* m_pStage;
+	// レベルへのポインタ
+	Level* m_pLevel;
 
 	// アクティブならtrueを設定
 	bool m_isActive;
@@ -135,7 +134,7 @@ private:
 	POINT m_adjustPosition;
 
 	// 顔の向き
-	FaceDirection m_faceDirection;
+	Direction m_faceDirection;
 
 	// アニメーションステート
 	PlayerAnimationState m_playerAnimationState;
@@ -144,13 +143,13 @@ private:
 	DigDirection m_digDirection;
 
 	// 掘るアニメーションステート
-	Tile::DigAnimationState m_digAnimationState;
+	Level::DigAnimationState m_digAnimationState;
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
 
 	// コンストラクタ
-	Player(GamePlayScene* pScene, Stage* pStage);
+	Player(GamePlayScene* pScene, Level* pLevel);
 
 	// デストラクタ
 	~Player();
@@ -188,25 +187,25 @@ private:
 	void AjustRow();
 
 	// 落下しているかチェックする関数
-	bool IsFalling() const;
+	bool IsFalling();
 
 	// 上に移動可能か調べる関数
-	bool IsMovableUp() const;
+	bool IsMovableUp();
 
 	// 下に移動可能か調べる関数
-	bool IsMovableDown() const;
+	bool IsMovableDown();
 
 	// 左に掘れるか調べる関数
-	bool IsDiggableLeft() const;
+	bool IsDiggableLeft();
 
 	// 右に掘れるか調べる関数
-	bool IsDiggableRight() const;
+	bool IsDiggableRight();
 
 	// 左に移動可能か調べる関数
-	bool IsMovableLeft() const;
+	bool IsMovableLeft();
 
 	// 右に移動可能か調べる関数
-	bool IsMovableRight() const;
+	bool IsMovableRight();
 
 	// 左に掘る
 	void DigLeft();
@@ -237,5 +236,14 @@ private:
 
 	// 金塊が拾えるか調べる関数
 	void CheckGoldPickedUp();
+
+	// 移動可能なタイルか調べる関数（上左右）
+	bool IsMovableTileULR(Level::Tile tile);
+
+	// 移動可能なタイルか調べる関数（下）
+	bool IsMovableTileDown(Level::Tile tile);
+
+	// 移動可能なタイルか調べる関数（落下）
+	bool IsMovableTileFall(Level::Tile tile);
 
 };

@@ -5,7 +5,7 @@
 #include "IrisWipe.h"
 
 // マスクデータ
-unsigned char IrisWipe::m_maskData[Stage::STAGE_SCREEN_HEIGHT][Stage::STAGE_SCREEN_WIDTH]{};
+unsigned char IrisWipe::m_maskData[Level::LEVEL_SCREEN_HEIGHT][Level::LEVEL_SCREEN_WIDTH]{};
 
 // コンストラクタ
 IrisWipe::IrisWipe()
@@ -43,9 +43,9 @@ void IrisWipe::Initialize(Mode mode)
 	}
 
 	// マスクデータを初期化
-	for (int i = 0; i < Stage::Stage::STAGE_SCREEN_HEIGHT; i++)
+	for (int i = 0; i < Level::Level::LEVEL_SCREEN_HEIGHT; i++)
 	{
-		for (int j = 0; j < Stage::STAGE_SCREEN_WIDTH; j++)
+		for (int j = 0; j < Level::LEVEL_SCREEN_WIDTH; j++)
 		{
 			m_maskData[i][j] = 0xff;
 		}
@@ -58,9 +58,9 @@ void IrisWipe::Update()
 	if (m_mode == Mode::None) return;
 
 	// 黒で初期化
-	for (int i = 0; i < Stage::Stage::STAGE_SCREEN_HEIGHT; i++)
+	for (int i = 0; i < Level::Level::LEVEL_SCREEN_HEIGHT; i++)
 	{
-		for (int j = 0; j < Stage::STAGE_SCREEN_WIDTH; j++)
+		for (int j = 0; j < Level::LEVEL_SCREEN_WIDTH; j++)
 		{
 			m_maskData[i][j] = 0xff;
 		}
@@ -83,8 +83,8 @@ void IrisWipe::Update()
 				xx = cx + x;
 				yy = cy + y;
 				// 配列外じゃないかチェック
-				if ( (xx >= 0) && (xx < Stage::STAGE_SCREEN_WIDTH)
-				  && (yy >= 0) && (yy < Stage::STAGE_SCREEN_HEIGHT)
+				if ( (xx >= 0) && (xx < Level::LEVEL_SCREEN_WIDTH)
+				  && (yy >= 0) && (yy < Level::LEVEL_SCREEN_HEIGHT)
 				   )
 				{
 					m_maskData[yy][xx] = 0;
@@ -101,7 +101,7 @@ void IrisWipe::Render() const
 	if (m_mode == Mode::None) return;
 
 	// マスクのデータをマスク画面に直接描画する
-	DrawMaskToDirectData(0, 0, Stage::STAGE_SCREEN_WIDTH, Stage::STAGE_SCREEN_HEIGHT, m_maskData, DX_MASKTRANS_BLACK);
+	DrawMaskToDirectData(0, 0, Level::LEVEL_SCREEN_WIDTH, Level::LEVEL_SCREEN_HEIGHT, m_maskData, DX_MASKTRANS_BLACK);
 }
 
 // 終了処理

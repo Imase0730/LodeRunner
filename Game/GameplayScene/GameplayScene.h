@@ -5,11 +5,11 @@
 #pragma once
 
 #include "Game/Screen.h"
-#include "Game/Stage.h"
+#include "Game/Level.h"
 #include "Game/String.h"
 #include "Game/Number.h"
 #include "Player.h"
-#include "Gurad.h"
+//#include "Gurad.h"
 
 // クラスの前方宣言
 class Game;
@@ -34,7 +34,7 @@ private:
 	static constexpr int GUARD_PHASE_COUNT = 3;
 
 	// ガードの１フレームに行動する人数のパターンのリスト
-	static constexpr int GUARD_PATTERNS_LIST[GUARD_PHASE_COUNT * (Stage::GUARD_MAX + 1)] =
+	static constexpr int GUARD_PATTERNS_LIST[GUARD_PHASE_COUNT * (Level::GUARD_MAX + 1)] =
 	{
 		0, 0, 0,	// ガードの人数（0人）
 		0, 1, 1,	// ガードの人数（1人）
@@ -59,7 +59,7 @@ private:
 	int m_updateCounter;
 
 	// ステージ
-	Stage m_stage;
+	Level m_level;
 
 	// SCOREの文字列
 	String m_scoreString;
@@ -86,13 +86,13 @@ private:
 	int m_men;
 
 	// レベル
-	int m_level;
+	int m_levelNo;
 
 	// プレイヤー
 	Player m_player;
 
-	// ガード
-	Gurad* m_pGurad[Stage::GUARD_MAX];
+	//// ガード
+	//Gurad* m_pGurad[Level::GUARD_MAX];
 
 	// ガードの行動人数のパターン
 	int m_guradPattern[GUARD_PHASE_COUNT];
@@ -140,7 +140,7 @@ public:
 	// 得点を加算する関数
 	void AddScore(int score);
 
-	// プレイヤーを取得する関数
-	Player* GetPlayer() { return &m_player; }
+	//// プレイヤーを取得する関数
+	//Player* GetPlayer() { return &m_player; }
 
 };

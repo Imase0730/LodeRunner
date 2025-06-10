@@ -4,8 +4,7 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
-#include "Game/Stage.h"
-#include "Game/Tile.h"
+#include "Game/Level.h"
 
 // アイリスワイプクラス
 class IrisWipe
@@ -25,8 +24,8 @@ public:
 private:
 
 	// ワイプの中心位置
-	static constexpr int WIPE_CENTER_X = Stage::STAGE_SCREEN_WIDTH / 2;
-	static constexpr int WIPE_CENTER_Y = Stage::STAGE_SCREEN_HEIGHT / 2;
+	static constexpr int WIPE_CENTER_X = Level::LEVEL_SCREEN_WIDTH / 2;
+	static constexpr int WIPE_CENTER_Y = Level::LEVEL_SCREEN_HEIGHT / 2;
 
 	// ワイプのフレーム数
 	static constexpr int WIPE_COUNTER = 170;
@@ -39,7 +38,7 @@ private:
 private:
 
 	// マスクデータ
-	static unsigned char m_maskData[Stage::STAGE_SCREEN_HEIGHT][Stage::STAGE_SCREEN_WIDTH];
+	static unsigned char m_maskData[Level::LEVEL_SCREEN_HEIGHT][Level::LEVEL_SCREEN_WIDTH];
 
 	// ワイプ用使マスク用中フラグ
 	bool m_isUse;

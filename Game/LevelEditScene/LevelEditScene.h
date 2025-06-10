@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------------
-// File: StageEditScene.h
+// File: LevelEditScene.h
 //
 //--------------------------------------------------------------------------------------
 #pragma once
 
 #include "Game/Screen.h"
-#include "Game/Stage.h"
+#include "Game/Level.h"
 #include "Game/Blink.h"
 #include "Game/Number.h"
 #include "Game/String.h"
@@ -14,7 +14,7 @@
 class Game;
 
 // ゲームプレイシーン
-class StageEditScene
+class LevelEditScene
 {
 	// 列挙型の定義 -----------------------------------------------------
 public:
@@ -36,8 +36,11 @@ private:
 	// 点滅の間隔
 	static constexpr int BLINK_INTEVAL = 60;
 
-	// ステージの最大値
-	static constexpr int STAGE_MAX = 999;
+	// レベルの最大値
+	static constexpr int LEVEL_MAX = 999;
+
+	// 選択可能なタイルの数
+	static constexpr int SELECT_TILE_MAX = 10;
 
 // データメンバの宣言 -----------------------------------------------
 private:
@@ -45,11 +48,11 @@ private:
 	// このシーンを含むゲームオブジェクトへのポインタ
 	Game* m_pGame;
 
-	// レベル
-	int m_level;
+	// 編集中のステージ番号
+	int m_levelNo;
 
 	// ステージ
-	Stage m_stage;
+	Level m_level;
 
 	// 点滅制御
 	Blink m_blink;
@@ -61,7 +64,7 @@ private:
 	POINT m_cursorEdit;
 
 	// 選択中のタイル
-	Tile::TileType m_selectTile;
+	Level::Tile m_selectTile;
 
 	// SAVEの文字列
 	String m_saveString;
@@ -79,10 +82,10 @@ private:
 public:
 
 	// コンストラクタ
-	StageEditScene(Game* pGame);
+	LevelEditScene(Game* pGame);
 
 	// デストラクタ
-	~StageEditScene();
+	~LevelEditScene();
 
 	// 初期化処理
 	void Initialize();

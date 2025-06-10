@@ -28,7 +28,7 @@ Game::Game()
 	, m_requestedSceneID{ SceneID::None }
 	, m_titleScene{ this }
 	, m_gamePlayScene{ this }
-	, m_stageEditScene{ this }
+	, m_levelEditScene{ this }
 	, m_ghScreen{ -1 }
 	, m_ghTileset{ -1 }
 	, m_irisWipe{}
@@ -188,8 +188,8 @@ void Game::InitializeCurrentScene()
 	case SceneID::GamePlay:		// ゲームプレイ
 		m_gamePlayScene.Initialize();
 		break;
-	case SceneID::StageEdit:	// ステージエディット
-		m_stageEditScene.Initialize();
+	case SceneID::LevelEdit:	// ステージエディット
+		m_levelEditScene.Initialize();
 		break;
 	default:
 		break;
@@ -207,8 +207,8 @@ void Game::UpdateCurrentScene(int keyCondition, int keyTrigger)
 	case SceneID::GamePlay:		// ゲームプレイ
 		m_gamePlayScene.Update(keyCondition, keyTrigger);
 		break;
-	case SceneID::StageEdit:	// ステージエディット
-		m_stageEditScene.Update(keyCondition, keyTrigger);
+	case SceneID::LevelEdit:	// ステージエディット
+		m_levelEditScene.Update(keyCondition, keyTrigger);
 		break;
 	default:
 		break;
@@ -226,8 +226,8 @@ void Game::RenderCurrentScene()
 	case SceneID::GamePlay:		// ゲームプレイ
 		m_gamePlayScene.Render(m_ghTileset);
 		break;
-	case SceneID::StageEdit:	// ステージエディット
-		m_stageEditScene.Render(m_ghTileset);
+	case SceneID::LevelEdit:	// ステージエディット
+		m_levelEditScene.Render(m_ghTileset);
 		break;
 	default:
 		break;
@@ -246,8 +246,8 @@ void Game::FinalizeCurrentScene()
 	case SceneID::GamePlay:		// ゲームプレイ
 		m_gamePlayScene.Finalize();
 		break;
-	case SceneID::StageEdit:	// ステージエディット
-		m_stageEditScene.Finalize();
+	case SceneID::LevelEdit:	// ステージエディット
+		m_levelEditScene.Finalize();
 		break;
 	default:
 		break;
