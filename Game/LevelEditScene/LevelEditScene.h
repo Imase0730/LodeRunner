@@ -49,7 +49,7 @@ private:
 	Game* m_pGame;
 
 	// 編集中のステージ番号
-	int m_levelNo;
+	int m_levelId;
 
 	// ステージ
 	Level m_level;

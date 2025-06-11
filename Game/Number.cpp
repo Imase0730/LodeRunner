@@ -3,7 +3,7 @@
 //
 //--------------------------------------------------------------------------------------
 #include "Number.h"
-#include "Tile.h"
+#include "Level.h"
 
 // コンストラクタ
 Number::Number(POINT position, int digit)
@@ -32,9 +32,9 @@ void Number::Render(int ghTileset) const
 	// 数字の表示
 	for (int i = 0; i < m_digit; i++)
 	{
-		DrawRectGraph( m_position.x + ((m_digit - 1) - i) * Tile::TILE_PIXEL_WIDTH, m_position.y
-					 , (number % 10) * Tile::TILE_PIXEL_WIDTH, 0
-					 , Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT
+		DrawRectGraph( m_position.x + ((m_digit - 1) - i) * Level::TILE_PIXEL_WIDTH, m_position.y
+					 , (number % 10) * Level::TILE_PIXEL_WIDTH, 0
+					 , Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT
 					 , ghTileset, TRUE);
 		number /= 10;
 	}

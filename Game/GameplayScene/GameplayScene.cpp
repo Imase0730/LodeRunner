@@ -18,28 +18,28 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	, m_levelNumber{ POINT{ 25 * Level::TILE_PIXEL_WIDTH, Game::INFOMATION_Y }, 3 }
 	, m_score{ 0 }
 	, m_men{ 0 }
-	, m_levelNo{ 0 }
+	, m_levelId{ 0 }
 	, m_player{ this, &m_level }
-	//, m_pGurad{}
+	, m_pGurad{}
 	, m_guradPattern{ 0, 0, 0 }
 	, m_guradPhase{ 0 }
 	, m_guradNumber{ 0 }
 {
-	//// ガードを生成
-	//for (int i = 0; i < Level::GUARD_MAX; i++)
-	//{
-	//	m_pGurad[i] = new Gurad(this, &m_level);
-	//}
+	// ガードを生成
+	for (int i = 0; i < Level::GUARD_MAX; i++)
+	{
+		m_pGurad[i] = new Gurad(this, &m_level);
+	}
 }
 
 // デストラクタ
 GamePlayScene::~GamePlayScene()
 {
-	//// メモリを解放
-	//for (int i = 0; i < Level::GUARD_MAX; i++)
-	//{
-	//	delete m_pGurad[i];
-	//}
+	// メモリを解放
+	for (int i = 0; i < Level::GUARD_MAX; i++)
+	{
+		delete m_pGurad[i];
+	}
 }
 
 // 初期化処理
@@ -54,8 +54,8 @@ void GamePlayScene::Initialize()
 	m_menNumber.SetNumber(m_men);
 
 	// レベルの初期化
-	m_levelNo = 1;
-	m_levelNumber.SetNumber(m_levelNo);
+	m_levelId = 1;
+	m_levelNumber.SetNumber(m_levelId);
 
 	// ゲームスタート時の初期化
 	GameInitialize();
@@ -93,8 +93,8 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	// プレイヤーの更新
 	m_player.Update(keyCondition, keyTrigger);
 
-	//// ガードの更新
-	//GuradsUpdate();
+	// ガードの更新
+	GuradsUpdate();
 
 	// プレイヤーが生きているなら
 	if (m_player.IsAlive())
@@ -132,11 +132,11 @@ void GamePlayScene::Render(int ghTileset)
 	// プレイヤーの描画
 	m_player.Render(ghTileset);
 
-	//// ガードの描画
-	//for (int i = 0; i < m_level.GetGuardCount(); i++)
-	//{
-	//	m_pGurad[i]->Render(ghTileset);
-	//}
+	// ガードの描画
+	for (int i = 0; i < m_level.GetGuardCount(); i++)
+	{
+		m_pGurad[i]->Render(ghTileset);
+	}
 
 	// 『SCORE』の文字の表示
 	m_scoreString.Render(ghTileset);
@@ -169,11 +169,11 @@ void GamePlayScene::GameInitialize()
 	if (m_player.IsAlive())
 	{
 		// 次のレベルへ
-		m_levelNumber.SetNumber(++m_levelNo);
+		m_levelNumber.SetNumber(++m_levelId);
 	}
 
 	// ステージのロード
-	m_level.Initialize(m_levelNo, Level::Mode::GamePlay);
+	m_level.Initialize(m_levelId, Level::Mode::GamePlay);
 
 	// プレイヤーの初期化
 	POINT pos = m_level.GetPlayerPosition();
@@ -182,19 +182,19 @@ void GamePlayScene::GameInitialize()
 
 	//// ----- ガードの初期化 ----- //
 
-	//// ガードの人数に応じて行動可能人数のテーブルを設定する
-	//for (int i = 0; i < GUARD_PHASE_COUNT; i++)
-	//{
-	//	m_guradPattern[i] = GUARD_PATTERNS_LIST[m_level.GetGuardCount() * GUARD_PHASE_COUNT + i];
-	//}
+	// ガードの人数に応じて行動可能人数のテーブルを設定する
+	for (int i = 0; i < GUARD_PHASE_COUNT; i++)
+	{
+		m_guradPattern[i] = GUARD_PATTERNS_LIST[m_level.GetGuardCount() * GUARD_PHASE_COUNT + i];
+	}
 
-	//// ガードの位置を設定
-	//for (int i = 0; i < m_level.GetGuardCount(); i++)
-	//{
-	//	POINT pos = m_level.GetGuardPosition(i);
-	//	m_pGurad[i]->Initialize(POINT{ pos.x, pos.y }
-	//	, POINT{ Level::TILE_CENTER_X, Level::TILE_CENTER_Y });
-	//}
+	// ガードの位置を設定
+	for (int i = 0; i < m_level.GetGuardCount(); i++)
+	{
+		POINT pos = m_level.GetGuardPosition(i);
+		m_pGurad[i]->Initialize(POINT{ pos.x, pos.y }
+		, POINT{ Level::TILE_CENTER_X, Level::TILE_CENTER_Y });
+	}
 }
 
 // レベルクリアか調べる関数
@@ -213,16 +213,16 @@ bool GamePlayScene::IsLevelCleared()
 // ガードの更新処理
 void GamePlayScene::GuradsUpdate()
 {
-	//// １フレームに行動できるガードの人数分ループ
-	//for (int i = 0; i < m_guradPattern[m_guradPhase]; i++)
-	//{
-	//	// ガードがアクティブなら更新
-	//	if (m_pGurad[m_guradNumber]->IsActive()) m_pGurad[m_guradNumber]->Update();
-	//	// 次の行動するガード番号へ
-	//	m_guradNumber = (m_guradNumber + 1) % m_level.GetGuardCount();
-	//}
-	//// 次の行動可能人数へ
-	//m_guradPhase = (m_guradPhase + 1) % GUARD_PHASE_COUNT;
+	// １フレームに行動できるガードの人数分ループ
+	for (int i = 0; i < m_guradPattern[m_guradPhase]; i++)
+	{
+		// ガードがアクティブなら更新
+		if (m_pGurad[m_guradNumber]->IsActive()) m_pGurad[m_guradNumber]->Update();
+		// 次の行動するガード番号へ
+		m_guradNumber = (m_guradNumber + 1) % m_level.GetGuardCount();
+	}
+	// 次の行動可能人数へ
+	m_guradPhase = (m_guradPhase + 1) % GUARD_PHASE_COUNT;
 }
 
 // 得点を加算する関数

@@ -4,10 +4,8 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
-#include "Game/Stage.h"
-
 class GamePlayScene;
-class Stage;
+class Level;
 
 // ガードクラス
 class Gurad
@@ -89,7 +87,7 @@ private:
 	GamePlayScene* m_pGamePlayScene;
 
 	// ステージへのポインタ
-	Stage* m_pStage;
+	Level* m_pLevel;
 
 	// アクティブならtrueを設定
 	bool m_isActive;
@@ -125,7 +123,7 @@ private:
 public:
 
 	// コンストラクタ
-	Gurad(GamePlayScene* pScene, Stage* pStage);
+	Gurad(GamePlayScene* pScene, Level* pLevel);
 
 	// デストラクタ
 	~Gurad();

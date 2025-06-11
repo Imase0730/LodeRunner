@@ -31,12 +31,9 @@ public:
 		Player,				// プレイヤー
 	};
 
-	// 掘るアニメーションステート
-	enum class DigAnimationState
+	// 復元するレンガのアニメーションステート
+	enum class FillAnimationState
 	{
-		NotDigging = -1,
-		Dig01, Dig02, Dig03, Dig04, Dig05, Dig06,
-		Dig07, Dig08, Dig09, Dig10, Dig11, Dig12,
 		Fill01, Fill02,
 	};
 
@@ -79,6 +76,9 @@ public:
 	// ステージ上に置けるガードの最大数
 	static constexpr int GUARD_MAX = 5;
 
+	// ステージ上に置ける隠れハシゴの最大数
+	static constexpr int INVISIBLE_LADDER_MAX = 45;
+
 	// 掘ったレンガ情報を記憶するワークの最大数
 	static constexpr int DIG_BRICK_MAX = 30;
 
@@ -104,16 +104,9 @@ public:
 		{ 9, 4 },	// プレイヤー
 	};
 
-	// 掘られているレンガの絵の位置
-	static constexpr POINT DIG_BRICK_SPRITES[] =
+	// 復元するレンガの絵の位置
+	static constexpr POINT FILL_BRICK_SPRITES[] =
 	{
-		{ 0, 10 }, { 0, 10 },
-		{ 1, 10 }, { 1, 10 },
-		{ 2, 10 }, { 2, 10 },
-		{ 3, 10 }, { 3, 10 },
-		{ 4, 10 }, { 4, 10 },
-		{ 5, 10 }, { 5, 10 },
-
 		{ 6, 10 }, { 7, 10 },
 	};
 
@@ -133,13 +126,16 @@ private:
 	Mode m_mode;
 
 	// レベル番号
-	int m_levelNo;
+	int m_levelId;
 
 	// ステージ上のガードの数
 	int m_guardCount;
 
 	// ステージ上の金塊の数
 	int m_goldCount;
+
+	// ステージ上の隠れハシゴの数
+	int m_invisibleLadderCount;
 
 	// プレイヤーの初期位置
 	POINT m_playerPosition;
@@ -149,6 +145,9 @@ private:
 
 	// 掘ったレンガの情報記録用
 	DigBrick m_digBrick[DIG_BRICK_MAX];
+
+	// 隠れハシゴの情報記録用
+	POINT m_invisibleLadderPosition[INVISIBLE_LADDER_MAX];
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
@@ -169,7 +168,7 @@ public:
 	void Render(int ghTileset) const;
 
 	// レベル番号の取得
-	int GetLevel() const { return m_levelNo; }
+	int GetLevel() const { return m_levelId; }
 
 	// タイルを設定する関数（Page1）
 	void SetTilePage1(int x, int y, Tile tile) { m_page1[y][x] = tile; }
@@ -183,16 +182,13 @@ public:
 	// タイルを取得する関数（Page2）
 	Tile GetTilePage2(int x, int y) const { return m_page2[y][x]; }
 
-	//// 指定場所のタイルの掘るアニメーションを設定する関数
-	//void SetTileDigAnimationState(int x, int y, Tile::DigAnimationState state) { m_stageData[y][x].SetDigAnimationState(state); }
-
 	// 指定レベルをセーブする関数
 	bool SaveLevel(int level);
 
 	// 指定レベルをロードする関数
 	bool LoadLevel(int level, Mode mode);
 
-	// ハシゴを出現する関数
+	// 隠しハシゴを出現する関数
 	void AppearLadder();
 
 	// プレイヤーの位置を取得する関数
@@ -212,6 +208,15 @@ public:
 
 	// ガードの位置を取得する関数
 	POINT GetGuardPosition(int index) const { return m_guardPosition[index]; }
+
+	// 移動可能なタイルか調べる関数（上左右）
+	static bool IsMovableTileULR(Level::Tile tile);
+
+	// 移動可能なタイルか調べる関数（下）
+	static bool IsMovableTileDown(Level::Tile tile);
+
+	// 移動可能なタイルか調べる関数（落下）
+	static bool IsMovableTileFall(Level::Tile tile);
 
 };
 

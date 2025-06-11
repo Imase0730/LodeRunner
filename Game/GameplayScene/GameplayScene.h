@@ -9,7 +9,7 @@
 #include "Game/String.h"
 #include "Game/Number.h"
 #include "Player.h"
-//#include "Gurad.h"
+#include "Gurad.h"
 
 // クラスの前方宣言
 class Game;
@@ -86,13 +86,13 @@ private:
 	int m_men;
 
 	// レベル
-	int m_levelNo;
+	int m_levelId;
 
 	// プレイヤー
 	Player m_player;
 
-	//// ガード
-	//Gurad* m_pGurad[Level::GUARD_MAX];
+	// ガード
+	Gurad* m_pGurad[Level::GUARD_MAX];
 
 	// ガードの行動人数のパターン
 	int m_guradPattern[GUARD_PHASE_COUNT];
@@ -140,7 +140,7 @@ public:
 	// 得点を加算する関数
 	void AddScore(int score);
 
-	//// プレイヤーを取得する関数
-	//Player* GetPlayer() { return &m_player; }
+	// プレイヤーを取得する関数
+	Player* GetPlayer() { return &m_player; }
 
 };

@@ -12,7 +12,7 @@ LevelEditScene::LevelEditScene(Game* pGame)
 	, m_cursorEdit{ 0, 0 }
 	, m_selectTile{ Level::Tile::Blick }
 	, m_blink{ BLINK_INTEVAL }
-	, m_levelNo{ 0 }
+	, m_levelId{ 0 }
 	, m_mode{ Mode::SelectTile }
 	, m_saveString{ POINT{ Level::TILE_PIXEL_WIDTH * 10 , Game::INFOMATION_Y }, "SAVE" }
 	, m_loadString{ POINT{ Level::TILE_PIXEL_WIDTH * 15 , Game::INFOMATION_Y }, "LOAD" }
@@ -33,14 +33,14 @@ void LevelEditScene::Initialize()
 	// 各変数の初期化
 	m_cursorEdit = POINT{ 0, 0 };
 	m_selectTile = Level::Tile::Blick;
-	m_levelNo = 1;
+	m_levelId = 1;
 	m_mode = Mode::SelectTile;
 
 	// レベルの数字の表示
-	m_levelNumber.SetNumber(m_levelNo);
+	m_levelNumber.SetNumber(m_levelId);
 
 	// レベルの初期化
-	m_level.Initialize(m_levelNo, Level::Mode::LevelEdit);
+	m_level.Initialize(m_levelId, Level::Mode::LevelEdit);
 }
 
 // 更新処理
@@ -243,20 +243,20 @@ void LevelEditScene::Save(int keyTrigger, int keyRepeat)
 	// Zキーでセーブ
 	if (keyTrigger & PAD_INPUT_1)
 	{
-		m_level.SaveLevel(m_levelNo);
+		m_level.SaveLevel(m_levelId);
 	}
 	// 上キーまたはWキーでレベル加算
 	if ((keyRepeat & PAD_INPUT_UP) || (keyRepeat & PAD_INPUT_8))
 	{
-		if (m_levelNo < LEVEL_MAX) m_levelNo++;
+		if (m_levelId < LEVEL_MAX) m_levelId++;
 	}
 	// 下キーまたはSキーでレベル減算
 	if ((keyRepeat & PAD_INPUT_DOWN) || (keyRepeat & PAD_INPUT_5))
 	{
-		if (m_levelNo > 1) m_levelNo--;
+		if (m_levelId > 1) m_levelId--;
 	}
 	// レベルの設定
-	m_levelNumber.SetNumber(m_levelNo);
+	m_levelNumber.SetNumber(m_levelId);
 }
 
 // ロード
@@ -265,23 +265,23 @@ void LevelEditScene::Load(int keyTrigger, int keyRepeat)
 	// Zキーでロード
 	if (keyTrigger & PAD_INPUT_1)
 	{
-		if (m_levelNo != m_level.GetLevel())
+		if (m_levelId != m_level.GetLevel())
 		{
-			m_level.Initialize(m_levelNo, Level::Mode::LevelEdit);
+			m_level.Initialize(m_levelId, Level::Mode::LevelEdit);
 		}
 	}
 	// 上キーまたはWキーでレベル加算
 	if ((keyRepeat & PAD_INPUT_UP) || (keyRepeat & PAD_INPUT_8))
 	{
-		if (m_levelNo < LEVEL_MAX) m_levelNo++;
+		if (m_levelId < LEVEL_MAX) m_levelId++;
 	}
 	// 下キーまたはSキーでレベル減算
 	if ((keyRepeat & PAD_INPUT_DOWN) || (keyRepeat & PAD_INPUT_5))
 	{
-		if (m_levelNo > 1) m_levelNo--;
+		if (m_levelId > 1) m_levelId--;
 	}
 	// レベルの設定
-	m_levelNumber.SetNumber(m_levelNo);
+	m_levelNumber.SetNumber(m_levelId);
 }
 
 

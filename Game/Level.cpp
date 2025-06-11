@@ -14,12 +14,14 @@ Level::Level(Mode mode)
 	, m_page1{}
 	, m_page2{}
 	, m_mode{ mode }
-	, m_levelNo{ 0 }
+	, m_levelId{ 0 }
 	, m_guardCount{ 0 }
 	, m_goldCount{ 0 }
+	, m_invisibleLadderCount{ 0 }
 	, m_playerPosition{ 0, 0 }
 	, m_guardPosition{}
 	, m_digBrick{}
+	, m_invisibleLadderPosition{}
 {
 }
 
@@ -32,7 +34,7 @@ Level::~Level()
 void Level::Initialize(int levelNo, Mode mode)
 {
 	// レベルが違っていればレベルをロードする
-	if (levelNo != m_levelNo) LoadLevel(levelNo, mode);
+	if (levelNo != m_levelId) LoadLevel(levelNo, mode);
 
 	// ステージデータの初期化
 	for (int i = 0; i < MAX_GAME_ROW + 1; i++)
@@ -53,25 +55,40 @@ void Level::Initialize(int levelNo, Mode mode)
 	// 金塊の数を初期化
 	m_goldCount = 0;
 
+	// 隠しハシゴの数を初期化
+	m_invisibleLadderCount = 0;
+
 	// ロードしたデータからステージデータを作成
 	for (int i = 0; i < MAX_GAME_ROW + 1; i++)
 	{
 		for (int j = 0; j < MAX_GAME_COLMUN + 1; j++)
 		{
+			// タイルの種類
 			Tile tile = m_loadData[i][j];
 
 			// プレイヤーなら位置を取得
 			if (tile == Tile::Player) m_playerPosition = POINT{ j, i };
 
-			// ガードなら位置を取得
-			if ((m_guardCount < GUARD_MAX - 1) && (tile == Tile::Guard))
+			// ガードなら
+			if ((tile == Tile::Guard) && (m_guardCount < GUARD_MAX - 1))
 			{
+				// ガードの位置を記憶
 				m_guardPosition[m_guardCount] = POINT{ j, i };
+				// ガードの数を加算
 				m_guardCount++;
 			}
 
 			// 金塊なら金塊の数を加算
 			if (tile == Tile::Gold) m_goldCount++;
+
+			// 隠しハシゴなら
+			if ((tile == Tile::InvisibleLadder) && (m_invisibleLadderCount < INVISIBLE_LADDER_MAX - 1))
+			{
+				// 隠しハシゴの位置を記憶する
+				m_invisibleLadderPosition[m_invisibleLadderCount] = POINT{ j, i };
+				// 隠しハシゴの数を加算
+				m_invisibleLadderCount++;
+			}
 
 			// ステージデータを作成
 			if ( (m_mode != Mode::GamePlay)
@@ -94,26 +111,22 @@ void Level::Initialize(int levelNo, Mode mode)
 // 更新処理
 void Level::Update()
 {
-	//// 掘ったブロックを元に戻す
-	//for (int i = 0; i < DIG_BRICK_MAX; i++)
-	//{
-	//	// 復元タイマーが０でない
-	//	if (m_digBrick[i].timer != 0)
-	//	{
-	//		// 復元タイマーを減算する
-	//		m_digBrick[i].timer--;
+	// 掘ったブロックを元に戻す
+	for (int i = 0; i < DIG_BRICK_MAX; i++)
+	{
+		// 復元タイマーが０でない
+		if (m_digBrick[i].timer != 0)
+		{
+			// 復元タイマーを減算する
+			m_digBrick[i].timer--;
 
-	//		// 復元するレンガの位置
-	//		int x = m_digBrick[i].position.x;
-	//		int y = m_digBrick[i].position.y;
-
-	//		// レンガの復元アニメーション
-	//		if (m_digBrick[i].timer == BRICK_ANIME_TIME_FILL01) m_stageData[y][x].SetDigAnimationState(Tile::DigAnimationState::Fill01);
-	//		if (m_digBrick[i].timer == BRICK_ANIME_TIME_FILL02) m_stageData[y][x].SetDigAnimationState(Tile::DigAnimationState::Fill02);
-	//		if (m_digBrick[i].timer == 0) m_stageData[y][x].SetDigAnimationState(Tile::DigAnimationState::NotDigging);
-	//		if (m_digBrick[i].timer == 0) m_stageData[y][x].SetTileType(Tile::TileType::Blick);
-	//	}
-	//}
+			// レンガに戻る
+			if (m_digBrick[i].timer == 0)
+			{
+				m_page1[m_digBrick[i].position.y][m_digBrick[i].position.x] = Tile::Blick;
+			}
+		}
+	}
 
 	// 金塊が全てなくなったら隠れハシゴを出現させる
 	if (m_goldCount == 0)
@@ -136,6 +149,7 @@ void Level::Render(int ghTileset) const
 			int x = j * TILE_PIXEL_WIDTH;
 			int y = i * TILE_PIXEL_HEIGHT;
 
+			// ページ２のタイルを描画対象にする
 			Tile tile = m_page2[i][j];
 
 			// ゲームプレイなら
@@ -144,18 +158,46 @@ void Level::Render(int ghTileset) const
 				// 罠はレンガで表示する
 				if (m_page2[i][j] == Tile::Trap) tile = Tile::Blick;
 
-				// プレイヤーが穴を開けた場所
+				// プレイヤーが穴を開けた場所の場合
 				if ((m_page2[i][j] == Tile::Blick) && (m_page1[i][j] == Tile::Empty))
 				{
+					// レンガの表示はしない
 					tile = Tile::Empty;
 				}
 			}
 			// タイルの絵の位置
 			POINT pos = TILE_SPRITES[static_cast<int>(tile)];
-			// タイルを描画
-			DrawRectGraph(x, y
-				, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
-				, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+			//// タイルを描画
+			//DrawRectGraph(x, y
+			//	, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
+			//	, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+		}
+	}
+
+	// 復元中のレンガの描画
+	for (int i = 0; i < DIG_BRICK_MAX; i++)
+	{
+		// 復元タイマーが０でない
+		if (m_digBrick[i].timer)
+		{
+			// 掘っているレンガの絵の位置
+			POINT pos = m_digBrick[i].position;
+			if (m_digBrick[i].timer <= BRICK_ANIME_TIME_FILL02)
+			{
+				// 復元中のレンガ２
+				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill02)];
+				DrawRectGraph(pos.x * TILE_PIXEL_WIDTH, pos.y * TILE_PIXEL_HEIGHT
+					, TILE_PIXEL_WIDTH * spritePos.x, TILE_PIXEL_HEIGHT * spritePos.y
+					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+			}
+			else if (m_digBrick[i].timer <= BRICK_ANIME_TIME_FILL01)
+			{
+				// 復元中のレンガ１
+				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill01)];
+				DrawRectGraph(pos.x * TILE_PIXEL_WIDTH, pos.y * TILE_PIXEL_HEIGHT
+					, TILE_PIXEL_WIDTH * spritePos.x, TILE_PIXEL_HEIGHT * spritePos.y
+					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+			}
 		}
 	}
 
@@ -165,6 +207,28 @@ void Level::Render(int ghTileset) const
 		DrawRectGraph(j * TILE_PIXEL_WIDTH, (MAX_GAME_ROW + 1) * TILE_PIXEL_HEIGHT
 			, TILE_PIXEL_WIDTH * 2, TILE_PIXEL_HEIGHT * 4, TILE_PIXEL_WIDTH, 4, ghTileset, FALSE);
 	}
+
+	// ステージの描画
+	for (int i = 0; i < MAX_GAME_ROW + 1; i++)
+	{
+		for (int j = 0; j < MAX_GAME_COLMUN + 1; j++)
+		{
+			// 描画位置
+			int x = j * TILE_PIXEL_WIDTH;
+			int y = i * TILE_PIXEL_HEIGHT;
+
+			// ページ２のタイルを描画対象にする
+			Tile tile = m_page1[i][j];
+
+			// タイルの絵の位置
+			POINT pos = TILE_SPRITES[static_cast<int>(tile)];
+			// タイルを描画
+			DrawRectGraph(x, y
+				, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
+				, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+		}
+	}
+
 }
 
 // 指定レベルをセーブする関数
@@ -228,23 +292,18 @@ bool Level::LoadLevel(int level, Mode mode)
 	ifs.close();
 
 	// レベルを設定
-	m_levelNo = level;
+	m_levelId = level;
 
 	return false;
 }
 
-// ハシゴを出現する関数
+// 隠しハシゴを出現する関数
 void Level::AppearLadder()
 {
-	for (int i = 0; i < MAX_GAME_ROW + 1; i++)
+	for (int i = 0; i < m_invisibleLadderCount; i++)
 	{
-		for (int j = 0; j < MAX_GAME_COLMUN + 1; j++)
-		{
-			if (m_loadData[i][j] == Tile::InvisibleLadder)
-			{
-				m_page2[i][j] = Tile::Ladder;
-			}
-		}
+		POINT pos = m_invisibleLadderPosition[i];
+		m_page2[pos.y][pos.x] = Tile::Ladder;
 	}
 }
 
@@ -265,3 +324,43 @@ void Level::SetFillBrick(int x, int y)
 	}
 }
 
+// 移動可能なタイルか調べる関数（上左右）
+bool Level::IsMovableTileULR(Level::Tile tile)
+{
+	// ブロック、石、罠なら移動不可
+	if ((tile == Level::Tile::Blick)
+		|| (tile == Level::Tile::Stone)
+		|| (tile == Level::Tile::Trap)
+		)
+	{
+		return false;
+	}
+	return true;
+}
+
+// 移動可能なタイルか調べる関数（下）
+bool Level::IsMovableTileDown(Level::Tile tile)
+{
+	// ブロック、石なら移動不可
+	if ((tile == Level::Tile::Blick)
+		|| (tile == Level::Tile::Stone)
+		)
+	{
+		return false;
+	}
+	return true;
+}
+
+// 移動可能なタイルか調べる関数（落下）
+bool Level::IsMovableTileFall(Level::Tile tile)
+{
+	// ブロック、石、ハシゴなら移動可
+	if ((tile == Level::Tile::Blick)
+		|| (tile == Level::Tile::Stone)
+		|| (tile == Level::Tile::Ladder)
+		)
+	{
+		return false;
+	}
+	return true;
+}

@@ -20,7 +20,7 @@ public:
 		Left,	// 左
 	};
 
-	// アニメーションインデックス
+	// アニメーションステート
 	enum class PlayerAnimationState
 	{
 		Run01_L, Run02_L, Run03_L,		// 走り（左向き）
@@ -42,6 +42,14 @@ public:
 		NotDigging,	// 掘っていない
 		Right,		// 右
 		Left,		// 左
+	};
+
+	// 掘るアニメーションステート
+	enum class DigAnimationState
+	{
+		NotDigging = -1,
+		Dig01, Dig02, Dig03, Dig04, Dig05, Dig06,
+		Dig07, Dig08, Dig09, Dig10, Dig11, Dig12,
 	};
 
 	// クラス定数の宣言 -------------------------------------------------
@@ -85,6 +93,17 @@ private:
 		// ハシゴを上っている
 		{ 6, 5 },
 		{ 7, 5 },
+	};
+
+	// 掘られているレンガの絵の位置
+	static constexpr POINT DIG_BRICK_SPRITES[] =
+	{
+		{ 0, 10 }, { 0, 10 },
+		{ 1, 10 }, { 1, 10 },
+		{ 2, 10 }, { 2, 10 },
+		{ 3, 10 }, { 3, 10 },
+		{ 4, 10 }, { 4, 10 },
+		{ 5, 10 }, { 5, 10 },
 	};
 
 	// 掘っている最中のレンガの破片の絵の位置（左向き）
@@ -143,7 +162,7 @@ private:
 	DigDirection m_digDirection;
 
 	// 掘るアニメーションステート
-	Level::DigAnimationState m_digAnimationState;
+	DigAnimationState m_digAnimationState;
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
@@ -231,19 +250,10 @@ private:
 	// プレイヤーアニメーションステートの設定
 	void SetPlayerAnimationState(PlayerAnimationState start, PlayerAnimationState end);
 
-	// 掘るアニメーションステートの設定
-	void SetDigAnimationState();
+	// 掘るアニメーションの更新
+	void UpdateDigAnimation();
 
 	// 金塊が拾えるか調べる関数
 	void CheckGoldPickedUp();
-
-	// 移動可能なタイルか調べる関数（上左右）
-	bool IsMovableTileULR(Level::Tile tile);
-
-	// 移動可能なタイルか調べる関数（下）
-	bool IsMovableTileDown(Level::Tile tile);
-
-	// 移動可能なタイルか調べる関数（落下）
-	bool IsMovableTileFall(Level::Tile tile);
 
 };
