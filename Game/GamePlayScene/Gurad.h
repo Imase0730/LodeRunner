@@ -4,8 +4,9 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
+#include "Game/Level.h"
+
 class GamePlayScene;
-class Level;
 
 // ガードクラス
 class Gurad
@@ -161,19 +162,19 @@ private:
 	void AjustRow();
 
 	// 落下しているかチェックする関数
-	bool IsFalling() const;
+	bool IsFalling();
 
 	// 上に移動可能か調べる関数
-	bool IsMovableUp() const;
+	bool IsMovableUp();
 
 	// 下に移動可能か調べる関数
-	bool IsMovableDown() const;
+	bool IsMovableDown();
 
 	// 左に移動可能か調べる関数
-	bool IsMovableLeft() const;
+	bool IsMovableLeft();
 
 	// 右に移動可能か調べる関数
-	bool IsMovableRight() const;
+	bool IsMovableRight();
 
 	// 落下中
 	void Falling();
@@ -197,7 +198,7 @@ private:
 	void CheckGoldPickedUp();
 
 	// 指定した行まで移動可能か調べる関数
-	bool IsMovableColumn(int column) const;
+	bool IsMovableColumn(int column);
 	
 	// 左右どこまで移動できるか取得する関数
 	void GetLeftRightLimits(int* colmun, Direction direction, int limit);
@@ -225,5 +226,17 @@ private:
 
 	// 上に移動可能なタイルか調べる関数
 	bool IsMovableUp(int colmun, int row);
+
+	// 移動可能なタイルか調べる関数（落下）
+	bool IsMovableTileFall(Level::Tile page1, Level::Tile page2);
+
+	// 移動可能なタイルか調べる関数（左右）
+	bool IsMovableTileLR(Level::Tile page1, Level::Tile page2);
+
+	// 移動可能なタイルか調べる関数（上）
+	bool IsMovableTileU(Level::Tile page1);
+
+	// 移動可能なタイルか調べる関数（下）
+	bool IsMovableTileD(Level::Tile page1);
 
 };

@@ -256,4 +256,7 @@ private:
 	// 金塊が拾えるか調べる関数
 	void CheckGoldPickedUp();
 
+	// 移動可能なタイルか調べる関数（落下）
+	bool IsMovableTileFall(Level::Tile page1, Level::Tile page2);
+
 };

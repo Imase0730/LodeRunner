@@ -54,7 +54,7 @@ void GamePlayScene::Initialize()
 	m_menNumber.SetNumber(m_men);
 
 	// レベルの初期化
-	m_levelId = 1;
+	m_levelId = 2;
 	m_levelNumber.SetNumber(m_levelId);
 
 	// ゲームスタート時の初期化

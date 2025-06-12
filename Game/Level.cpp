@@ -167,10 +167,10 @@ void Level::Render(int ghTileset) const
 			}
 			// タイルの絵の位置
 			POINT pos = TILE_SPRITES[static_cast<int>(tile)];
-			//// タイルを描画
-			//DrawRectGraph(x, y
-			//	, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
-			//	, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+			// タイルを描画
+			DrawRectGraph(x, y
+				, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
+				, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 		}
 	}
 
@@ -208,26 +208,26 @@ void Level::Render(int ghTileset) const
 			, TILE_PIXEL_WIDTH * 2, TILE_PIXEL_HEIGHT * 4, TILE_PIXEL_WIDTH, 4, ghTileset, FALSE);
 	}
 
-	// ステージの描画
-	for (int i = 0; i < MAX_GAME_ROW + 1; i++)
-	{
-		for (int j = 0; j < MAX_GAME_COLMUN + 1; j++)
-		{
-			// 描画位置
-			int x = j * TILE_PIXEL_WIDTH;
-			int y = i * TILE_PIXEL_HEIGHT;
+	//// ステージの描画
+	//for (int i = 0; i < MAX_GAME_ROW + 1; i++)
+	//{
+	//	for (int j = 0; j < MAX_GAME_COLMUN + 1; j++)
+	//	{
+	//		// 描画位置
+	//		int x = j * TILE_PIXEL_WIDTH;
+	//		int y = i * TILE_PIXEL_HEIGHT;
 
-			// ページ２のタイルを描画対象にする
-			Tile tile = m_page1[i][j];
+	//		// ページ２のタイルを描画対象にする
+	//		Tile tile = m_page1[i][j];
 
-			// タイルの絵の位置
-			POINT pos = TILE_SPRITES[static_cast<int>(tile)];
-			// タイルを描画
-			DrawRectGraph(x, y
-				, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
-				, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
-		}
-	}
+	//		// タイルの絵の位置
+	//		POINT pos = TILE_SPRITES[static_cast<int>(tile)];
+	//		// タイルを描画
+	//		DrawRectGraph(x, y
+	//			, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
+	//			, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+	//	}
+	//}
 
 }
 
@@ -351,16 +351,3 @@ bool Level::IsMovableTileDown(Level::Tile tile)
 	return true;
 }
 
-// 移動可能なタイルか調べる関数（落下）
-bool Level::IsMovableTileFall(Level::Tile tile)
-{
-	// ブロック、石、ハシゴなら移動可
-	if ((tile == Level::Tile::Blick)
-		|| (tile == Level::Tile::Stone)
-		|| (tile == Level::Tile::Ladder)
-		)
-	{
-		return false;
-	}
-	return true;
-}

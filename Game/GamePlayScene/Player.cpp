@@ -290,7 +290,9 @@ bool Player::IsFalling()
 	if (m_tilePosition.y == Level::MAX_GAME_ROW) return false;
 
 	// 下の行が落下可能なら
-	if (Level::IsMovableTileFall(m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y + 1))) return true;
+	Level::Tile page1 = m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y + 1);
+	Level::Tile page2 = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y + 1);
+	if (IsMovableTileFall(page1, page2)) return true;
 
 	return false;
 }
@@ -474,14 +476,13 @@ void Player::Falling()
 	if (m_adjustPosition.y > 4)
 	{
 		m_adjustPosition.y = 0;
-		if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Rope)
+		Level::Tile page2 = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
+		if (page2 != Level::Tile::Blick)
 		{
-			// ロープから落下
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Rope);
+			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, page2);
 		}
 		else
 		{
-			// 空白から落下
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Empty);
 		}
 		m_tilePosition.y++;
@@ -691,5 +692,28 @@ void Player::CheckGoldPickedUp()
 		// 得点を加算
 		m_pGamePlayScene->AddScore(GamePlayScene::GOLD_SCORE);
 	}
+}
+
+bool Player::IsMovableTileFall(Level::Tile page1, Level::Tile page2)
+{
+	// 空白なら落下
+	if (page1 == Level::Tile::Empty)
+	{
+		return true;
+	}
+
+	// ガードなら落下しない
+	if (page1 == Level::Tile::Guard)
+	{
+		return false;
+	}
+
+	// レンガ、石、ハシゴなら落下しない
+	if ((page2 == Level::Tile::Blick) || (page2 == Level::Tile::Stone) || (page2 == Level::Tile::Ladder))
+	{
+		return false;
+	}
+
+	return true;
 }
 

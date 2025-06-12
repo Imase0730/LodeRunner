@@ -215,8 +215,5 @@ public:
 	// 移動可能なタイルか調べる関数（下）
 	static bool IsMovableTileDown(Level::Tile tile);
 
-	// 移動可能なタイルか調べる関数（落下）
-	static bool IsMovableTileFall(Level::Tile tile);
-
 };
 
