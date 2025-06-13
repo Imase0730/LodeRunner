@@ -149,22 +149,19 @@ void Level::Render(int ghTileset) const
 			int x = j * TILE_PIXEL_WIDTH;
 			int y = i * TILE_PIXEL_HEIGHT;
 
-			// ページ２のタイルを描画対象にする
+			// ページ２を描画対象にする
 			Tile tile = m_page2[i][j];
 
 			// ゲームプレイなら
 			if (m_mode == Mode::GamePlay)
 			{
-				// 罠はレンガで表示する
-				if (m_page2[i][j] == Tile::Trap) tile = Tile::Blick;
+				// 罠はレンガで描画
+				if (tile == Tile::Trap) tile = Tile::Blick;
 
-				// プレイヤーが穴を開けた場所の場合
-				if ((m_page2[i][j] == Tile::Blick) && (m_page1[i][j] == Tile::Empty))
-				{
-					// レンガの表示はしない
-					tile = Tile::Empty;
-				}
+				// Page1が空白の場合、空白を描画
+				if (m_page1[i][j] == Tile::Empty) tile = Tile::Empty;
 			}
+
 			// タイルの絵の位置
 			POINT pos = TILE_SPRITES[static_cast<int>(tile)];
 			// タイルを描画
@@ -188,7 +185,7 @@ void Level::Render(int ghTileset) const
 				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill02)];
 				DrawRectGraph(pos.x * TILE_PIXEL_WIDTH, pos.y * TILE_PIXEL_HEIGHT
 					, TILE_PIXEL_WIDTH * spritePos.x, TILE_PIXEL_HEIGHT * spritePos.y
-					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, FALSE);
 			}
 			else if (m_digBrick[i].timer <= BRICK_ANIME_TIME_FILL01)
 			{
@@ -196,7 +193,15 @@ void Level::Render(int ghTileset) const
 				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill01)];
 				DrawRectGraph(pos.x * TILE_PIXEL_WIDTH, pos.y * TILE_PIXEL_HEIGHT
 					, TILE_PIXEL_WIDTH * spritePos.x, TILE_PIXEL_HEIGHT * spritePos.y
-					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, FALSE);
+			}
+			else
+			{
+				// 空白
+				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::EMPTY)];
+				DrawRectGraph(pos.x * TILE_PIXEL_WIDTH, pos.y * TILE_PIXEL_HEIGHT
+					, TILE_PIXEL_WIDTH * spritePos.x, TILE_PIXEL_HEIGHT * spritePos.y
+					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, FALSE);
 			}
 		}
 	}

@@ -342,12 +342,11 @@ bool Player::IsDiggableLeft()
 	// 一番左の列なら掘れない
 	if (m_tilePosition.x == 0) return false;
 
-	// 左が空白か隠しハシゴでない
-	Level::Tile tileType = m_pLevel->GetTilePage2(m_tilePosition.x - 1, m_tilePosition.y);
-	if ((tileType != Level::Tile::Empty) && (tileType != Level::Tile::InvisibleLadder)) return false;
-
 	// 左下がブロックでない
-	if (m_pLevel->GetTilePage2(m_tilePosition.x - 1, m_tilePosition.y + 1) != Level::Tile::Blick) return false;
+	if (m_pLevel->GetTilePage1(m_tilePosition.x - 1, m_tilePosition.y + 1) != Level::Tile::Blick) return false;
+
+	// 左が空白
+	if (m_pLevel->GetTilePage1(m_tilePosition.x - 1, m_tilePosition.y) != Level::Tile::Empty) return false;
 
 	return true;
 }
@@ -361,12 +360,11 @@ bool Player::IsDiggableRight()
 	// 一番右の列なら掘れない
 	if (m_tilePosition.x == Level::MAX_GAME_COLMUN) return false;
 
-	// 右が空白か隠しハシゴでない
-	Level::Tile tileType = m_pLevel->GetTilePage2(m_tilePosition.x + 1, m_tilePosition.y);
-	if ((tileType != Level::Tile::Empty) && (tileType != Level::Tile::InvisibleLadder)) return false;
-
 	// 右下がブロックでない
-	if (m_pLevel->GetTilePage2(m_tilePosition.x + 1, m_tilePosition.y + 1) != Level::Tile::Blick) return false;
+	if (m_pLevel->GetTilePage1(m_tilePosition.x + 1, m_tilePosition.y + 1) != Level::Tile::Blick) return false;
+
+	// 右が空白
+	if (m_pLevel->GetTilePage1(m_tilePosition.x + 1, m_tilePosition.y) != Level::Tile::Empty) return false;
 
 	return true;
 }
