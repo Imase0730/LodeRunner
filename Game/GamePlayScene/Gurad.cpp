@@ -118,8 +118,8 @@ void Gurad::Render(int ghTileset)
 	if (m_resurrectionTimer > 0)
 	{
 		// 復活のアニメーション
-		if (m_resurrectionTimer == 19) m_guardAnimationState = GuradAnimationState::Egg01;
-		if (m_resurrectionTimer == 10) m_guardAnimationState = GuradAnimationState::Egg02;
+		if (m_resurrectionTimer == RESURRECTION_ANIME_TIME_EGG01) m_guardAnimationState = GuradAnimationState::Egg01;
+		if (m_resurrectionTimer == RESURRECTION_ANIME_TIME_EGG02) m_guardAnimationState = GuradAnimationState::Egg02;
 	}
 
 	// ガードの描画
@@ -128,6 +128,17 @@ void Gurad::Render(int ghTileset)
 				 , m_tilePosition.y * Level::TILE_PIXEL_HEIGHT + (m_adjustPosition.y - Level::TILE_CENTER_Y) * 2
 				 , Level::TILE_PIXEL_WIDTH * pos.x, Level::TILE_PIXEL_HEIGHT * pos.y
 				 , Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+}
+
+// 指定位置から復活する関数
+void Gurad::Resurrection(int colmun, int row)
+{
+	// アニメーションを初期化
+	m_guardAnimationState = GuradAnimationState::AnimNone;
+	// 位置を設定
+	SetTilePosition(colmun, row);
+	// 復活タイマーを設定
+	SetResurrectionTimer(RESURRECTION_ANIME_TIME_NONE);
 }
 
 // 位置を列に調整する関数
@@ -210,7 +221,7 @@ bool Gurad::IsMovableUp()
 
 	// 上の行が移動可能なら
 	Level::Tile page1 = m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y - 1);
-	if (IsMovableTileU(page1)) return true;
+	if (IsMovableTileULR(page1)) return true;
 
 	return false;
 }
@@ -241,8 +252,7 @@ bool Gurad::IsMovableLeft()
 
 	// 移動先タイルが移動可能か調べる
 	Level::Tile page1 = m_pLevel->GetTilePage1(m_tilePosition.x - 1, m_tilePosition.y);
-	Level::Tile page2 = m_pLevel->GetTilePage2(m_tilePosition.x - 1, m_tilePosition.y);
-	if (IsMovableTileLR(page1, page2)) return true;
+	if (IsMovableTileULR(page1)) return true;
 
 	return false;
 }
@@ -258,8 +268,7 @@ bool Gurad::IsMovableRight()
 
 	// 移動先タイルが移動可能か調べる
 	Level::Tile page1 = m_pLevel->GetTilePage1(m_tilePosition.x + 1, m_tilePosition.y);
-	Level::Tile page2 = m_pLevel->GetTilePage2(m_tilePosition.x + 1, m_tilePosition.y);
-	if (IsMovableTileLR(page1, page2)) return true;
+	if (IsMovableTileULR(page1)) return true;
 
 	return false;
 }
@@ -292,6 +301,12 @@ void Gurad::Falling()
 		// 下の行へ移動
 		m_tilePosition.y++;
 
+		// プレイヤーなら死亡
+		if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Player)
+		{
+			m_pGamePlayScene->GetPlayer()->SetAlive(false);
+		}
+
 		// 掘った穴なら
 		if ( (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Blick)
 		  && (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Empty)
@@ -315,6 +330,7 @@ void Gurad::Falling()
 				}
 			}
 		}
+
 		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
 	}
 	else
@@ -334,12 +350,11 @@ void Gurad::Falling()
 				// 金塊保持タイマー設定（復活用に使用する）
 				m_goldTimer = GOLD_TIMER_START_VALUE;
 
-				// スコア加算（７５点）
-
+				// 得点を加算（７５点）
+				m_pGamePlayScene->AddScore(GamePlayScene::GUARD_HOLE_SCORE);
 			}
 		}
 	}
-
 
 	// 落下アニメーション
 	if (m_faceDirection == Direction::Left)
@@ -427,8 +442,14 @@ void Gurad::MoveUp()
 		m_adjustPosition.y = 4;
 		// Page1を元に戻す
 		m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
-		// Page1に書き込む
+		// 上にタイルを移動
 		m_tilePosition.y--;
+		// プレイヤーなら死亡
+		if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Player)
+		{
+			m_pGamePlayScene->GetPlayer()->SetAlive(false);
+		}
+		// Page1に書き込む
 		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
 	}
 
@@ -458,8 +479,14 @@ void Gurad::MoveDown()
 		m_adjustPosition.y = 0;
 		// Page1を元に戻す
 		m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
-		// Page1に書き込む
+		// 下にタイルを移動
 		m_tilePosition.y++;
+		// プレイヤーなら死亡
+		if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Player)
+		{
+			m_pGamePlayScene->GetPlayer()->SetAlive(false);
+		}
+		// Page1に書き込む
 		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
 	}
 
@@ -492,8 +519,14 @@ void Gurad::MoveLeft()
 		m_adjustPosition.x = 4;
 		// Page1を元に戻す
 		m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
-		// Page1に書き込む
+		// 左にタイルを移動
 		m_tilePosition.x--;
+		// プレイヤーなら死亡
+		if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Player)
+		{
+			m_pGamePlayScene->GetPlayer()->SetAlive(false);
+		}
+		// Page1に書き込む
 		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
 	}
 
@@ -535,8 +568,14 @@ void Gurad::MoveRight()
 		m_adjustPosition.x = 0;
 		// Page1を元に戻す
 		m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
-		// Page1に書き込む
+		// 右にタイルを移動
 		m_tilePosition.x++;
+		// プレイヤーなら死亡
+		if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Player)
+		{
+			m_pGamePlayScene->GetPlayer()->SetAlive(false);
+		}
+		// Page1に書き込む
 		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
 	}
 
@@ -918,8 +957,6 @@ Gurad::MoveDirection Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int c
 }
 
 // 下に移動可能なタイルか調べる関数
-//
-// 下に移動可能：true
 bool Gurad::IsMovableDown(int colmun, int row)
 {
 	if ( (row != Level::MAX_GAME_ROW)	// １番下の行ではなく
@@ -933,8 +970,6 @@ bool Gurad::IsMovableDown(int colmun, int row)
 }
 
 // 上に移動可能なタイルか調べる関数
-//
-// 上に移動可能：true
 bool Gurad::IsMovableUp(int colmun, int row)
 {
 	if ( (row != 0)	// 一番上の行でなく
@@ -946,6 +981,7 @@ bool Gurad::IsMovableUp(int colmun, int row)
 	return false;
 }
 
+// 移動可能なタイルか調べる関数（落下）
 bool Gurad::IsMovableTileFall(Level::Tile page1, Level::Tile page2)
 {
 	// 空白、プレイヤーなら落下
@@ -970,28 +1006,12 @@ bool Gurad::IsMovableTileFall(Level::Tile page1, Level::Tile page2)
 }
 
 // 移動可能なタイルか調べる関数（上左右）
-bool Gurad::IsMovableTileLR(Level::Tile page1, Level::Tile page2)
+bool Gurad::IsMovableTileULR(Level::Tile tile)
 {
-	if ( (page1 == Level::Tile::Blick)	// page1:レンガ
-	  || (page1 == Level::Tile::Stone)	// page1:石
-	  || (page1 == Level::Tile::Guard)	// page1:ガード
-	  || (page2 == Level::Tile::Trap)	// page1:罠
-	   )
-	{
-		// 移動不可
-		return false;
-	}
-	// 移動可能
-	return true;
-}
-
-// 移動可能なタイルか調べる関数（上）
-bool Gurad::IsMovableTileU(Level::Tile page1)
-{
-	if ( (page1 == Level::Tile::Blick)	// page1:レンガ
-	  || (page1 == Level::Tile::Stone)	// page1:石
-	  || (page1 == Level::Tile::Guard)	// page1:ガード
-	  || (page1 == Level::Tile::Trap)	// page1:罠
+	if ( (tile == Level::Tile::Blick)	// page1:レンガ
+	  || (tile == Level::Tile::Stone)	// page1:石
+	  || (tile == Level::Tile::Guard)	// page1:ガード
+	  || (tile == Level::Tile::Trap)	// page1:罠（罠は上から以外は移動不可）
 	   )
 	{
 		// 移動不可
@@ -1002,11 +1022,11 @@ bool Gurad::IsMovableTileU(Level::Tile page1)
 }
 
 // 移動可能なタイルか調べる関数（下）
-bool Gurad::IsMovableTileD(Level::Tile page1)
+bool Gurad::IsMovableTileD(Level::Tile tile)
 {
-	if ( (page1 == Level::Tile::Blick)	// page1:レンガ
-	  || (page1 == Level::Tile::Stone)	// page1:石
-	  || (page1 == Level::Tile::Guard)	// page1:ガード
+	if ( (tile == Level::Tile::Blick)	// page1:レンガ
+	  || (tile == Level::Tile::Stone)	// page1:石
+	  || (tile == Level::Tile::Guard)	// page1:ガード
 	   )
 	{
 		// 移動不可

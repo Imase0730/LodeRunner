@@ -66,6 +66,26 @@ private:
 		{ 0, 4 }, { 6, 10 }, { 7, 10 },
 	};
 
+	// スタート時のウエイト
+	static constexpr int START_WAIT_FRAME = 30;
+
+	// ゲームクリア時のウエイト
+	static constexpr int CLEAR_WAIT_FRAME = 30;
+
+public:
+
+	// 金塊の得点
+	static constexpr int GOLD_SCORE = 250;
+
+	// ガードを穴に落とした時の得点
+	static constexpr int GUARD_HOLE_SCORE = 75;
+
+	// ガードを穴で殺した時の得点
+	static constexpr int GUARD_KILL_SCORE = 75;
+
+	// レベルクリアした時の得点
+	static constexpr int LEVEL_CLEAR_SCORE = 1500;
+
 	// 構造体の宣言 -------------------------------------------------
 private:
 
@@ -75,11 +95,6 @@ private:
 		POINT position;	// 位置
 		int timer;		// 復元タイマー
 	};
-
-public:
-
-	// 金塊の得点
-	static constexpr int GOLD_SCORE = 250;
 
 // データメンバの宣言 -----------------------------------------------
 private:
@@ -141,6 +156,15 @@ private:
 	// ガードの復活する列
 	int m_guardResurrectColmun;
 
+	// ゲームスタート時のウエイトタイマー
+	int m_startWaitTimer;
+
+	// レベルクリア時のウエイトタイマー
+	int m_clearWaitTimer;
+
+	// レベルクリア時の得点加算用
+	int m_levelClearScore;
+
 // メンバ関数の宣言 -------------------------------------------------
 public:
 
@@ -181,6 +205,12 @@ private:
 
 	// 掘ったレンガを元に戻す処理
 	void RestoreDigBrick();
+
+	// 次のレベルへの移行処理
+	bool WipeToNextLevel();
+
+	// レベルクリア時の待ち時間の処理
+	bool WaitLevelClear();
 
 public:
 

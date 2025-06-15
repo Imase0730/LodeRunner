@@ -102,6 +102,11 @@ private:
 	// 穴に落ちた時に横に揺れるアニメーションテーブル（Xの揺れ幅）
 	static constexpr int HOLE_ANIMATION_TABLE[HOLE_ANIMATION_TABLE_SIZE] = { 2, 1, 2, 3, 2 };
 
+	// 復活アニメーション用
+	static constexpr int RESURRECTION_ANIME_TIME_NONE = 20;
+	static constexpr int RESURRECTION_ANIME_TIME_EGG01 = 19;
+	static constexpr int RESURRECTION_ANIME_TIME_EGG02 = 10;
+
 	// データメンバの宣言 -----------------------------------------------
 private:
 
@@ -201,6 +206,9 @@ public:
 	// 復活タイマーの取得関数
 	int GetResurrectionTimer() const { return m_resurrectionTimer; }
 
+	// 指定位置から復活する関数
+	void Resurrection(int colmun, int row);
+
 private:
 
 	// 位置を列に調整する関数
@@ -281,14 +289,11 @@ private:
 	// 移動可能なタイルか調べる関数（落下）
 	bool IsMovableTileFall(Level::Tile page1, Level::Tile page2);
 
-	// 移動可能なタイルか調べる関数（左右）
-	bool IsMovableTileLR(Level::Tile page1, Level::Tile page2);
-
-	// 移動可能なタイルか調べる関数（上）
-	bool IsMovableTileU(Level::Tile page1);
+	// 移動可能なタイルか調べる関数（上左右）
+	bool IsMovableTileULR(Level::Tile tile);
 
 	// 移動可能なタイルか調べる関数（下）
-	bool IsMovableTileD(Level::Tile page1);
+	bool IsMovableTileD(Level::Tile tile);
 
 	// 金塊保持タイマーを更新して金塊を落とす処理
 	void UpdateGoldDropTimer();

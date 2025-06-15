@@ -171,15 +171,16 @@ void Player::Update(int keyCondition, int keyTrigger)
 // 描画処理
 void Player::Render(int ghTileset) const
 {
-	// 表示(OFF)
-	if (!m_isVisible) return;
-
-	// プレイヤーの描画
-	POINT pos = PLAYER_SPRITES[static_cast<int>(m_playerAnimationState)];
-	DrawRectGraph( m_tilePosition.x * Level::TILE_PIXEL_WIDTH + (m_adjustPosition.x - Level::TILE_CENTER_X) * 2
-				 , m_tilePosition.y * Level::TILE_PIXEL_HEIGHT + (m_adjustPosition.y - Level::TILE_CENTER_Y) * 2
-				 , Level::TILE_PIXEL_WIDTH * pos.x, Level::TILE_PIXEL_HEIGHT * pos.y
-				 , Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+	// 表示(ON)
+	if (m_isVisible)
+	{
+		// プレイヤーの描画
+		POINT pos = PLAYER_SPRITES[static_cast<int>(m_playerAnimationState)];
+		DrawRectGraph(m_tilePosition.x * Level::TILE_PIXEL_WIDTH + (m_adjustPosition.x - Level::TILE_CENTER_X) * 2
+			, m_tilePosition.y * Level::TILE_PIXEL_HEIGHT + (m_adjustPosition.y - Level::TILE_CENTER_Y) * 2
+			, Level::TILE_PIXEL_WIDTH * pos.x, Level::TILE_PIXEL_HEIGHT * pos.y
+			, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+	}
 
 	// 掘っている時の破片の描画
 	if (m_digAnimationState != DigAnimationState::NotDigging)
@@ -678,7 +679,7 @@ void Player::CheckGoldPickedUp()
 		m_pLevel->SetTilePage2(m_tilePosition.x, m_tilePosition.y, Level::Tile::Empty);
 		// ステージ上の金塊の数を減らす
 		m_pLevel->LostGold();
-		// 得点を加算
+		// 得点を加算（２５０点）
 		m_pGamePlayScene->AddScore(GamePlayScene::GOLD_SCORE);
 	}
 }

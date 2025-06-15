@@ -26,6 +26,9 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	, m_guradNumber{ 0 }
 	, m_digBrick{}
 	, m_guardResurrectColmun{ 0 }
+	, m_startWaitTimer{ 0 }
+	, m_clearWaitTimer{ 0 }
+	, m_levelClearScore{ 0 }
 {
 	// ガードを生成
 	for (int i = 0; i < Level::GUARD_MAX; i++)
@@ -77,20 +80,11 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 
 	keyTrigger = ~oldKey & keyCondition;
 
-	// ワイプ動作中なら何もしない
-	if (m_pGame->GetIrisWipe()->IsActive()) return;
+	// 次のレベルへの移行処理
+	if (WipeToNextLevel()) return;
 
-	// ワイプが閉じたら
-	if (m_pGame->GetIrisWipe()->GetMode() == IrisWipe::Mode::Close)
-	{
-		// ゲームを初期化
-		GameInitialize();
-
-		// ワイプオープン
-		m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Open);
-
-		return;
-	}
+	// レベルクリア時の待ち時間の処理
+	if (WaitLevelClear()) return;
 
 	// ステージの更新
 	m_level.Update();
@@ -115,8 +109,14 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	// プレイヤーが生きているなら
 	if (m_player.IsAlive())
 	{
-		// ステージクリアならワイプを閉じる
-		if (IsLevelCleared()) m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Close);
+		// レベルクリアなら得点を１５００点加算する
+		if (IsLevelCleared())
+		{
+			// レベルクリア時の待ち時間を設定
+			m_clearWaitTimer = CLEAR_WAIT_FRAME;
+			// レベルクリア時の加算するスコアを設定
+			m_levelClearScore = LEVEL_CLEAR_SCORE;
+		}
 	}
 	else
 	{
@@ -184,9 +184,18 @@ void GamePlayScene::Finalize()
 // ゲームスタート時の初期化
 void GamePlayScene::GameInitialize()
 {
+	// ゲームスター時の待ち時間を設定
+	m_startWaitTimer = START_WAIT_FRAME;
+
+	// ゲームクリア時の待ち時間を初期化
+	m_clearWaitTimer = 0;
+
 	// プレイヤーが生きている
 	if (m_player.IsAlive())
 	{
+		// 残機数を増やす
+		m_menNumber.SetNumber(++m_men);
+
 		// 次のレベルへ
 		m_levelNumber.SetNumber(++m_levelId);
 	}
@@ -358,13 +367,14 @@ void GamePlayScene::RestoreDigBrick()
 						// 金塊保持タイマーに大きな値を入れて動かないようにする
 						gurad->SetGoldTimer(0x7f);
 					}
-					// 復活位置を設定
+					// 復活位置を取得
 					POINT pos = GetResurrectPosition(m_guardResurrectColmun);
-					gurad->SetTilePosition(pos.x, pos.y);
-					// 復活タイマーを設定
-					gurad->SetResurrectionTimer(20);
+
+					// ガードの復活設定
+					gurad->Resurrection(pos.x, pos.y);
 
 					// 得点を加算（７５点）
+					AddScore(GamePlayScene::GUARD_KILL_SCORE);
 				}
 
 				// 金塊なら
@@ -379,6 +389,74 @@ void GamePlayScene::RestoreDigBrick()
 			}
 		}
 	}
+}
+
+// 次のレベルへの移行処理
+bool GamePlayScene::WipeToNextLevel()
+{
+	// ワイプ動作中なら何もしない
+	if (m_pGame->GetIrisWipe()->IsActive()) return true;
+
+	// ワイプが閉じたら
+	if (m_pGame->GetIrisWipe()->GetMode() == IrisWipe::Mode::Close)
+	{
+		// ゲームを初期化
+		GameInitialize();
+
+		// ワイプオープン
+		m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Open);
+
+		return true;
+	}
+
+	// ワイプが終了したら
+	if (m_pGame->GetIrisWipe()->GetMode() == IrisWipe::Mode::None)
+	{
+		// ゲームスタート時のウエイト
+		if (m_startWaitTimer > 0) m_startWaitTimer--;
+		if (m_startWaitTimer != 0)
+		{
+			// プレイヤーを点滅
+			if ((m_startWaitTimer / 4) % 2)
+			{
+				m_player.SetVisible(true);
+			}
+			else
+			{
+				m_player.SetVisible(false);
+			}
+			return true;
+		}
+		else
+		{
+			m_player.SetVisible(true);
+		}
+	}
+
+	return false;
+}
+
+// レベルクリア時の待ち時間の処理
+bool GamePlayScene::WaitLevelClear()
+{
+	if (m_clearWaitTimer != 0)
+	{
+		if (m_clearWaitTimer > 0) m_clearWaitTimer--;
+		// 次のレベルへ移行するためワイプをクローズする
+		if (m_clearWaitTimer == 0)
+		{
+			m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Close);
+		}
+		// 100点ずつ足される（合計1500点）
+		int score = 100;
+		m_levelClearScore -= score;
+		if (m_levelClearScore >= 0)
+		{
+			AddScore(score);
+		}
+		return true;
+	}
+	return false;
 }
 
 // 得点を加算する関数
