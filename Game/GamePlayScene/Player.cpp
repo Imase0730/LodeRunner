@@ -43,6 +43,9 @@ void Player::Initialize(POINT tilePosition, POINT ajustPosition)
 	m_tilePosition = tilePosition;
 	m_adjustPosition = ajustPosition;
 
+	// Page1にプレイヤーの位置を設定する
+	m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Tile::Type::Player);
+
 	// 各変数の初期化
 	m_faceDirection = Direction::Right;
 	m_playerAnimationState = PlayerAnimationState::Run01_R;

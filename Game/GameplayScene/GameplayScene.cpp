@@ -509,7 +509,10 @@ POINT GamePlayScene::GetResurrectPosition(int colmun)
 	{
 		for (int i = colmun; i < Level::MAX_GAME_COLMUN; i++)
 		{
-			if (m_level.GetTilePage2(i, row) == Tile::Type::Empty)
+			// ‹ó”’‚ÈêŠ‚ð’T‚·
+			if ( (m_level.GetTilePage2(i, row) == Tile::Type::Empty)
+			  && (m_level.GetTilePage1(i, row) == Tile::Type::Empty)
+			   )
 			{
 				return POINT{ i, row };
 			}

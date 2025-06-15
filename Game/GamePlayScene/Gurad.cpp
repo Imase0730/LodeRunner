@@ -45,6 +45,9 @@ void Gurad::Initialize(POINT tilePosition, POINT ajustPosition)
 	m_tilePosition = tilePosition;
 	m_adjustPosition = ajustPosition;
 
+	// Page1にガードの位置を設定する
+	m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Tile::Type::Guard);
+
 	// 各変数の初期化
 	m_faceDirection = Direction::Left;
 	m_guardAnimationState = GuradAnimationState::Run01_L;
