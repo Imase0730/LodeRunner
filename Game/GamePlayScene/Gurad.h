@@ -33,6 +33,7 @@ public:
 	// アニメーションインデックス
 	enum class GuradAnimationState
 	{
+		AnimNone,						// 表示しない
 		Run01_L, Run02_L, Run03_L,		// 走り（左向き）
 		Rope01_L, Rope02_L, Rope03_L,	// ロープで移動（左向き）
 		Fall_L,							// 落下中（左向き）
@@ -42,6 +43,7 @@ public:
 		Fall_R,							// 落下中（右向き）
 
 		Climb01, Climb02,				// ハシゴを登って
+		Egg01, Egg02,					// 復活中
 	};
 
 	// クラス定数の宣言 -------------------------------------------------
@@ -50,6 +52,9 @@ private:
 	// ガードの絵の位置
 	static constexpr POINT GUARD_SPRITES[] =
 	{
+		// 表示しない
+		{ 0, 4 },
+
 		// 走り（左向き）
 		{ 0, 7 },
 		{ 1, 7 },
@@ -79,7 +84,23 @@ private:
 		// ハシゴを上っている
 		{ 6, 7 },
 		{ 7, 7 },
+
+		// 復活中
+		{ 8, 10 },
+		{ 9, 10 },
 	};
+
+	// 金塊保持タイマーの初期値
+	static constexpr int GOLD_TIMER_START_VALUE = 0x26;
+
+	// 穴に落ちた時に揺れるアニメーションのスタートフレーム
+	static constexpr int HOLE_ANIMATION_START_FRAME = 11;
+
+	// 穴に落ちた時に横に揺れるアニメーションのテーブルサイズ
+	static constexpr int HOLE_ANIMATION_TABLE_SIZE = 5;
+
+	// 穴に落ちた時に横に揺れるアニメーションテーブル（Xの揺れ幅）
+	static constexpr int HOLE_ANIMATION_TABLE[HOLE_ANIMATION_TABLE_SIZE] = { 2, 1, 2, 3, 2 };
 
 	// データメンバの宣言 -----------------------------------------------
 private:
@@ -136,7 +157,7 @@ public:
 	void Update();
 
 	// 描画関数
-	void Render(int ghTileset) const;
+	void Render(int ghTileset);
 
 	// アクティブを設定する関数
 	void SetActive(bool active) { m_isActive = active; }
@@ -144,14 +165,41 @@ public:
 	// アクティブか調べる関数
 	bool IsActive() const { return m_isActive; }
 
-	// 生存しているか調べる関数
+	// 生きているか調べる関数
 	bool IsAlive() const { return m_isAlive; }
+
+	// タイル上の位置を設定する関数
+	void SetTilePosition(int colmun, int row)
+	{
+		m_tilePosition.x = colmun;
+		m_tilePosition.y = row;
+		SetAdjustPosition(Level::TILE_CENTER_X, Level::TILE_CENTER_Y);
+	}
 
 	// タイル上の位置を取得する関数
 	POINT GetTilePosition() const { return m_tilePosition; }
 
+	// タイル内の位置を設定する関数
+	void SetAdjustPosition(int x, int y)
+	{
+		m_adjustPosition.x = x;
+		m_adjustPosition.y = y;
+	}
+
 	// タイル内の位置を取得する関数
 	POINT GetAdjustPosition() const { return m_adjustPosition; }
+
+	// 金塊保持タイマーを設定する関数
+	void SetGoldTimer(int goldTimer) { m_goldTimer = goldTimer; }
+
+	// 金塊保持タイマーを取得する関数
+	int GetGoldTimer() const { return m_goldTimer; }
+
+	// 復活タイマーの設定関数
+	void SetResurrectionTimer(int timer) { m_resurrectionTimer = timer; }
+
+	// 復活タイマーの取得関数
+	int GetResurrectionTimer() const { return m_resurrectionTimer; }
 
 private:
 
@@ -178,6 +226,9 @@ private:
 
 	// 落下中
 	void Falling();
+
+	// 移動方向を決める関数
+	MoveDirection DecideMoveDirection();
 
 	// 上に移動
 	void MoveUp();
@@ -213,13 +264,13 @@ private:
 	bool CheckLeftRightMove(int colmun, int row, Direction direction);
 
 	// プレイヤーとの疑似距離を求める関数
-	int GetPsuedoDistance(int colmun, int row);
+	int GetPsuedoDistance(int row);
 
 	// 上下へ移動するか調べる関数
-	void SelectMoveUpAndDown(int* bestGuradDistance);
+	Gurad::MoveDirection SelectMoveUpAndDown(int* bestGuradDistance);
 
 	// 左へ移動するか調べる関数
-	void SelectMoveLeftAndRight(int* bestGuradDistance, int leftColmunLimit, Direction direction);
+	Gurad::MoveDirection SelectMoveLeftAndRight(int* bestGuradDistance, int leftColmunLimit, Direction direction);
 
 	// 下に移動可能なタイルか調べる関数
 	bool IsMovableDown(int colmun, int row);
@@ -238,5 +289,8 @@ private:
 
 	// 移動可能なタイルか調べる関数（下）
 	bool IsMovableTileD(Level::Tile page1);
+
+	// 金塊保持タイマーを更新して金塊を落とす処理
+	void UpdateGoldDropTimer();
 
 };

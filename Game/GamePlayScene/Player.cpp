@@ -12,7 +12,7 @@ Player::Player(GamePlayScene* pScene, Level* pLevel)
 	, m_pLevel{ pLevel }
 	, m_isActive{ false }
 	, m_isAlive{ false }
-	, m_isDisplay{ false }
+	, m_isVisible{ false }
 	, m_tilePosition{ 0, 0 }
 	, m_adjustPosition{ 0, 0 }
 	, m_faceDirection{ Direction::Right }
@@ -37,7 +37,7 @@ void Player::Initialize(POINT tilePosition, POINT ajustPosition)
 	m_isAlive = true;
 
 	// 表示(ON)
-	m_isDisplay = true;
+	m_isVisible = true;
 
 	// 位置を初期化する
 	m_tilePosition = tilePosition;
@@ -53,15 +53,8 @@ void Player::Initialize(POINT tilePosition, POINT ajustPosition)
 // 更新処理
 void Player::Update(int keyCondition, int keyTrigger)
 {
-	// 今いる場所がレンガなら死亡
-	if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Blick)
-	{
-		// 死亡
-		m_isAlive = false;
-		// 表示(OFF)
-		m_isDisplay = false;
-		return;
-	}
+	// 死んでいるなら何もしない
+	if (!m_isAlive) return;
 
 	// 左向きに掘っている
 	if (m_digDirection == DigDirection::Left)
@@ -179,7 +172,7 @@ void Player::Update(int keyCondition, int keyTrigger)
 void Player::Render(int ghTileset) const
 {
 	// 表示(OFF)
-	if (!m_isDisplay) return;
+	if (!m_isVisible) return;
 
 	// プレイヤーの描画
 	POINT pos = PLAYER_SPRITES[static_cast<int>(m_playerAnimationState)];
@@ -310,7 +303,7 @@ bool Player::IsMovableUp()
 		if (m_tilePosition.y == 0) return false;
 
 		// 上の行が移動可能なら
-		if (Level::IsMovableTileULR(m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y - 1))) return true;
+		if (Level::IsMovableTileULR(m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y - 1))) return true;
 	}
 	else
 	{
@@ -328,7 +321,7 @@ bool Player::IsMovableDown()
 	if (m_tilePosition.y == Level::MAX_GAME_ROW) return false;
 
 	// 下の行が移動可能なら
-	if (Level::IsMovableTileDown(m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y + 1))) return true;
+	if (Level::IsMovableTileDown(m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y + 1))) return true;
 
 	return false;
 }
@@ -379,7 +372,7 @@ bool Player::IsMovableLeft()
 	if (m_tilePosition.x == 0) return false;
 
 	// 移動先タイルが移動可能か調べる
-	return Level::IsMovableTileULR(m_pLevel->GetTilePage2(m_tilePosition.x - 1, m_tilePosition.y));
+	return Level::IsMovableTileULR(m_pLevel->GetTilePage1(m_tilePosition.x - 1, m_tilePosition.y));
 }
 
 // 右に移動可能か調べる関数
@@ -392,7 +385,7 @@ bool Player::IsMovableRight()
 	if (m_tilePosition.x == Level::MAX_GAME_COLMUN) return false;
 
 	// 移動先タイルが移動可能か調べる
-	return Level::IsMovableTileULR(m_pLevel->GetTilePage2(m_tilePosition.x + 1, m_tilePosition.y));
+	return Level::IsMovableTileULR(m_pLevel->GetTilePage1(m_tilePosition.x + 1, m_tilePosition.y));
 }
 
 // 左に掘る
@@ -418,7 +411,7 @@ void Player::DigLeft()
 			// 掘った場所を空白に設定
 			m_pLevel->SetTilePage1(m_tilePosition.x - 1, m_tilePosition.y + 1, Level::Tile::Empty);
 			// 掘った場所のレンガの復元設定
-			m_pLevel->SetFillBrick(m_tilePosition.x - 1, m_tilePosition.y + 1);
+			m_pGamePlayScene->SetFillBrick(m_tilePosition.x - 1, m_tilePosition.y + 1);
 		}
 	}
 	else
@@ -452,7 +445,7 @@ void Player::DigRight()
 			// 掘った場所を空白に設定
 			m_pLevel->SetTilePage1(m_tilePosition.x + 1, m_tilePosition.y + 1, Level::Tile::Empty);
 			// 掘った場所のレンガの復元設定
-			m_pLevel->SetFillBrick(m_tilePosition.x + 1, m_tilePosition.y + 1);
+			m_pGamePlayScene->SetFillBrick(m_tilePosition.x + 1, m_tilePosition.y + 1);
 		}
 	}
 	else
@@ -474,15 +467,9 @@ void Player::Falling()
 	if (m_adjustPosition.y > 4)
 	{
 		m_adjustPosition.y = 0;
-		Level::Tile page2 = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
-		if (page2 != Level::Tile::Blick)
-		{
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, page2);
-		}
-		else
-		{
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Empty);
-		}
+		// Page1を元に戻す
+		m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
+		// Page1に書き込む
 		m_tilePosition.y++;
 		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Player);
 	}
@@ -515,8 +502,9 @@ void Player::MoveUp()
 		if (m_adjustPosition.y < 0)
 		{
 			m_adjustPosition.y = 4;
-			Level::Tile tile = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, tile);
+			// Page1を元に戻す
+			m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
+			// Page1に書き込む
 			m_tilePosition.y--;
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Player);
 		}
@@ -543,8 +531,9 @@ void Player::MoveDown()
 		if (m_adjustPosition.y > 4)
 		{
 			m_adjustPosition.y = 0;
-			Level::Tile tile = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, tile);
+			// Page1を元に戻す
+			m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
+			// Page1に書き込む
 			m_tilePosition.y++;
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Player);
 		}
@@ -574,8 +563,9 @@ void Player::MoveLeft()
 		if (m_adjustPosition.x < 0)
 		{
 			m_adjustPosition.x = 4;
-			Level::Tile tile = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, tile);
+			// Page1を元に戻す
+			m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
+			// Page1に書き込む
 			m_tilePosition.x--;
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Player);
 		}
@@ -614,8 +604,9 @@ void Player::MoveRight()
 		if (m_adjustPosition.x > 4)
 		{
 			m_adjustPosition.x = 0;
-			Level::Tile tile = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, tile);
+			// Page1を元に戻す
+			m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
+			// Page1に書き込む
 			m_tilePosition.x++;
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Player);
 		}
@@ -686,7 +677,7 @@ void Player::CheckGoldPickedUp()
 		// 空白にする
 		m_pLevel->SetTilePage2(m_tilePosition.x, m_tilePosition.y, Level::Tile::Empty);
 		// ステージ上の金塊の数を減らす
-		m_pLevel->GetGold();
+		m_pLevel->LostGold();
 		// 得点を加算
 		m_pGamePlayScene->AddScore(GamePlayScene::GOLD_SCORE);
 	}

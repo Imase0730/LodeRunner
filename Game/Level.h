@@ -31,22 +31,6 @@ public:
 		Player,				// プレイヤー
 	};
 
-	// 復元するレンガのアニメーションステート
-	enum class FillAnimationState
-	{
-		EMPTY, Fill01, Fill02,
-	};
-
-	// 構造体の宣言 -------------------------------------------------
-private:
-
-	// 掘ったレンガの情報
-	struct DigBrick
-	{
-		POINT position;	// 位置
-		int timer;		// 復元タイマー
-	};
-
 	// クラス定数の宣言 -------------------------------------------------
 public:
 
@@ -79,16 +63,6 @@ public:
 	// ステージ上に置ける隠れハシゴの最大数
 	static constexpr int INVISIBLE_LADDER_MAX = 45;
 
-	// 掘ったレンガ情報を記憶するワークの最大数
-	static constexpr int DIG_BRICK_MAX = 30;
-
-	// 掘ったレンガの復元するまでのフレーム数
-	static constexpr int BRICK_FILL_FRAME = 180;
-
-	// レンガの復元アニメーション用
-	static constexpr int BRICK_ANIME_TIME_FILL01 = 20;
-	static constexpr int BRICK_ANIME_TIME_FILL02 = 10;
-
 	// タイルの絵の位置
 	static constexpr POINT TILE_SPRITES[] =
 	{
@@ -102,12 +76,6 @@ public:
 		{ 7, 4 },	// 金塊
 		{ 8, 4 },	// ガード
 		{ 9, 4 },	// プレイヤー
-	};
-
-	// 復元するレンガの絵の位置
-	static constexpr POINT FILL_BRICK_SPRITES[] =
-	{
-		{ 0, 4 }, { 6, 10 }, { 7, 10 },
 	};
 
 	// データメンバの宣言 -----------------------------------------------
@@ -142,9 +110,6 @@ private:
 
 	// ガードの初期位置
 	POINT m_guardPosition[GUARD_MAX];
-
-	// 掘ったレンガの情報記録用
-	DigBrick m_digBrick[DIG_BRICK_MAX];
 
 	// 隠れハシゴの情報記録用
 	POINT m_invisibleLadderPosition[INVISIBLE_LADDER_MAX];
@@ -183,7 +148,7 @@ public:
 	Tile GetTilePage2(int x, int y) const { return m_page2[y][x]; }
 
 	// 指定レベルをセーブする関数
-	bool SaveLevel(int level);
+	bool SaveLevel(int level) const;
 
 	// 指定レベルをロードする関数
 	bool LoadLevel(int level, Mode mode);
@@ -194,14 +159,11 @@ public:
 	// プレイヤーの位置を取得する関数
 	POINT GetPlayerPosition() const { return m_playerPosition; }
 
-	// 指定位置のレンガを復元する
-	void SetFillBrick(int x, int y);
-
 	// ステージ上の金塊の数を取得する関数
 	int GetGoldCount() const { return m_goldCount; }
 
 	// ステージ上の金塊の数を減らす関数
-	void GetGold() { m_goldCount--; }
+	void LostGold() { m_goldCount--; }
 
 	// ステージ上のガードの数を取得する関数
 	int GetGuardCount() const { return m_guardCount; }
@@ -214,6 +176,9 @@ public:
 
 	// 移動可能なタイルか調べる関数（下）
 	static bool IsMovableTileDown(Level::Tile tile);
+
+	// Page2の内容をPage1に指定位置のタイルをコピーする関数
+	void CopyPage2toPage1(int x, int y);
 
 };
 

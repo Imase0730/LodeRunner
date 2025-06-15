@@ -24,6 +24,8 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	, m_guradPattern{ 0, 0, 0 }
 	, m_guradPhase{ 0 }
 	, m_guradNumber{ 0 }
+	, m_digBrick{}
+	, m_guardResurrectColmun{ 0 }
 {
 	// ガードを生成
 	for (int i = 0; i < Level::GUARD_MAX; i++)
@@ -83,8 +85,11 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	{
 		// ゲームを初期化
 		GameInitialize();
+
 		// ワイプオープン
 		m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Open);
+
+		return;
 	}
 
 	// ステージの更新
@@ -94,7 +99,18 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	m_player.Update(keyCondition, keyTrigger);
 
 	// ガードの更新
-	GuradsUpdate();
+	UpdateGurads();
+
+	// ----- タイマー関係の処理 ----- //
+
+	// ガードの復活処理
+	ResurrectionGuards();
+
+	// ガードの復活位置の更新（列を１足す）
+	if (++m_guardResurrectColmun > Level::MAX_GAME_COLMUN) m_guardResurrectColmun = 0;
+
+	// 掘ったブロックを元に戻す処理
+	RestoreDigBrick();
 
 	// プレイヤーが生きているなら
 	if (m_player.IsAlive())
@@ -128,6 +144,9 @@ void GamePlayScene::Render(int ghTileset)
 {
 	// ステージの描画
 	m_level.Render(ghTileset);
+
+	// 復元中のレンガの描画処理
+	RenderDigBrick(ghTileset);
 
 	// プレイヤーの描画
 	m_player.Render(ghTileset);
@@ -175,12 +194,19 @@ void GamePlayScene::GameInitialize()
 	// ステージのロード
 	m_level.Initialize(m_levelId, Level::Mode::GamePlay);
 
+	// 掘ったレンガを情報の初期化
+	for (int i = 0; i < DIG_BRICK_MAX; i++)
+	{
+		m_digBrick[i].position = POINT{ 0, 0 };
+		m_digBrick[i].timer = 0;
+	}
+
 	// プレイヤーの初期化
 	POINT pos = m_level.GetPlayerPosition();
 	m_player.Initialize(POINT{ pos.x, pos.y }
 	, POINT{ Level::TILE_CENTER_X, Level::TILE_CENTER_Y });
 
-	//// ----- ガードの初期化 ----- //
+	// ----- ガードの初期化 ----- //
 
 	// ガードの人数に応じて行動可能人数のテーブルを設定する
 	for (int i = 0; i < GUARD_PHASE_COUNT; i++)
@@ -211,7 +237,7 @@ bool GamePlayScene::IsLevelCleared()
 }
 
 // ガードの更新処理
-void GamePlayScene::GuradsUpdate()
+void GamePlayScene::UpdateGurads()
 {
 	// １フレームに行動できるガードの人数分ループ
 	for (int i = 0; i < m_guradPattern[m_guradPhase]; i++)
@@ -225,6 +251,136 @@ void GamePlayScene::GuradsUpdate()
 	m_guradPhase = (m_guradPhase + 1) % GUARD_PHASE_COUNT;
 }
 
+// ガードの復活処理
+void GamePlayScene::ResurrectionGuards()
+{
+	for (int i = 0; i < Level::GUARD_MAX; i++)
+	{
+		int timer = m_pGurad[i]->GetResurrectionTimer();
+		if (timer > 0)
+		{
+			// 金塊保持タイマーに大きな値を入れて動かないようにする
+			m_pGurad[i]->SetGoldTimer(0x7f);
+			timer--;
+			if (timer == 0)
+			{
+				// 復活場所にガードがいなければ復活する
+				POINT pos = m_pGurad[i]->GetTilePosition();
+				if (m_level.GetTilePage1(pos.x, pos.y) == Level::Tile::Empty)
+				{
+					m_level.SetTilePage1(pos.x, pos.y, Level::Tile::Empty);
+					m_pGurad[i]->Initialize(m_pGurad[i]->GetTilePosition(), m_pGurad[i]->GetAdjustPosition());
+				}
+			}
+			else
+			{
+				// 復活タイマー減算
+				m_pGurad[i]->SetResurrectionTimer(timer);
+			}
+		}
+	}
+}
+
+// 復元中のレンガの描画処理
+void GamePlayScene::RenderDigBrick(int ghTileset) const
+{
+	// 復元中のレンガの描画
+	for (int i = 0; i < DIG_BRICK_MAX; i++)
+	{
+		// 復元タイマーが０でない
+		if (m_digBrick[i].timer)
+		{
+			// 掘っているレンガの絵の位置
+			POINT pos = m_digBrick[i].position;
+			if (m_digBrick[i].timer <= BRICK_ANIME_TIME_FILL02)
+			{
+				// 復元中のレンガ２
+				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill02)];
+				DrawRectGraph(pos.x * Level::TILE_PIXEL_WIDTH, pos.y * Level::TILE_PIXEL_HEIGHT
+					, Level::TILE_PIXEL_WIDTH * spritePos.x, Level::TILE_PIXEL_HEIGHT * spritePos.y
+					, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
+			}
+			else if (m_digBrick[i].timer <= BRICK_ANIME_TIME_FILL01)
+			{
+				// 復元中のレンガ１
+				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill01)];
+				DrawRectGraph(pos.x * Level::TILE_PIXEL_WIDTH, pos.y * Level::TILE_PIXEL_HEIGHT
+					, Level::TILE_PIXEL_WIDTH * spritePos.x, Level::TILE_PIXEL_HEIGHT * spritePos.y
+					, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
+			}
+			else
+			{
+				// 空白
+				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::EMPTY)];
+				DrawRectGraph(pos.x * Level::TILE_PIXEL_WIDTH, pos.y * Level::TILE_PIXEL_HEIGHT
+					, Level::TILE_PIXEL_WIDTH * spritePos.x, Level::TILE_PIXEL_HEIGHT * spritePos.y
+					, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
+			}
+		}
+	}
+}
+
+// 掘ったレンガを元に戻す処理
+void GamePlayScene::RestoreDigBrick()
+{
+	for (int i = 0; i < DIG_BRICK_MAX; i++)
+	{
+		// 復元タイマーが０でない
+		if (m_digBrick[i].timer != 0)
+		{
+			// 復元タイマーを減算する
+			m_digBrick[i].timer--;
+
+			// レンガに戻る
+			if (m_digBrick[i].timer == 0)
+			{
+				Level::Tile page1 = m_level.GetTilePage1(m_digBrick[i].position.x, m_digBrick[i].position.y);
+
+				// プレイヤーなら
+				if (page1 == Level::Tile::Player)
+				{
+					// プレイヤー死亡
+					m_player.SetAlive(false);
+					// プレーヤーを非表示
+					m_player.SetVisible(false);
+				}
+
+				// ガードなら
+				if (page1 == Level::Tile::Guard)
+				{
+					// 死んだガードを見つける
+					Gurad* gurad = GetGurad(m_digBrick[i].position.x, m_digBrick[i].position.y);
+					// 死んだガードが金塊をもっていたら
+					if (gurad->GetGoldTimer())
+					{
+						// 金塊の数を減らす
+
+						// 金塊保持タイマーに大きな値を入れて動かないようにする
+						gurad->SetGoldTimer(0x7f);
+					}
+					// 復活位置を設定
+					POINT pos = GetResurrectPosition(m_guardResurrectColmun);
+					gurad->SetTilePosition(pos.x, pos.y);
+					// 復活タイマーを設定
+					gurad->SetResurrectionTimer(20);
+
+					// 得点を加算（７５点）
+				}
+
+				// 金塊なら
+				if (page1 == Level::Tile::Gold)
+				{
+					// 金塊の数を減らす
+					m_level.LostGold();
+				}
+
+				// レンガに戻す
+				m_level.SetTilePage1(m_digBrick[i].position.x, m_digBrick[i].position.y, Level::Tile::Blick);
+			}
+		}
+	}
+}
+
 // 得点を加算する関数
 void GamePlayScene::AddScore(int score)
 {
@@ -232,4 +388,57 @@ void GamePlayScene::AddScore(int score)
 	m_scoreNumber.SetNumber(m_score);
 }
 
+// ガードを取得する関数
+Gurad* GamePlayScene::GetGurad(int colmun, int row)
+{
+	for (int i = 0; i < Level::GUARD_MAX; i++)
+	{
+		// 指定位置にいるガードへのポインタを返す
+		POINT pos = m_pGurad[i]->GetTilePosition();
+		if ((pos.x == colmun) && (pos.y == row))
+		{
+			return m_pGurad[i];
+		}
+	}
+	return nullptr;
+}
+
+// 指定位置のレンガを復元する
+void GamePlayScene::SetFillBrick(int x, int y)
+{
+	for (int i = 0; i < DIG_BRICK_MAX; i++)
+	{
+		// 未使用のワークなら
+		if (m_digBrick[i].timer == 0)
+		{
+			// レンガの復元情報を設定
+			m_digBrick[i].position.x = x;
+			m_digBrick[i].position.y = y;
+			m_digBrick[i].timer = BRICK_FILL_FRAME;
+			return;
+		}
+	}
+}
+
+// ガードの復活位置を取得する関数
+POINT GamePlayScene::GetResurrectPosition(int colmun)
+{
+	int row = 1;
+
+	// 上の行から順番に空いている位置を探す
+	while (row <= Level::MAX_GAME_ROW)
+	{
+		for (int i = colmun; i < Level::MAX_GAME_COLMUN; i++)
+		{
+			if (m_level.GetTilePage2(i, row) == Level::Tile::Empty)
+			{
+				return POINT{ i, row };
+			}
+		}
+		row++;
+		colmun = 0;
+	}
+
+	return POINT{ -1, -1 };
+}
 

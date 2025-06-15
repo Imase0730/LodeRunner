@@ -23,6 +23,7 @@ public:
 	// アニメーションステート
 	enum class PlayerAnimationState
 	{
+		AnimNone,						// 表示しない
 		Run01_L, Run02_L, Run03_L,		// 走り（左向き）
 		Rope01_L, Rope02_L, Rope03_L,	// ロープで移動（左向き）
 		Dig_L,							// 穴掘り（左向き）
@@ -58,6 +59,9 @@ private:
 	// プレイヤーの絵の位置
 	static constexpr POINT PLAYER_SPRITES[] =
 	{
+		// 表示しない
+		{ 0, 4 },
+
 		// 走り（左向き）
 		{ 0, 5 },
 		{ 1, 5 },
@@ -144,7 +148,7 @@ private:
 	bool m_isAlive;
 
 	// 表示フラグ
-	bool m_isDisplay;
+	bool m_isVisible;
 
 	// タイル上の位置
 	POINT m_tilePosition;
@@ -188,8 +192,14 @@ public:
 	// アクティブか調べる関数
 	bool IsActive() const { return m_isActive; }
 
+	// 生きているか設定する関数
+	void SetAlive(bool alive) { m_isAlive = alive; }
+
 	// 生存しているか調べる関数
 	bool IsAlive() const { return m_isAlive; }
+
+	// 表示(ON/OFF)
+	void SetVisible(bool isVisible) { m_isVisible = isVisible; }
 
 	// タイル上の位置を取得する関数
 	POINT GetTilePosition() const { return m_tilePosition; }

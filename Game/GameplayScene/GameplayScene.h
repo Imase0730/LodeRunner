@@ -19,9 +19,15 @@ class IrisWipe;
 class GamePlayScene
 {
 	// 列挙型の定義 -----------------------------------------------------
-public:
+private:
 
-// クラス定数の宣言 -------------------------------------------------
+	// 復元するレンガのアニメーションステート
+	enum class FillAnimationState
+	{
+		EMPTY, Fill01, Fill02,
+	};
+
+	// クラス定数の宣言 -------------------------------------------------
 private:
 	
 	// プレイヤーの数
@@ -42,6 +48,32 @@ private:
 		1, 2, 1,	// ガードの人数（3人）
 		1, 2, 2,	// ガードの人数（4人）
 		2, 2, 2,	// ガードの人数（5人）
+	};
+
+	// 掘ったレンガ情報を記憶するワークの最大数
+	static constexpr int DIG_BRICK_MAX = 30;
+
+	// 掘ったレンガの復元するまでのフレーム数
+	static constexpr int BRICK_FILL_FRAME = 180;
+
+	// レンガの復元アニメーション用
+	static constexpr int BRICK_ANIME_TIME_FILL01 = 20;
+	static constexpr int BRICK_ANIME_TIME_FILL02 = 10;
+
+	// 復元するレンガの絵の位置
+	static constexpr POINT FILL_BRICK_SPRITES[] =
+	{
+		{ 0, 4 }, { 6, 10 }, { 7, 10 },
+	};
+
+	// 構造体の宣言 -------------------------------------------------
+private:
+
+	// 掘ったレンガの情報
+	struct DigBrick
+	{
+		POINT position;	// 位置
+		int timer;		// 復元タイマー
 	};
 
 public:
@@ -103,6 +135,12 @@ private:
 	// 行動中のガードの番号
 	int m_guradNumber;
 
+	// 掘ったレンガの情報記録用
+	DigBrick m_digBrick[DIG_BRICK_MAX];
+
+	// ガードの復活する列
+	int m_guardResurrectColmun;
+
 // メンバ関数の宣言 -------------------------------------------------
 public:
 
@@ -133,7 +171,16 @@ private:
 	bool IsLevelCleared();
 
 	// ガードの更新処理
-	void GuradsUpdate();
+	void UpdateGurads();
+
+	// ガードの復活処理
+	void ResurrectionGuards();
+
+	// 復元中のレンガの描画処理
+	void RenderDigBrick(int ghTileset) const;
+
+	// 掘ったレンガを元に戻す処理
+	void RestoreDigBrick();
 
 public:
 
@@ -142,5 +189,14 @@ public:
 
 	// プレイヤーを取得する関数
 	Player* GetPlayer() { return &m_player; }
+
+	// ガードを取得する関数
+	Gurad* GetGurad(int colmun, int row);
+
+	// 指定位置のレンガを復元する
+	void SetFillBrick(int x, int y);
+
+	// ガードの復活位置を取得する関数
+	POINT GetResurrectPosition(int colmun);
 
 };

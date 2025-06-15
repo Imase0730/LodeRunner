@@ -48,62 +48,45 @@ void Gurad::Initialize(POINT tilePosition, POINT ajustPosition)
 	// 各変数の初期化
 	m_faceDirection = Direction::Left;
 	m_guardAnimationState = GuradAnimationState::Run01_L;
+	m_goldTimer = 0;
+	m_resurrectionTimer = 0;
+	m_moveDirection = MoveDirection::None;
 }
 
 // 更新処理
 void Gurad::Update()
 {
-	// プレイヤーを取得
-	Player* pPlayer = m_pGamePlayScene->GetPlayer();
-	int playerColumn = pPlayer->GetTilePosition().x;
-	int playerRow = pPlayer->GetTilePosition().y;
-
-	// 落下中か
-	if (IsFalling())
+	// 金塊保持タイマーが０より大きい場合は穴に落ちてる
+	// 金塊保持タイマーが－の場合は金塊保持中（カウンターとして使用）
+	if (m_goldTimer > 0)
 	{
-		// 落下中
-		Falling();
-		return;
-	}
+		// 金塊保持タイマーを減算
+		m_goldTimer--;
 
-	// プレイヤーと同じ行にいる場合
-	if (m_tilePosition.y == playerRow)
-	{
-		// プレイヤーの位置まで移動可能か？
-		if (IsMovableColumn(playerColumn))
+		// 穴に落ちた直後、数フレームはアニメーションしない
+		if (m_goldTimer > HOLE_ANIMATION_START_FRAME) return;
+
+		// 横に揺れるアニメーション
+		int idx = m_goldTimer - (HOLE_ANIMATION_START_FRAME - HOLE_ANIMATION_TABLE_SIZE + 1);
+		if (idx >= 0)
 		{
-			// 左右どちらにプレイヤーがいるかチェックする
-			if (m_tilePosition.x > playerColumn)
-			{
-				// 左に移動
-				MoveLeft();
-				return;
-			}
-			else
-			{
-				// 右に移動
-				MoveRight();
-				return;
-			}
+			m_adjustPosition.x = HOLE_ANIMATION_TABLE[idx];
+			return;
+		}
+	}
+	else
+	{
+		// 落下中か
+		if (IsFalling())
+		{
+			// 落下中
+			Falling();
+			return;
 		}
 	}
 
-	// 移動方向をリセット
-	m_moveDirection = MoveDirection::None;
-
-	// プレイヤーとガードとの疑似的な距離をリセット
-	int bestGuradDistance = 255;
-
-	// 左右の位置調べる位置を取得
-	int leftColmunLimit = 0;
-	int rightColmunLimit = 0;
-	GetLeftRightLimits(&leftColmunLimit, Direction::Left, 0);
-	GetLeftRightLimits(&rightColmunLimit, Direction::Right, Level::MAX_GAME_COLMUN);
-
-	// どの方向へ移動すべきか決める
-	SelectMoveUpAndDown(&bestGuradDistance);
-	SelectMoveLeftAndRight(&bestGuradDistance, leftColmunLimit, Direction::Left);
-	SelectMoveLeftAndRight(&bestGuradDistance, rightColmunLimit, Direction::Right);
+	// 移動方向を決める
+	m_moveDirection = DecideMoveDirection();
 
 	// 移動
 	switch (m_moveDirection)
@@ -126,10 +109,18 @@ void Gurad::Update()
 }
 
 // 描画処理
-void Gurad::Render(int ghTileset) const
+void Gurad::Render(int ghTileset)
 {
 	// 表示(OFF)
 	if (!m_isDisplay) return;
+
+	// 復活中
+	if (m_resurrectionTimer > 0)
+	{
+		// 復活のアニメーション
+		if (m_resurrectionTimer == 19) m_guardAnimationState = GuradAnimationState::Egg01;
+		if (m_resurrectionTimer == 10) m_guardAnimationState = GuradAnimationState::Egg02;
+	}
 
 	// ガードの描画
 	POINT pos = GUARD_SPRITES[static_cast<int>(m_guardAnimationState)];
@@ -192,7 +183,10 @@ bool Gurad::IsFalling()
 	}
 
 	// 空中に浮いている
-	if (m_adjustPosition.y < Level::TILE_CENTER_Y) return true;
+	if (m_adjustPosition.y < Level::TILE_CENTER_Y)
+	{
+		return true;
+	}
 
 	// 一番下なら移動可能
 	if (m_tilePosition.y == Level::MAX_GAME_ROW) return false;
@@ -208,23 +202,16 @@ bool Gurad::IsFalling()
 // 上に移動可能か調べる関数
 bool Gurad::IsMovableUp()
 {
-	// ハシゴがある？
-	if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Ladder)
-	{
-		// ハシゴ上なのでハシゴの真ん中までは移動可能
-		if (m_adjustPosition.y > Level::TILE_CENTER_Y) return true;
+	// ハシゴ上なのでハシゴの真ん中までは移動可能
+	if (m_adjustPosition.y > Level::TILE_CENTER_Y) return true;
 
-		// 一番上なら移動不可
-		if (m_tilePosition.y == 0) return false;
+	// 一番上なら移動不可
+	if (m_tilePosition.y == 0) return false;
 
-		// 上の行が移動可能なら
-		Level::Tile page1 = m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y - 1);
-		if (IsMovableTileU(page1)) return true;
-	}
-	else
-	{
-		if (m_adjustPosition.y > Level::TILE_CENTER_Y) return true;
-	}
+	// 上の行が移動可能なら
+	Level::Tile page1 = m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y - 1);
+	if (IsMovableTileU(page1)) return true;
+
 	return false;
 }
 
@@ -256,6 +243,8 @@ bool Gurad::IsMovableLeft()
 	Level::Tile page1 = m_pLevel->GetTilePage1(m_tilePosition.x - 1, m_tilePosition.y);
 	Level::Tile page2 = m_pLevel->GetTilePage2(m_tilePosition.x - 1, m_tilePosition.y);
 	if (IsMovableTileLR(page1, page2)) return true;
+
+	return false;
 }
 
 // 右に移動可能か調べる関数
@@ -271,6 +260,8 @@ bool Gurad::IsMovableRight()
 	Level::Tile page1 = m_pLevel->GetTilePage1(m_tilePosition.x + 1, m_tilePosition.y);
 	Level::Tile page2 = m_pLevel->GetTilePage2(m_tilePosition.x + 1, m_tilePosition.y);
 	if (IsMovableTileLR(page1, page2)) return true;
+
+	return false;
 }
 
 // 落下中
@@ -283,22 +274,72 @@ void Gurad::Falling()
 	m_adjustPosition.y++;
 	if (m_adjustPosition.y > 4)
 	{
+		// 下のタイルへ移動したのでPage1のタイル情報を書き換える
 		m_adjustPosition.y = 0;
+
 		Level::Tile page2 = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
 		if (page2 != Level::Tile::Blick)
 		{
+			// Page2→Page1へコピー
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, page2);
 		}
 		else
 		{
+			// 掘った穴を通過
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Empty);
 		}
+
+		// 下の行へ移動
 		m_tilePosition.y++;
+
+		// 掘った穴なら
+		if ( (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Blick)
+		  && (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Empty)
+		   )
+		{
+			// 金塊を持っている
+			if (m_goldTimer < 0)
+			{
+				// 金塊を落とす
+				m_goldTimer = 0;
+				// 金塊が置けるか？
+				if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y - 1) == Level::Tile::Empty)
+				{
+					// 金塊を上に置く
+					m_pLevel->SetTilePage2(m_tilePosition.x, m_tilePosition.y - 1, Level::Tile::Gold);
+				}
+				else
+				{
+					// 金塊をロストする
+					m_pLevel->LostGold();
+				}
+			}
+		}
 		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
 	}
+	else
+	{
+		// 落下中のタイルチェックをする
+		if (m_adjustPosition.y == Level::TILE_CENTER_Y)
+		{
+			// 金塊が拾えるかチェック
+			CheckGoldPickedUp();
 
-	// 金塊が拾えるかチェック
-	CheckGoldPickedUp();
+			// 掘った穴なら
+			if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Blick)
+			{
+				// 金塊を持っていればロストする
+				if (m_goldTimer < 0) m_pLevel->LostGold();
+
+				// 金塊保持タイマー設定（復活用に使用する）
+				m_goldTimer = GOLD_TIMER_START_VALUE;
+
+				// スコア加算（７５点）
+
+			}
+		}
+	}
+
 
 	// 落下アニメーション
 	if (m_faceDirection == Direction::Left)
@@ -311,139 +352,210 @@ void Gurad::Falling()
 	}
 }
 
+// 移動方向を決める関数
+Gurad::MoveDirection Gurad::DecideMoveDirection()
+{
+	// 穴の中
+	if ( (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Blick)
+	  && (m_goldTimer > 0)
+	   )
+	{
+		// 上へ
+		return MoveDirection::UP;
+	}
+
+	// プレイヤーの位置を取得
+	Player* pPlayer = m_pGamePlayScene->GetPlayer();
+	int playerColumn = pPlayer->GetTilePosition().x;
+	int playerRow = pPlayer->GetTilePosition().y;
+
+	// プレイヤーと同じ行にいる
+	if (m_tilePosition.y == playerRow)
+	{
+		// プレイヤーの位置まで移動可能か？
+		if (IsMovableColumn(playerColumn))
+		{
+			// 左右どちらにプレイヤーがいるかチェックする
+			if (m_tilePosition.x > playerColumn)
+			{
+				// 左に移動
+				return MoveDirection::Left;
+			}
+			else
+			{
+				// 右に移動
+				return MoveDirection::Right;
+			}
+		}
+	}
+
+	// 左右の位置調べる位置を取得
+	int leftColmunLimit = 0;
+	int rightColmunLimit = 0;
+	GetLeftRightLimits(&leftColmunLimit, Direction::Left, 0);
+	GetLeftRightLimits(&rightColmunLimit, Direction::Right, Level::MAX_GAME_COLMUN);
+
+	// プレイヤーとガードとの疑似的な距離をリセット
+	int bestGuradDistance = 255;
+
+	// どの方向へ移動すべきか決める
+	MoveDirection moveDirection = MoveDirection::None;
+	MoveDirection dir{};
+	dir = SelectMoveUpAndDown(&bestGuradDistance);
+	if (dir != MoveDirection::None) moveDirection = dir;
+	dir = SelectMoveLeftAndRight(&bestGuradDistance, leftColmunLimit, Direction::Left);
+	if (dir != MoveDirection::None) moveDirection = dir;
+	dir = SelectMoveLeftAndRight(&bestGuradDistance, rightColmunLimit, Direction::Right);
+	if (dir != MoveDirection::None) moveDirection = dir;
+
+	return moveDirection;
+}
+
 // 上に移動
 void Gurad::MoveUp()
 {
-	// 上に移動可能か？
-	if (IsMovableUp())
+	// 上に移動できない
+	if (!IsMovableUp()) return;
+
+	// 列に合わせるようにX座標を調整する
+	AjustCloumn();
+
+	// 上に移動する
+	m_adjustPosition.y--;
+	if (m_adjustPosition.y < 0)
 	{
-		// 列に合わせるようにX座標を調整する
-		AjustCloumn();
-
-		// 上に移動する
-		m_adjustPosition.y--;
-		if (m_adjustPosition.y < 0)
-		{
-			m_adjustPosition.y = 4;
-			Level::Tile tile = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, tile);
-			m_tilePosition.y--;
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
-		}
-
-		// 金塊が拾えるかチェック
-		CheckGoldPickedUp();
-
-		// ハシゴを登るアニメーション
-		SetGuradAnimationState(GuradAnimationState::Climb01, GuradAnimationState::Climb02);
+		m_adjustPosition.y = 4;
+		// Page1を元に戻す
+		m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
+		// Page1に書き込む
+		m_tilePosition.y--;
+		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
 	}
+
+	// 金塊が拾えるかチェック
+	CheckGoldPickedUp();
+
+	// 金塊保持タイマーを更新して金塊を落とす処理
+	UpdateGoldDropTimer();
+
+	// ハシゴを登るアニメーション
+	SetGuradAnimationState(GuradAnimationState::Climb01, GuradAnimationState::Climb02);
 }
 
 // 下に移動
 void Gurad::MoveDown()
 {
-	// 下に移動可能か？
-	if (IsMovableDown())
+	// 下に移動できない
+	if (!IsMovableDown()) return;
+
+	// 列に合わせるようにX座標を調整する
+	AjustCloumn();
+
+	// 下に移動する
+	m_adjustPosition.y++;
+	if (m_adjustPosition.y > 4)
 	{
-		// 列に合わせるようにX座標を調整する
-		AjustCloumn();
-
-		// 下に移動する
-		m_adjustPosition.y++;
-		if (m_adjustPosition.y > 4)
-		{
-			m_adjustPosition.y = 0;
-			Level::Tile tile = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, tile);
-			m_tilePosition.y++;
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
-		}
-
-		// 金塊が拾えるかチェック
-		CheckGoldPickedUp();
-
-		// ハシゴを登るアニメーション
-		SetGuradAnimationState(GuradAnimationState::Climb01, GuradAnimationState::Climb02);
+		m_adjustPosition.y = 0;
+		// Page1を元に戻す
+		m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
+		// Page1に書き込む
+		m_tilePosition.y++;
+		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
 	}
+
+	// 金塊が拾えるかチェック
+	CheckGoldPickedUp();
+
+	// 金塊保持タイマーを更新して金塊を落とす処理
+	UpdateGoldDropTimer();
+
+	// ハシゴを登るアニメーション
+	SetGuradAnimationState(GuradAnimationState::Climb01, GuradAnimationState::Climb02);
 }
 
 // 左に移動
 void Gurad::MoveLeft()
 {
-	// 左に移動可能か？
-	if (IsMovableLeft())
+	// 左に移動できない
+	if (!IsMovableLeft()) return;
+
+	// 行に合わせるようにY座標を調整する
+	AjustRow();
+
+	// 左向きに
+	m_faceDirection = Direction::Left;
+
+	// 左に移動する
+	m_adjustPosition.x--;
+	if (m_adjustPosition.x < 0)
 	{
-		// 行に合わせるようにY座標を調整する
-		AjustRow();
+		m_adjustPosition.x = 4;
+		// Page1を元に戻す
+		m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
+		// Page1に書き込む
+		m_tilePosition.x--;
+		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
+	}
 
-		// 左向きに
-		m_faceDirection = Direction::Left;
+	// 金塊が拾えるかチェック
+	CheckGoldPickedUp();
 
-		// 左に移動する
-		m_adjustPosition.x--;
-		if (m_adjustPosition.x < 0)
-		{
-			m_adjustPosition.x = 4;
-			Level::Tile tile = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, tile);
-			m_tilePosition.x--;
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
-		}
+	// 金塊保持タイマーを更新して金塊を落とす処理
+	UpdateGoldDropTimer();
 
-		// 金塊が拾えるかチェック
-		CheckGoldPickedUp();
-
-		// ロープの場合
-		if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Rope)
-		{
-			// ロープで移動するアニメーション
-			SetGuradAnimationState(GuradAnimationState::Rope01_L, GuradAnimationState::Rope03_L);
-		}
-		else
-		{
-			// 走るアニメーション
-			SetGuradAnimationState(GuradAnimationState::Run01_L, GuradAnimationState::Run03_L);
-		}
+	// ロープの場合
+	if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Rope)
+	{
+		// ロープで移動するアニメーション
+		SetGuradAnimationState(GuradAnimationState::Rope01_L, GuradAnimationState::Rope03_L);
+	}
+	else
+	{
+		// 走るアニメーション
+		SetGuradAnimationState(GuradAnimationState::Run01_L, GuradAnimationState::Run03_L);
 	}
 }
 
 // 右に移動
 void Gurad::MoveRight()
 {
-	// 右に移動可能か？
-	if (IsMovableRight())
+	// 右に移動できない
+	if (!IsMovableRight()) return;
+
+	// 行に合わせるようにY座標を調整する
+	AjustRow();
+
+	// 右向きに
+	m_faceDirection = Direction::Right;
+
+	// 右移動する
+	m_adjustPosition.x++;
+	if (m_adjustPosition.x > 4)
 	{
-		// 行に合わせるようにY座標を調整する
-		AjustRow();
+		m_adjustPosition.x = 0;
+		// Page1を元に戻す
+		m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
+		// Page1に書き込む
+		m_tilePosition.x++;
+		m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
+	}
 
-		// 右向きに
-		m_faceDirection = Direction::Right;
+	// 金塊が拾えるかチェック
+	CheckGoldPickedUp();
 
-		// 右移動する
-		m_adjustPosition.x++;
-		if (m_adjustPosition.x > 4)
-		{
-			m_adjustPosition.x = 0;
-			Level::Tile tile = m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y);
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, tile);
-			m_tilePosition.x++;
-			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Level::Tile::Guard);
-		}
+	// 金塊保持タイマーを更新して金塊を落とす処理
+	UpdateGoldDropTimer();
 
-		// 金塊が拾えるかチェック
-		CheckGoldPickedUp();
-
-		// ロープの場合
-		if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Rope)
-		{
-			// ロープで移動するアニメーション
-			SetGuradAnimationState(GuradAnimationState::Rope01_R, GuradAnimationState::Rope03_R);
-		}
-		else
-		{
-			// 走るアニメーション
-			SetGuradAnimationState(GuradAnimationState::Run01_R, GuradAnimationState::Run03_R);
-		}
+	// ロープの場合
+	if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Rope)
+	{
+		// ロープで移動するアニメーション
+		SetGuradAnimationState(GuradAnimationState::Rope01_R, GuradAnimationState::Rope03_R);
+	}
+	else
+	{
+		// 走るアニメーション
+		SetGuradAnimationState(GuradAnimationState::Run01_R, GuradAnimationState::Run03_R);
 	}
 }
 
@@ -477,12 +589,17 @@ void Gurad::CheckGoldPickedUp()
 	if (m_adjustPosition.x != Level::TILE_CENTER_X) return;
 	if (m_adjustPosition.y != Level::TILE_CENTER_Y) return;
 
-	// 金塊があれば金塊を拾う
-	if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Gold)
-	{
-		// 空白にする
-		m_pLevel->SetTilePage2(m_tilePosition.x, m_tilePosition.y, Level::Tile::Empty);
-	}
+	// 金塊がない
+	if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) != Level::Tile::Gold) return;
+
+	// 既に金塊を持っている
+	if (m_goldTimer < 0) return;
+
+	// 金塊があれば金塊を拾う（金塊保持タイマーを設定）
+	m_goldTimer = -0x53;
+
+	// 空白にする
+	m_pLevel->SetTilePage2(m_tilePosition.x, m_tilePosition.y, Level::Tile::Empty);
 }
 
 // 指定した行まで移動可能か調べる関数
@@ -578,7 +695,7 @@ int Gurad::FindCandidateRowBelow(int colmun, int row)
 	// プレイヤーのいる行
 	int playerRow = m_pGamePlayScene->GetPlayer()->GetTilePosition().y;
 
-	// 一番したの行まで調べる
+	// 一番下の行まで調べる
 	while (row != Level::MAX_GAME_ROW)
 	{
 		// １つ下の行がレンガか石なら終了
@@ -596,13 +713,13 @@ int Gurad::FindCandidateRowBelow(int colmun, int row)
 			// 左側は移動可能なら
 			if (CheckLeftRightMove(colmun, row, Direction::Left))
 			{
-				// プレイヤーの方が同じ行か下の行なら
+				// プレイヤーの方が下の行なら
 				if (row >= playerRow) return row;
 			}
 			// 右側は移動可能なら
 			if (CheckLeftRightMove(colmun, row, Direction::Right))
 			{
-				// プレイヤーの方が同じ行か下の行なら
+				// プレイヤーの方が下の行なら
 				if (row >= playerRow) return row;
 			}
 		}
@@ -629,14 +746,20 @@ int Gurad::FindCandidateRowAbove(int colmun, int row)
 		// 左側は移動可能なら
 		if (CheckLeftRightMove(colmun, row, Direction::Left))
 		{
-			// プレイヤーの方が同じ行か下の行なら
-			if (row >= playerRow) return row;
+			// プレイヤーの方が上の行なら
+			if (row <= playerRow)
+			{
+				return row;
+			}
 		}
 		// 右側は移動可能なら
 		if (CheckLeftRightMove(colmun, row, Direction::Right))
 		{
-			// プレイヤーの方が同じ行か下の行なら
-			if (row >= playerRow) return row;
+			// プレイヤーの方が上の行なら
+			if (row <= playerRow)
+			{
+				return row;
+			}
 		}
 	}
 	return row;
@@ -679,8 +802,10 @@ bool Gurad::CheckLeftRightMove(int colmun, int row, Direction direction)
 // 上下へ移動するか調べる関数
 //
 // ガードの現在いる位置の上下を調べ最も疑似距離の近い方向へ移動する
-void Gurad::SelectMoveUpAndDown(int* bestGuradDistance)
+Gurad::MoveDirection Gurad::SelectMoveUpAndDown(int* bestGuradDistance)
 {
+	MoveDirection moveDirection = MoveDirection::None;
+
 	// ガードの位置
 	int colmun = m_tilePosition.x;
 	int row = m_tilePosition.y;
@@ -689,37 +814,41 @@ void Gurad::SelectMoveUpAndDown(int* bestGuradDistance)
 	if (IsMovableDown(colmun, row))
 	{
 		// 下に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
-		int distance = GetPsuedoDistance(colmun, FindCandidateRowBelow(colmun, row));
+		int distance = GetPsuedoDistance(FindCandidateRowBelow(colmun, row));
 		// 最も近い場合は
 		if (distance < *bestGuradDistance)
 		{
 			// プレイヤーとの疑似距離を更新
 			*bestGuradDistance = distance;
 			// 下へ移動
-			m_moveDirection = MoveDirection::Down;
+			moveDirection = MoveDirection::Down;
 		}
 	}
 	// 上へ移動可能なら
 	if (IsMovableUp(colmun, row))
 	{
 		// 上に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
-		int distance = GetPsuedoDistance(colmun, FindCandidateRowAbove(colmun, row));
+		int distance = GetPsuedoDistance(FindCandidateRowAbove(colmun, row));
 		// 最も近い場合は
 		if (distance < *bestGuradDistance)
 		{
 			// プレイヤーとの疑似距離を更新
 			*bestGuradDistance = distance;
 			// 上へ移動
-			m_moveDirection = MoveDirection::UP;
+			moveDirection = MoveDirection::UP;
 		}
 	}
+
+	return moveDirection;
 }
 
 // 左へ移動するか調べる関数
 //
 // 移動可能な各行の上下方向を最もプレイヤーとの疑似距離が近い方向へ移動する
-void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Direction direction)
+Gurad::MoveDirection Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Direction direction)
 {
+	MoveDirection moveDirection = MoveDirection::None;
+
 	// ガードの位置
 	int colmun = m_tilePosition.x;
 	int row = m_tilePosition.y;
@@ -731,7 +860,7 @@ void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Dire
 		if (IsMovableDown(colmunLimit, row))
 		{
 			// 下に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
-			int distance = GetPsuedoDistance(colmunLimit, FindCandidateRowBelow(colmunLimit, row));
+			int distance = GetPsuedoDistance(FindCandidateRowBelow(colmunLimit, row));
 			// 最も近い場合は
 			if (distance < *bestGuradDistance)
 			{
@@ -740,12 +869,12 @@ void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Dire
 				if (direction == Direction::Left)
 				{
 					// 左へ移動
-					m_moveDirection = MoveDirection::Left;
+					moveDirection = MoveDirection::Left;
 				}
 				else
 				{
 					// 右へ移動
-					m_moveDirection = MoveDirection::Right;
+					moveDirection = MoveDirection::Right;
 				}
 			}
 		}
@@ -754,7 +883,7 @@ void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Dire
 		if (IsMovableUp(colmunLimit,row))
 		{
 			// 上に移動した時の最適な行を見つけてプレイヤーとの疑似距離を算出する
-			int distance = GetPsuedoDistance(colmunLimit, FindCandidateRowAbove(colmunLimit, row));
+			int distance = GetPsuedoDistance(FindCandidateRowAbove(colmunLimit, row));
 			// 最も近い場合は
 			if (distance < *bestGuradDistance)
 			{
@@ -763,12 +892,12 @@ void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Dire
 				if (direction == Direction::Left)
 				{
 					// 左へ移動
-					m_moveDirection = MoveDirection::Left;
+					moveDirection = MoveDirection::Left;
 				}
 				else
 				{
 					// 右へ移動
-					m_moveDirection = MoveDirection::Right;
+					moveDirection = MoveDirection::Right;
 				}
 			}
 		}
@@ -784,6 +913,8 @@ void Gurad::SelectMoveLeftAndRight(int* bestGuradDistance, int colmunLimit, Dire
 			colmunLimit--;
 		}
 	}
+
+	return moveDirection;
 }
 
 // 下に移動可能なタイルか調べる関数
@@ -841,45 +972,71 @@ bool Gurad::IsMovableTileFall(Level::Tile page1, Level::Tile page2)
 // 移動可能なタイルか調べる関数（上左右）
 bool Gurad::IsMovableTileLR(Level::Tile page1, Level::Tile page2)
 {
-	// ブロック、石、ガード、罠なら移動不可
-	if ( (page1 == Level::Tile::Blick)
-	  || (page1 == Level::Tile::Stone)
-	  || (page1 == Level::Tile::Guard)
-	  || (page2 == Level::Tile::Trap)
+	if ( (page1 == Level::Tile::Blick)	// page1:レンガ
+	  || (page1 == Level::Tile::Stone)	// page1:石
+	  || (page1 == Level::Tile::Guard)	// page1:ガード
+	  || (page2 == Level::Tile::Trap)	// page1:罠
 	   )
 	{
+		// 移動不可
 		return false;
 	}
+	// 移動可能
 	return true;
 }
 
 // 移動可能なタイルか調べる関数（上）
 bool Gurad::IsMovableTileU(Level::Tile page1)
 {
-	// ブロック、石、ガード、罠なら移動不可
-	if ((page1 == Level::Tile::Blick)
-		|| (page1 == Level::Tile::Stone)
-		|| (page1 == Level::Tile::Guard)
-		|| (page1 == Level::Tile::Trap)
-		)
+	if ( (page1 == Level::Tile::Blick)	// page1:レンガ
+	  || (page1 == Level::Tile::Stone)	// page1:石
+	  || (page1 == Level::Tile::Guard)	// page1:ガード
+	  || (page1 == Level::Tile::Trap)	// page1:罠
+	   )
 	{
+		// 移動不可
 		return false;
 	}
+	// 移動可能
 	return true;
 }
 
 // 移動可能なタイルか調べる関数（下）
 bool Gurad::IsMovableTileD(Level::Tile page1)
 {
-	// ブロック、石、ガード、罠なら移動不可
-	if ((page1 == Level::Tile::Blick)
-		|| (page1 == Level::Tile::Stone)
-		|| (page1 == Level::Tile::Guard)
-		)
+	if ( (page1 == Level::Tile::Blick)	// page1:レンガ
+	  || (page1 == Level::Tile::Stone)	// page1:石
+	  || (page1 == Level::Tile::Guard)	// page1:ガード
+	   )
 	{
+		// 移動不可
 		return false;
 	}
+	// 移動可能
 	return true;
+}
+
+// 金塊保持タイマーを更新して金塊を落とす処理
+void Gurad::UpdateGoldDropTimer()
+{
+	// 金塊保持タイマーが０になったら落とす
+	if (m_goldTimer < 0)
+	{
+		m_goldTimer++;
+		if (m_goldTimer == 0)
+		{
+			// 空白なら金塊を落とす
+			if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Level::Tile::Empty)
+			{
+				m_pLevel->SetTilePage2(m_tilePosition.x, m_tilePosition.y, Level::Tile::Gold);
+			}
+			else
+			{
+				// 次の機会を待つ
+				m_goldTimer--;
+			}
+		}
+	}
 }
 
 // プレイヤーとの疑似距離を求める関数
@@ -889,7 +1046,7 @@ bool Gurad::IsMovableTileD(Level::Tile page1)
 //   １・プレイヤーが同じ行
 //   ２・プレイヤーが下 (+100)
 //   ３・プレイヤーが上 (+200)
-int Gurad::GetPsuedoDistance(int colmun, int row)
+int Gurad::GetPsuedoDistance(int row)
 {
 	// プレイヤーの位置
 	int playerColmun = m_pGamePlayScene->GetPlayer()->GetTilePosition().x;
@@ -899,7 +1056,7 @@ int Gurad::GetPsuedoDistance(int colmun, int row)
 	if (row == playerRow)
 	{
 		// プレイヤーとの距離を返す
-		return abs(playerColmun - colmun);
+		return abs(playerColmun - m_tilePosition.x);
 	}
 	// プレイヤーが上にいる
 	else if(row > playerRow)

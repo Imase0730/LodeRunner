@@ -20,7 +20,6 @@ Level::Level(Mode mode)
 	, m_invisibleLadderCount{ 0 }
 	, m_playerPosition{ 0, 0 }
 	, m_guardPosition{}
-	, m_digBrick{}
 	, m_invisibleLadderPosition{}
 {
 }
@@ -99,35 +98,11 @@ void Level::Initialize(int levelNo, Mode mode)
 			}
 		}
 	}
-
-	// 掘ったレンガを情報の初期化
-	for (int i = 0; i < DIG_BRICK_MAX; i++)
-	{
-		m_digBrick[i].position = POINT{0, 0};
-		m_digBrick[i].timer = 0;
-	}
 }
 
 // 更新処理
 void Level::Update()
 {
-	// 掘ったブロックを元に戻す
-	for (int i = 0; i < DIG_BRICK_MAX; i++)
-	{
-		// 復元タイマーが０でない
-		if (m_digBrick[i].timer != 0)
-		{
-			// 復元タイマーを減算する
-			m_digBrick[i].timer--;
-
-			// レンガに戻る
-			if (m_digBrick[i].timer == 0)
-			{
-				m_page1[m_digBrick[i].position.y][m_digBrick[i].position.x] = Tile::Blick;
-			}
-		}
-	}
-
 	// 金塊が全てなくなったら隠れハシゴを出現させる
 	if (m_goldCount == 0)
 	{
@@ -158,8 +133,8 @@ void Level::Render(int ghTileset) const
 				// 罠はレンガで描画
 				if (tile == Tile::Trap) tile = Tile::Blick;
 
-				// Page1が空白の場合、空白を描画
-				if (m_page1[i][j] == Tile::Empty) tile = Tile::Empty;
+				// Page2：レンガ　Page1：空白の場合、掘った穴なので空白を描画
+				if ((m_page2[i][j] == Tile::Blick) && (m_page1[i][j] == Tile::Empty)) tile = Tile::Empty;
 			}
 
 			// タイルの絵の位置
@@ -168,41 +143,6 @@ void Level::Render(int ghTileset) const
 			DrawRectGraph(x, y
 				, TILE_PIXEL_WIDTH * pos.x, TILE_PIXEL_HEIGHT * pos.y
 				, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, TRUE);
-		}
-	}
-
-	// 復元中のレンガの描画
-	for (int i = 0; i < DIG_BRICK_MAX; i++)
-	{
-		// 復元タイマーが０でない
-		if (m_digBrick[i].timer)
-		{
-			// 掘っているレンガの絵の位置
-			POINT pos = m_digBrick[i].position;
-			if (m_digBrick[i].timer <= BRICK_ANIME_TIME_FILL02)
-			{
-				// 復元中のレンガ２
-				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill02)];
-				DrawRectGraph(pos.x * TILE_PIXEL_WIDTH, pos.y * TILE_PIXEL_HEIGHT
-					, TILE_PIXEL_WIDTH * spritePos.x, TILE_PIXEL_HEIGHT * spritePos.y
-					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, FALSE);
-			}
-			else if (m_digBrick[i].timer <= BRICK_ANIME_TIME_FILL01)
-			{
-				// 復元中のレンガ１
-				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill01)];
-				DrawRectGraph(pos.x * TILE_PIXEL_WIDTH, pos.y * TILE_PIXEL_HEIGHT
-					, TILE_PIXEL_WIDTH * spritePos.x, TILE_PIXEL_HEIGHT * spritePos.y
-					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, FALSE);
-			}
-			else
-			{
-				// 空白
-				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::EMPTY)];
-				DrawRectGraph(pos.x * TILE_PIXEL_WIDTH, pos.y * TILE_PIXEL_HEIGHT
-					, TILE_PIXEL_WIDTH * spritePos.x, TILE_PIXEL_HEIGHT * spritePos.y
-					, TILE_PIXEL_WIDTH, TILE_PIXEL_HEIGHT, ghTileset, FALSE);
-			}
 		}
 	}
 
@@ -237,7 +177,7 @@ void Level::Render(int ghTileset) const
 }
 
 // 指定レベルをセーブする関数
-bool Level::SaveLevel(int level)
+bool Level::SaveLevel(int level) const
 {
 	char fileName[MAX_PATH];
 
@@ -312,23 +252,6 @@ void Level::AppearLadder()
 	}
 }
 
-// 指定位置のレンガを復元する
-void Level::SetFillBrick(int x, int y)
-{
-	for (int i = 0; i < DIG_BRICK_MAX; i++)
-	{
-		// 未使用のワークなら
-		if (m_digBrick[i].timer == 0)
-		{
-			// レンガの復元情報を設定
-			m_digBrick[i].position.x = x;
-			m_digBrick[i].position.y = y;
-			m_digBrick[i].timer = BRICK_FILL_FRAME;
-			return;
-		}
-	}
-}
-
 // 移動可能なタイルか調べる関数（上左右）
 bool Level::IsMovableTileULR(Level::Tile tile)
 {
@@ -354,5 +277,19 @@ bool Level::IsMovableTileDown(Level::Tile tile)
 		return false;
 	}
 	return true;
+}
+
+// Page2の内容をPage1に指定位置のタイルをコピーする関数
+void Level::CopyPage2toPage1(int x, int y)
+{
+	// 穴の上なのでコピーしない
+	if (m_page2[y][x] == Level::Tile::Blick)
+	{
+		m_page1[y][x] = Tile::Empty;
+	}
+	else
+	{
+		m_page1[y][x] = m_page2[y][x];
+	}
 }
 
