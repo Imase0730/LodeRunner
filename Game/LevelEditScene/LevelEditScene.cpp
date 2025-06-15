@@ -10,14 +10,14 @@ LevelEditScene::LevelEditScene(Game* pGame)
 	: m_pGame{ pGame }
 	, m_level{ Level::Mode::LevelEdit }
 	, m_cursorEdit{ 0, 0 }
-	, m_selectTile{ Level::Tile::Blick }
+	, m_selectTile{ Tile::Type::Blick }
 	, m_blink{ BLINK_INTEVAL }
 	, m_levelId{ 0 }
 	, m_mode{ Mode::SelectTile }
-	, m_saveString{ POINT{ Level::TILE_PIXEL_WIDTH * 10 , Game::INFOMATION_Y }, "SAVE" }
-	, m_loadString{ POINT{ Level::TILE_PIXEL_WIDTH * 15 , Game::INFOMATION_Y }, "LOAD" }
-	, m_levelString{ POINT{ Level::TILE_PIXEL_WIDTH * 20 , Game::INFOMATION_Y }, "LEVEL" }
-	, m_levelNumber{ POINT{ Level::TILE_PIXEL_WIDTH * 25, Game::INFOMATION_Y }, 3 }
+	, m_saveStringRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 10 , Level::INFOMATION_Y }, "SAVE" }
+	, m_loadStringRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 15 , Level::INFOMATION_Y }, "LOAD" }
+	, m_levelStringRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 20 , Level::INFOMATION_Y }, "LEVEL" }
+	, m_levelNumberRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 25, Level::INFOMATION_Y }, 3 }
 {
 
 }
@@ -32,12 +32,12 @@ void LevelEditScene::Initialize()
 {
 	// 各変数の初期化
 	m_cursorEdit = POINT{ 0, 0 };
-	m_selectTile = Level::Tile::Blick;
+	m_selectTile = Tile::Type::Blick;
 	m_levelId = 1;
 	m_mode = Mode::SelectTile;
 
 	// レベルの数字の表示
-	m_levelNumber.SetNumber(m_levelId);
+	m_levelNumberRenderer.SetNumber(m_levelId);
 
 	// レベルの初期化
 	m_level.Initialize(m_levelId, Level::Mode::LevelEdit);
@@ -102,15 +102,15 @@ void LevelEditScene::Render(int ghTileset)
 	m_level.Render(ghTileset);
 
 	// 選択用タイルの描画
-	DrawRectGraph(0, Game::INFOMATION_Y
-		, Level::TILE_PIXEL_WIDTH * 1, Level::TILE_PIXEL_HEIGHT * 4
-		, Level::TILE_PIXEL_WIDTH * 9, Level::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+	DrawRectGraph(0, Level::INFOMATION_Y
+		, Tile::TILE_PIXEL_WIDTH * 1, Tile::TILE_PIXEL_HEIGHT * 4
+		, Tile::TILE_PIXEL_WIDTH * 9, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 
 	// 各文字列の描画
-	if (m_mode != Mode::Save) m_saveString.Render(ghTileset);			// SAVE
-	if (m_mode != Mode::Load) m_loadString.Render(ghTileset);			// LOAD
-	m_levelString.Render(ghTileset);									// LEVEL
-	if (m_mode == Mode::SelectTile) m_levelNumber.Render(ghTileset);	// 000
+	if (m_mode != Mode::Save) m_saveStringRenderer.Render(ghTileset);			// SAVE
+	if (m_mode != Mode::Load) m_loadStringRenderer.Render(ghTileset);			// LOAD
+	m_levelStringRenderer.Render(ghTileset);									// LEVEL
+	if (m_mode == Mode::SelectTile) m_levelNumberRenderer.Render(ghTileset);	// 000
 
 	// ----- ここから点滅 ----- //
 	int col = static_cast<int>(100.0f + 155.0f * m_blink.GetBlinkRate());
@@ -120,22 +120,22 @@ void LevelEditScene::Render(int ghTileset)
 	{
 	case Mode::SelectTile:
 		// カーソルの描画（上部）
-		DrawRectGraph(m_cursorEdit.x * Level::TILE_PIXEL_WIDTH, m_cursorEdit.y * Level::TILE_PIXEL_HEIGHT
-			, Level::TILE_PIXEL_WIDTH * 6, Level::TILE_PIXEL_HEIGHT * 3
-			, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+		DrawRectGraph(m_cursorEdit.x * Tile::TILE_PIXEL_WIDTH, m_cursorEdit.y * Tile::TILE_PIXEL_HEIGHT
+			, Tile::TILE_PIXEL_WIDTH * 6, Tile::TILE_PIXEL_HEIGHT * 3
+			, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 
 		// カーソルの描画（下部）
-		DrawRectGraph(Level::TILE_PIXEL_WIDTH * (static_cast<int>(m_selectTile) - 1), Game::INFOMATION_Y
-			, Level::TILE_PIXEL_WIDTH * 6, Level::TILE_PIXEL_HEIGHT * 3
-			, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+		DrawRectGraph(Tile::TILE_PIXEL_WIDTH * (static_cast<int>(m_selectTile) - 1), Level::INFOMATION_Y
+			, Tile::TILE_PIXEL_WIDTH * 6, Tile::TILE_PIXEL_HEIGHT * 3
+			, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 		break;
 	case Mode::Save:
-		m_saveString.Render(ghTileset);	// SAVE
-		m_levelNumber.Render(ghTileset);	// 000
+		m_saveStringRenderer.Render(ghTileset);	// SAVE
+		m_levelNumberRenderer.Render(ghTileset);	// 000
 		break;
 	case Mode::Load:
-		m_loadString.Render(ghTileset);	// LOAD
-		m_levelNumber.Render(ghTileset);	// 000
+		m_loadStringRenderer.Render(ghTileset);	// LOAD
+		m_levelNumberRenderer.Render(ghTileset);	// 000
 		break;
 	default:
 		break;
@@ -191,16 +191,16 @@ void LevelEditScene::SelectTile(int keyCondition, int keyRepeat)
 	{
 		if (keyRepeat & PAD_INPUT_LEFT)
 		{
-			if (m_selectTile != Level::Tile::Blick)
+			if (m_selectTile != Tile::Type::Blick)
 			{
-				m_selectTile = static_cast<Level::Tile>(static_cast<int>(m_selectTile) - 1);
+				m_selectTile = static_cast<Tile::Type>(static_cast<int>(m_selectTile) - 1);
 			}
 		}
 		if (keyRepeat & PAD_INPUT_RIGHT)
 		{
-			if (m_selectTile != Level::Tile::Player)
+			if (m_selectTile != Tile::Type::Player)
 			{
-				m_selectTile = static_cast<Level::Tile>(static_cast<int>(m_selectTile) + 1);
+				m_selectTile = static_cast<Tile::Type>(static_cast<int>(m_selectTile) + 1);
 			}
 		}
 		return;
@@ -209,8 +209,8 @@ void LevelEditScene::SelectTile(int keyCondition, int keyRepeat)
 	// Wキーで選択タイルの変更（ループ）
 	if (keyRepeat & PAD_INPUT_8)
 	{
-		m_selectTile = static_cast<Level::Tile>((static_cast<int>(m_selectTile) + 1) % SELECT_TILE_MAX);
-		if (m_selectTile == Level::Tile::Empty) m_selectTile = Level::Tile::Blick;
+		m_selectTile = static_cast<Tile::Type>((static_cast<int>(m_selectTile) + 1) % SELECT_TILE_MAX);
+		if (m_selectTile == Tile::Type::Empty) m_selectTile = Tile::Type::Blick;
 	}
 
 	// 上部カーソルの移動
@@ -233,7 +233,7 @@ void LevelEditScene::SelectTile(int keyCondition, int keyRepeat)
 	// Sキーでカーソル位置のタイルを消す
 	if (keyCondition & PAD_INPUT_5)
 	{
-		m_level.SetTilePage2(m_cursorEdit.x, m_cursorEdit.y, Level::Tile::Empty);
+		m_level.SetTilePage2(m_cursorEdit.x, m_cursorEdit.y, Tile::Type::Empty);
 	}
 }
 
@@ -256,7 +256,7 @@ void LevelEditScene::Save(int keyTrigger, int keyRepeat)
 		if (m_levelId > 1) m_levelId--;
 	}
 	// レベルの設定
-	m_levelNumber.SetNumber(m_levelId);
+	m_levelNumberRenderer.SetNumber(m_levelId);
 }
 
 // ロード
@@ -281,7 +281,7 @@ void LevelEditScene::Load(int keyTrigger, int keyRepeat)
 		if (m_levelId > 1) m_levelId--;
 	}
 	// レベルの設定
-	m_levelNumber.SetNumber(m_levelId);
+	m_levelNumberRenderer.SetNumber(m_levelId);
 }
 
 

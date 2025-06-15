@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Game/Level.h"
+#include "Game/Tile.h"
 
 class GamePlayScene;
 
@@ -267,6 +268,12 @@ private:
 	void CheckGoldPickedUp();
 
 	// 移動可能なタイルか調べる関数（落下）
-	bool IsMovableTileFall(Level::Tile page1, Level::Tile page2);
+	bool IsMovableTileFall(Tile::Type page1, Tile::Type page2);
+
+	// 移動可能なタイルか調べる関数（上左右）
+	static bool IsMovableTileULR(Tile::Type tile);
+
+	// 移動可能なタイルか調べる関数（下）
+	static bool IsMovableTileDown(Tile::Type tile);
 
 };

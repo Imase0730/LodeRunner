@@ -1,11 +1,11 @@
 //--------------------------------------------------------------------------------------
-// File: String.h
+// File: NumberRenderer.h
 //
 //--------------------------------------------------------------------------------------
 #pragma once
 
-// 文字列表示クラス
-class String
+// 数字表示クラス
+class NumberRenderer
 {
 	// データメンバの宣言 -----------------------------------------------
 private:
@@ -13,17 +13,26 @@ private:
 	// 位置
 	POINT m_position;
 
-	// 文字列
-	std::string m_string;
+	// 桁数
+	int m_digit;
+
+	// 数字
+	int m_number;
+
+	// 表示の最大値
+	int m_max;
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
 
 	// コンストラクタ
-	String(POINT position, const char* string);
+	NumberRenderer(POINT position, int digit);
 
 	// 描画処理
 	void Render(int ghTileset) const;
+
+	// 数字の設定関数
+	void SetNumber(int number) { m_number = number; }
 
 };
 

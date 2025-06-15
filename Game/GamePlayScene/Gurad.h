@@ -5,6 +5,7 @@
 #pragma once
 
 #include "Game/Level.h"
+#include "Game/Tile.h"
 
 class GamePlayScene;
 
@@ -178,7 +179,7 @@ public:
 	{
 		m_tilePosition.x = colmun;
 		m_tilePosition.y = row;
-		SetAdjustPosition(Level::TILE_CENTER_X, Level::TILE_CENTER_Y);
+		SetAdjustPosition(Tile::TILE_CENTER_X, Tile::TILE_CENTER_Y);
 	}
 
 	// タイル上の位置を取得する関数
@@ -287,15 +288,16 @@ private:
 	bool IsMovableUp(int colmun, int row);
 
 	// 移動可能なタイルか調べる関数（落下）
-	bool IsMovableTileFall(Level::Tile page1, Level::Tile page2);
-
-	// 移動可能なタイルか調べる関数（上左右）
-	bool IsMovableTileULR(Level::Tile tile);
-
-	// 移動可能なタイルか調べる関数（下）
-	bool IsMovableTileD(Level::Tile tile);
+	bool IsMovableTileFall(Tile::Type page1, Tile::Type page2);
 
 	// 金塊保持タイマーを更新して金塊を落とす処理
 	void UpdateGoldDropTimer();
+
+	// 移動可能なタイルか調べる関数（上左右）
+	static bool IsMovableTileULR(Tile::Type tile);
+
+	// 移動可能なタイルか調べる関数（下）
+	static bool IsMovableTileD(Tile::Type tile);
+
 
 };

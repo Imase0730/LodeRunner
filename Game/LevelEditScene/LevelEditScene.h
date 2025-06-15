@@ -7,8 +7,9 @@
 #include "Game/Screen.h"
 #include "Game/Level.h"
 #include "Game/Blink.h"
-#include "Game/Number.h"
-#include "Game/String.h"
+#include "Game/NumberRenderer.h"
+#include "Game/StringRenderer.h"
+#include "Game/Tile.h"
 
 // クラスの前方宣言
 class Game;
@@ -64,19 +65,19 @@ private:
 	POINT m_cursorEdit;
 
 	// 選択中のタイル
-	Level::Tile m_selectTile;
+	Tile::Type m_selectTile;
 
 	// SAVEの文字列
-	String m_saveString;
+	StringRenderer m_saveStringRenderer;
 
 	// LOADの文字列
-	String m_loadString;
+	StringRenderer m_loadStringRenderer;
 
 	// LEVELの文字列
-	String m_levelString;
+	StringRenderer m_levelStringRenderer;
 
 	// レベル表示
-	Number m_levelNumber;
+	NumberRenderer m_levelNumberRenderer;
 
 // メンバ関数の宣言 -------------------------------------------------
 public:

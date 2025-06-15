@@ -4,13 +4,14 @@
 //--------------------------------------------------------------------------------------
 #include "TitleScene.h"
 #include "Game/Game.h"
+#include "Game/Tile.h"
 
 // コンストラクタ
 TitleScene::TitleScene(Game* pGame)
 	: m_pGame{ pGame }
-	, m_titleString{ TITLE_POSITION, "LODE RUNNER" }
-	, m_gameString{ GAME_POSITION, "GAME" }
-	, m_editString{ EDIT_POSITION, "EDIT" }
+	, m_titleStringRenderer{ TITLE_POSITION, "LODE RUNNER" }
+	, m_gameStringRenderer{ GAME_POSITION, "GAME" }
+	, m_editStringRenderer{ EDIT_POSITION, "EDIT" }
 	, m_mode{ Mode::Game }
 	, m_blink{ BLINK_INTEVAL }
 {
@@ -57,13 +58,13 @@ void TitleScene::Update(int keyCondition, int keyTrigger)
 void TitleScene::Render(int ghTileset)
 {
 	// タイトルの表示
-	m_titleString.Render(ghTileset);
+	m_titleStringRenderer.Render(ghTileset);
 
 	// GAMEの表示
-	m_gameString.Render(ghTileset);
+	m_gameStringRenderer.Render(ghTileset);
 
 	// EDITの表示
-	m_editString.Render(ghTileset);
+	m_editStringRenderer.Render(ghTileset);
 
 	// ----- ここから点滅 ----- //
 	int col = static_cast<int>(100.0f + 155.0f * m_blink.GetBlinkRate());
@@ -73,12 +74,12 @@ void TitleScene::Render(int ghTileset)
 	if (m_mode == Mode::Game)
 	{
 		DrawRectGraph(GAME_POSITION.x - 18, GAME_POSITION.y + 1
-			, Level::TILE_PIXEL_WIDTH * 9, Level::TILE_PIXEL_HEIGHT * 4, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+			, Tile::TILE_PIXEL_WIDTH * 9, Tile::TILE_PIXEL_HEIGHT * 4, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 	}
 	else
 	{
 		DrawRectGraph(EDIT_POSITION.x - 18, EDIT_POSITION.y + 1
-			, Level::TILE_PIXEL_WIDTH * 9, Level::TILE_PIXEL_HEIGHT * 4, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
+			, Tile::TILE_PIXEL_WIDTH * 9, Tile::TILE_PIXEL_HEIGHT * 4, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 	}
 
 	// ----- 点滅を止める ----- //

@@ -4,18 +4,19 @@
 //--------------------------------------------------------------------------------------
 #include "GamePlayScene.h"
 #include "Game/Game.h"
+#include "Game/Tile.h"
 
 // コンストラクタ
 GamePlayScene::GamePlayScene(Game* pGame)
 	: m_pGame{ pGame }
 	, m_updateCounter{ 0 }
 	, m_level{ Level::Mode::GamePlay }
-	, m_scoreString{ POINT{ Level::TILE_PIXEL_WIDTH * 0 , Game::INFOMATION_Y }, "SCORE" }
-	, m_menString{ POINT{ Level::TILE_PIXEL_WIDTH * 13 , Game::INFOMATION_Y }, "MEN" }
-	, m_levelString{ POINT{ Level::TILE_PIXEL_WIDTH * 20 , Game::INFOMATION_Y }, "LEVEL" }
-	, m_scoreNumber{ POINT{ 5 * Level::TILE_PIXEL_WIDTH, Game::INFOMATION_Y }, 7 }
-	, m_menNumber{ POINT{ 16 * Level::TILE_PIXEL_WIDTH, Game::INFOMATION_Y }, 3 }
-	, m_levelNumber{ POINT{ 25 * Level::TILE_PIXEL_WIDTH, Game::INFOMATION_Y }, 3 }
+	, m_scoreStringRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 0 , Level::INFOMATION_Y }, "SCORE" }
+	, m_menStringRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 13 , Level::INFOMATION_Y }, "MEN" }
+	, m_levelStringRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 20 , Level::INFOMATION_Y }, "LEVEL" }
+	, m_scoreNumberRenderer{ POINT{ 5 * Tile::TILE_PIXEL_WIDTH, Level::INFOMATION_Y }, 7 }
+	, m_menNumberRenderer{ POINT{ 16 * Tile::TILE_PIXEL_WIDTH, Level::INFOMATION_Y }, 3 }
+	, m_levelNumberRenderer{ POINT{ 25 * Tile::TILE_PIXEL_WIDTH, Level::INFOMATION_Y }, 3 }
 	, m_score{ 0 }
 	, m_men{ 0 }
 	, m_levelId{ 0 }
@@ -52,15 +53,15 @@ void GamePlayScene::Initialize()
 {
 	// スコアの初期化
 	m_score = 0;
-	m_scoreNumber.SetNumber(m_score);
+	m_scoreNumberRenderer.SetNumber(m_score);
 
 	// プレイヤーの数の初期化
 	m_men = MEN_COUNT;
-	m_menNumber.SetNumber(m_men);
+	m_menNumberRenderer.SetNumber(m_men);
 
 	// レベルの初期化
 	m_levelId = 1;
-	m_levelNumber.SetNumber(m_levelId);
+	m_levelNumberRenderer.SetNumber(m_levelId);
 
 	// ゲームスタート時の初期化
 	GameInitialize();
@@ -121,7 +122,7 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	else
 	{
 		// 残機数を減らす
-		m_menNumber.SetNumber(--m_men);
+		m_menNumberRenderer.SetNumber(--m_men);
 
 		// 残機数が０なら
 		if (m_men == 0)
@@ -158,22 +159,22 @@ void GamePlayScene::Render(int ghTileset)
 	}
 
 	// 『SCORE』の文字の表示
-	m_scoreString.Render(ghTileset);
+	m_scoreStringRenderer.Render(ghTileset);
 
 	// 『MEN』の文字の表示
-	m_menString.Render(ghTileset);
+	m_menStringRenderer.Render(ghTileset);
 
 	// 『LEVEL』の文字の表示
-	m_levelString.Render(ghTileset);
+	m_levelStringRenderer.Render(ghTileset);
 
 	// スコアの表示
-	m_scoreNumber.Render(ghTileset);
+	m_scoreNumberRenderer.Render(ghTileset);
 
 	// 残機数の表示
-	m_menNumber.Render(ghTileset);
+	m_menNumberRenderer.Render(ghTileset);
 
 	// レベルの表示
-	m_levelNumber.Render(ghTileset);
+	m_levelNumberRenderer.Render(ghTileset);
 }
 
 // 終了処理
@@ -194,10 +195,10 @@ void GamePlayScene::GameInitialize()
 	if (m_player.IsAlive())
 	{
 		// 残機数を増やす
-		m_menNumber.SetNumber(++m_men);
+		m_menNumberRenderer.SetNumber(++m_men);
 
 		// 次のレベルへ
-		m_levelNumber.SetNumber(++m_levelId);
+		m_levelNumberRenderer.SetNumber(++m_levelId);
 	}
 
 	// ステージのロード
@@ -213,7 +214,7 @@ void GamePlayScene::GameInitialize()
 	// プレイヤーの初期化
 	POINT pos = m_level.GetPlayerPosition();
 	m_player.Initialize(POINT{ pos.x, pos.y }
-	, POINT{ Level::TILE_CENTER_X, Level::TILE_CENTER_Y });
+	, POINT{ Tile::TILE_CENTER_X, Tile::TILE_CENTER_Y });
 
 	// ----- ガードの初期化 ----- //
 
@@ -228,7 +229,7 @@ void GamePlayScene::GameInitialize()
 	{
 		POINT pos = m_level.GetGuardPosition(i);
 		m_pGurad[i]->Initialize(POINT{ pos.x, pos.y }
-		, POINT{ Level::TILE_CENTER_X, Level::TILE_CENTER_Y });
+		, POINT{ Tile::TILE_CENTER_X, Tile::TILE_CENTER_Y });
 	}
 }
 
@@ -237,7 +238,7 @@ bool GamePlayScene::IsLevelCleared()
 {
 	if ( (m_level.GetGoldCount() < 0)								// 隠しハシゴ出現済み
 	  && (m_player.GetTilePosition().y == 0)						// 一番上の行？
-	  && (m_player.GetAdjustPosition().y == Level::TILE_CENTER_Y)	// タイル上の位置も中心？
+	  && (m_player.GetAdjustPosition().y == Tile::TILE_CENTER_Y)	// タイル上の位置も中心？
 	   )
 	{
 		return true;
@@ -275,9 +276,9 @@ void GamePlayScene::ResurrectionGuards()
 			{
 				// 復活場所にガードがいなければ復活する
 				POINT pos = m_pGurad[i]->GetTilePosition();
-				if (m_level.GetTilePage1(pos.x, pos.y) == Level::Tile::Empty)
+				if (m_level.GetTilePage1(pos.x, pos.y) == Tile::Type::Empty)
 				{
-					m_level.SetTilePage1(pos.x, pos.y, Level::Tile::Empty);
+					m_level.SetTilePage1(pos.x, pos.y, Tile::Type::Empty);
 					m_pGurad[i]->Initialize(m_pGurad[i]->GetTilePosition(), m_pGurad[i]->GetAdjustPosition());
 				}
 			}
@@ -305,25 +306,25 @@ void GamePlayScene::RenderDigBrick(int ghTileset) const
 			{
 				// 復元中のレンガ２
 				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill02)];
-				DrawRectGraph(pos.x * Level::TILE_PIXEL_WIDTH, pos.y * Level::TILE_PIXEL_HEIGHT
-					, Level::TILE_PIXEL_WIDTH * spritePos.x, Level::TILE_PIXEL_HEIGHT * spritePos.y
-					, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
+				DrawRectGraph(pos.x * Tile::TILE_PIXEL_WIDTH, pos.y * Tile::TILE_PIXEL_HEIGHT
+					, Tile::TILE_PIXEL_WIDTH * spritePos.x, Tile::TILE_PIXEL_HEIGHT * spritePos.y
+					, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
 			}
 			else if (m_digBrick[i].timer <= BRICK_ANIME_TIME_FILL01)
 			{
 				// 復元中のレンガ１
 				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::Fill01)];
-				DrawRectGraph(pos.x * Level::TILE_PIXEL_WIDTH, pos.y * Level::TILE_PIXEL_HEIGHT
-					, Level::TILE_PIXEL_WIDTH * spritePos.x, Level::TILE_PIXEL_HEIGHT * spritePos.y
-					, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
+				DrawRectGraph(pos.x * Tile::TILE_PIXEL_WIDTH, pos.y * Tile::TILE_PIXEL_HEIGHT
+					, Tile::TILE_PIXEL_WIDTH * spritePos.x, Tile::TILE_PIXEL_HEIGHT * spritePos.y
+					, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
 			}
 			else
 			{
 				// 空白
 				POINT spritePos = FILL_BRICK_SPRITES[static_cast<int>(FillAnimationState::EMPTY)];
-				DrawRectGraph(pos.x * Level::TILE_PIXEL_WIDTH, pos.y * Level::TILE_PIXEL_HEIGHT
-					, Level::TILE_PIXEL_WIDTH * spritePos.x, Level::TILE_PIXEL_HEIGHT * spritePos.y
-					, Level::TILE_PIXEL_WIDTH, Level::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
+				DrawRectGraph(pos.x * Tile::TILE_PIXEL_WIDTH, pos.y * Tile::TILE_PIXEL_HEIGHT
+					, Tile::TILE_PIXEL_WIDTH * spritePos.x, Tile::TILE_PIXEL_HEIGHT * spritePos.y
+					, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
 			}
 		}
 	}
@@ -343,10 +344,10 @@ void GamePlayScene::RestoreDigBrick()
 			// レンガに戻る
 			if (m_digBrick[i].timer == 0)
 			{
-				Level::Tile page1 = m_level.GetTilePage1(m_digBrick[i].position.x, m_digBrick[i].position.y);
+				Tile::Type page1 = m_level.GetTilePage1(m_digBrick[i].position.x, m_digBrick[i].position.y);
 
 				// プレイヤーなら
-				if (page1 == Level::Tile::Player)
+				if (page1 == Tile::Type::Player)
 				{
 					// プレイヤー死亡
 					m_player.SetAlive(false);
@@ -355,7 +356,7 @@ void GamePlayScene::RestoreDigBrick()
 				}
 
 				// ガードなら
-				if (page1 == Level::Tile::Guard)
+				if (page1 == Tile::Type::Guard)
 				{
 					// 死んだガードを見つける
 					Gurad* gurad = GetGurad(m_digBrick[i].position.x, m_digBrick[i].position.y);
@@ -378,14 +379,14 @@ void GamePlayScene::RestoreDigBrick()
 				}
 
 				// 金塊なら
-				if (page1 == Level::Tile::Gold)
+				if (page1 == Tile::Type::Gold)
 				{
 					// 金塊の数を減らす
 					m_level.LostGold();
 				}
 
 				// レンガに戻す
-				m_level.SetTilePage1(m_digBrick[i].position.x, m_digBrick[i].position.y, Level::Tile::Blick);
+				m_level.SetTilePage1(m_digBrick[i].position.x, m_digBrick[i].position.y, Tile::Type::Blick);
 			}
 		}
 	}
@@ -463,7 +464,7 @@ bool GamePlayScene::WaitLevelClear()
 void GamePlayScene::AddScore(int score)
 {
 	m_score += score;
-	m_scoreNumber.SetNumber(m_score);
+	m_scoreNumberRenderer.SetNumber(m_score);
 }
 
 // ガードを取得する関数
@@ -508,7 +509,7 @@ POINT GamePlayScene::GetResurrectPosition(int colmun)
 	{
 		for (int i = colmun; i < Level::MAX_GAME_COLMUN; i++)
 		{
-			if (m_level.GetTilePage2(i, row) == Level::Tile::Empty)
+			if (m_level.GetTilePage2(i, row) == Tile::Type::Empty)
 			{
 				return POINT{ i, row };
 			}

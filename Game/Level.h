@@ -4,9 +4,12 @@
 //--------------------------------------------------------------------------------------
 #pragma once
 
+#include "Screen.h"
+#include "Tile.h"
+
 class Level
 {
-	// 列挙型の宣言 -------------------------------------------------
+	// 列挙型の宣言 -----------------------------------------------------
 public:
 
 	// モード
@@ -16,46 +19,19 @@ public:
 		LevelEdit,
 	};
 
-	// タイル
-	enum class Tile
-	{
-		Empty,				// なし
-		Blick,				// レンガ
-		Stone,				// 石
-		Ladder,				// ハシゴ
-		Rope,				// ロープ
-		Trap,				// トラップ
-		InvisibleLadder,	// 隠れハシゴ
-		Gold,				// 金塊
-		Guard,				// ガード
-		Player,				// プレイヤー
-	};
-
 	// クラス定数の宣言 -------------------------------------------------
 public:
 
 	// ステージデータのパス
 	static constexpr char LEVEL_DATA_PATH[] = "Resources/LevelData/";
 
-	// タイルのピクセルサイズ（表示用）
-	static constexpr int TILE_PIXEL_WIDTH = 10;
-	static constexpr int TILE_PIXEL_HEIGHT = 11;
-
-	// タイルのサイズ（プログラム上での座標計算用）
-	static constexpr int TILE_WIDTH = 5;
-	static constexpr int TILE_HEIGHT = 5;
-
-	// タイルの中心までの距離（プログラム上での座標計算用）
-	static constexpr int TILE_CENTER_X = 2;
-	static constexpr int TILE_CENTER_Y = 2;
-
 	// レベルサイズ
 	static constexpr int MAX_GAME_COLMUN = 28 - 1;
 	static constexpr int MAX_GAME_ROW = 16 - 1;
 
 	// ステージサイズ
-	static constexpr int LEVEL_SCREEN_WIDTH = (MAX_GAME_COLMUN + 1) * TILE_PIXEL_WIDTH;
-	static constexpr int LEVEL_SCREEN_HEIGHT = (MAX_GAME_ROW + 1) * TILE_PIXEL_HEIGHT;
+	static constexpr int LEVEL_SCREEN_WIDTH = (MAX_GAME_COLMUN + 1) * Tile::TILE_PIXEL_WIDTH;
+	static constexpr int LEVEL_SCREEN_HEIGHT = (MAX_GAME_ROW + 1) * Tile::TILE_PIXEL_HEIGHT;
 
 	// ステージ上に置けるガードの最大数
 	static constexpr int GUARD_MAX = 5;
@@ -78,17 +54,20 @@ public:
 		{ 9, 4 },	// プレイヤー
 	};
 
+	// 画面下部の情報ウインドウの縦の表示位置
+	static constexpr int INFOMATION_Y = Screen::GAME_HEIGHT - Tile::TILE_PIXEL_HEIGHT;
+
 	// データメンバの宣言 -----------------------------------------------
 private:
 
 	// 読み込んだレベルデータ
-	Tile m_loadData[MAX_GAME_ROW + 1][MAX_GAME_COLMUN + 1];
+	Tile::Type m_loadData[MAX_GAME_ROW + 1][MAX_GAME_COLMUN + 1];
 
 	// PAGE1
-	Tile m_page1[MAX_GAME_ROW + 1][MAX_GAME_COLMUN + 1];
+	Tile::Type m_page1[MAX_GAME_ROW + 1][MAX_GAME_COLMUN + 1];
 
 	// PAGE2
-	Tile m_page2[MAX_GAME_ROW + 1][MAX_GAME_COLMUN + 1];
+	Tile::Type m_page2[MAX_GAME_ROW + 1][MAX_GAME_COLMUN + 1];
 
 	// モード
 	Mode m_mode;
@@ -136,16 +115,16 @@ public:
 	int GetLevel() const { return m_levelId; }
 
 	// タイルを設定する関数（Page1）
-	void SetTilePage1(int x, int y, Tile tile) { m_page1[y][x] = tile; }
+	void SetTilePage1(int x, int y, Tile::Type tile) { m_page1[y][x] = tile; }
 
 	// タイルを設定する関数（Page2）
-	void SetTilePage2(int x, int y, Tile tile) { m_page2[y][x] = tile; }
+	void SetTilePage2(int x, int y, Tile::Type tile) { m_page2[y][x] = tile; }
 
 	// タイルを取得する関数（Page1）
-	Tile GetTilePage1(int x, int y) const { return m_page1[y][x]; }
+	Tile::Type GetTilePage1(int x, int y) const { return m_page1[y][x]; }
 
 	// タイルを取得する関数（Page2）
-	Tile GetTilePage2(int x, int y) const { return m_page2[y][x]; }
+	Tile::Type GetTilePage2(int x, int y) const { return m_page2[y][x]; }
 
 	// 指定レベルをセーブする関数
 	bool SaveLevel(int level) const;
@@ -170,12 +149,6 @@ public:
 
 	// ガードの位置を取得する関数
 	POINT GetGuardPosition(int index) const { return m_guardPosition[index]; }
-
-	// 移動可能なタイルか調べる関数（上左右）
-	static bool IsMovableTileULR(Level::Tile tile);
-
-	// 移動可能なタイルか調べる関数（下）
-	static bool IsMovableTileDown(Level::Tile tile);
 
 	// Page2の内容をPage1に指定位置のタイルをコピーする関数
 	void CopyPage2toPage1(int x, int y);

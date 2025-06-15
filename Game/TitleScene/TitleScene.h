@@ -5,9 +5,10 @@
 #pragma once
 
 #include "Game/Screen.h"
-#include "Game/String.h"
+#include "Game/StringRenderer.h"
 #include "Game/Blink.h"
 #include "Game/Level.h"
+#include "Game/Tile.h"
 
 // クラスの前方宣言
 class Game;
@@ -29,13 +30,13 @@ public:
 private:
 	
 	// タイトルの位置
-	static constexpr POINT TITLE_POSITION{ (Screen::GAME_WIDTH - Level::TILE_PIXEL_WIDTH * 11) / 2, Level::TILE_PIXEL_HEIGHT * 2 };
+	static constexpr POINT TITLE_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 11) / 2, Tile::TILE_PIXEL_HEIGHT * 2 };
 
 	// GAMEの位置
-	static constexpr POINT GAME_POSITION{ (Screen::GAME_WIDTH - Level::TILE_PIXEL_WIDTH * 4) / 2, Level::TILE_PIXEL_HEIGHT * 7 };
+	static constexpr POINT GAME_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 4) / 2, Tile::TILE_PIXEL_HEIGHT * 7 };
 
 	// EDITの位置
-	static constexpr POINT EDIT_POSITION{ (Screen::GAME_WIDTH - Level::TILE_PIXEL_WIDTH * 4) / 2, Level::TILE_PIXEL_HEIGHT * 10 };
+	static constexpr POINT EDIT_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 4) / 2, Tile::TILE_PIXEL_HEIGHT * 10 };
 
 	// 点滅の間隔
 	static constexpr int BLINK_INTEVAL = 60;
@@ -47,13 +48,13 @@ private:
 	Game* m_pGame;
 
 	// タイトルの文字列
-	String m_titleString;
+	StringRenderer m_titleStringRenderer;
 
 	// Gameの文字列
-	String m_gameString;
+	StringRenderer m_gameStringRenderer;
 
 	// Editの文字列
-	String m_editString;
+	StringRenderer m_editStringRenderer;
 
 	// モード
 	Mode m_mode;

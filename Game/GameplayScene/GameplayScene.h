@@ -6,8 +6,8 @@
 
 #include "Game/Screen.h"
 #include "Game/Level.h"
-#include "Game/String.h"
-#include "Game/Number.h"
+#include "Game/StringRenderer.h"
+#include "Game/NumberRenderer.h"
 #include "Player.h"
 #include "Gurad.h"
 
@@ -29,7 +29,7 @@ private:
 
 	// クラス定数の宣言 -------------------------------------------------
 private:
-	
+
 	// プレイヤーの数
 	static constexpr int MEN_COUNT = 2;
 
@@ -109,22 +109,22 @@ private:
 	Level m_level;
 
 	// SCOREの文字列
-	String m_scoreString;
+	StringRenderer m_scoreStringRenderer;
 
 	// MENの文字列
-	String m_menString;
+	StringRenderer m_menStringRenderer;
 
 	// LEVELの文字列
-	String m_levelString;
+	StringRenderer m_levelStringRenderer;
 
 	// スコア表示
-	Number m_scoreNumber;
+	NumberRenderer m_scoreNumberRenderer;
 
 	// 残機数表示
-	Number m_menNumber;
+	NumberRenderer m_menNumberRenderer;
 
 	// レベル表示
-	Number m_levelNumber;
+	NumberRenderer m_levelNumberRenderer;
 
 	// スコア
 	int m_score;
