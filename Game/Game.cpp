@@ -29,6 +29,7 @@ Game::Game()
 	, m_titleScene{ this }
 	, m_gamePlayScene{ this }
 	, m_levelEditScene{ this }
+	, m_highScoresScene{ this }
 	, m_ghScreen{ -1 }
 	, m_ghTileset{ -1 }
 	, m_irisWipe{}
@@ -191,6 +192,9 @@ void Game::InitializeCurrentScene()
 	case SceneID::LevelEdit:	// ステージエディット
 		m_levelEditScene.Initialize();
 		break;
+	case SceneID::HighScores:	// スコアランキング
+		m_highScoresScene.Initialize();
+		break;
 	default:
 		break;
 	}
@@ -209,6 +213,9 @@ void Game::UpdateCurrentScene(int keyCondition, int keyTrigger)
 		break;
 	case SceneID::LevelEdit:	// ステージエディット
 		m_levelEditScene.Update(keyCondition, keyTrigger);
+		break;
+	case SceneID::HighScores:	// スコアランキング
+		m_highScoresScene.Update(keyCondition, keyTrigger);
 		break;
 	default:
 		break;
@@ -229,6 +236,9 @@ void Game::RenderCurrentScene()
 	case SceneID::LevelEdit:	// ステージエディット
 		m_levelEditScene.Render(m_ghTileset);
 		break;
+	case SceneID::HighScores:	// スコアランキング
+		m_highScoresScene.Render(m_ghTileset);
+		break;
 	default:
 		break;
 	}
@@ -248,6 +258,9 @@ void Game::FinalizeCurrentScene()
 		break;
 	case SceneID::LevelEdit:	// ステージエディット
 		m_levelEditScene.Finalize();
+		break;
+	case SceneID::HighScores:	// スコアランキング
+		m_highScoresScene.Finalize();
 		break;
 	default:
 		break;

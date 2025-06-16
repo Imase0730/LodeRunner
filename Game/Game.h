@@ -19,6 +19,7 @@
 #include "TitleScene/TitleScene.h"
 #include "GamePlayScene/GamePlayScene.h"
 #include "LevelEditScene/LevelEditScene.h"
+#include "HighScoresScene/HighScoresScene.h"
 
 #include "Game/IrisWipe.h"
 
@@ -40,9 +41,10 @@ public:
 	enum class SceneID
 	{
 		None = -1,
-		Title,		// タイトル
-		GamePlay,	// ゲームプレイ
-		LevelEdit,	// レベルエディット
+		Title,			// タイトル
+		GamePlay,		// ゲームプレイ
+		LevelEdit,		// レベルエディット
+		HighScores,		// スコアランキング
 	};
 
 // クラス定数の宣言 -------------------------------------------------
@@ -63,6 +65,7 @@ private:
 	TitleScene m_titleScene;			// タイトルシーン
 	GamePlayScene m_gamePlayScene;		// ゲームプレイシーン
 	LevelEditScene m_levelEditScene;	// レベルエディットシーン
+	HighScoresScene m_highScoresScene;	// スコアランキングシーン
 
 	// 描画先のグラフィックハンドル
 	int m_ghScreen;

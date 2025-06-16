@@ -6,9 +6,10 @@
 #include "Tile.h"
 
 // コンストラクタ
-NumberRenderer::NumberRenderer(POINT position, int digit)
+NumberRenderer::NumberRenderer(POINT position, int digit, bool isZeroPadding)
 	: m_position{ position }
 	, m_digit{ digit }
+	, m_isZeroPadding{ isZeroPadding }
 	, m_number{ 0 }
 	, m_max{ 0 }
 {
@@ -37,5 +38,7 @@ void NumberRenderer::Render(int ghTileset) const
 					 , Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT
 					 , ghTileset, TRUE);
 		number /= 10;
+
+		if ((number == 0) && (m_isZeroPadding == false)) break;
 	}
 }

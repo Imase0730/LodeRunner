@@ -25,5 +25,11 @@ public:
 	// •`‰æˆ—
 	void Render(int ghTileset) const;
 
+	// •¶š‚ğİ’è‚·‚éŠÖ”
+	void SetString(const char* string) { m_string = string; }
+
+	// •\¦ˆÊ’u‚ğİ’è‚·‚éŠÖ”
+	void SetPosition(POINT position) { m_position = position; }
+
 };
 

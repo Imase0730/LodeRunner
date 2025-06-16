@@ -375,7 +375,7 @@ Gurad::MoveDirection Gurad::DecideMoveDirection()
 {
 	// ŒŠ‚Ì’†
 	if ( (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Blick)
-	  && (m_goldTimer > 0)
+	  && (m_goldTimer > 0)	// ŒŠ‚É—Ž‚¿‚Ä‚¢‚é
 	   )
 	{
 		// ã‚Ö

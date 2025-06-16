@@ -149,8 +149,8 @@ void Level::Render(int ghTileset) const
 	// ステージの下部の描画
 	for (int j = 0; j < MAX_GAME_COLMUN + 1; j++)
 	{
-		DrawRectGraph(j * Tile::TILE_PIXEL_WIDTH, (MAX_GAME_ROW + 1) * Tile::TILE_PIXEL_HEIGHT
-			, Tile::TILE_PIXEL_WIDTH * 2, Tile::TILE_PIXEL_HEIGHT * 4, Tile::TILE_PIXEL_WIDTH, 4, ghTileset, FALSE);
+		DrawRectGraph(j * Tile::TILE_PIXEL_WIDTH, Level::MAX_GAME_ROW * Tile::TILE_PIXEL_HEIGHT + 6
+			, Tile::TILE_PIXEL_WIDTH * 7, Tile::TILE_PIXEL_HEIGHT * 3, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 	}
 
 	//// ステージの描画

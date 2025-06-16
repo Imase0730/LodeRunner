@@ -22,8 +22,9 @@ public:
 	// モード
 	enum class Mode
 	{
-		Game,		// ゲーム
-		Edit,		// エディット
+		Game,	// ゲーム
+		Edit,	// エディット
+		Score,	// スコア
 	};
 
 // クラス定数の宣言 -------------------------------------------------
@@ -33,10 +34,13 @@ private:
 	static constexpr POINT TITLE_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 11) / 2, Tile::TILE_PIXEL_HEIGHT * 2 };
 
 	// GAMEの位置
-	static constexpr POINT GAME_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 4) / 2, Tile::TILE_PIXEL_HEIGHT * 7 };
+	static constexpr POINT GAME_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 4) / 2, Tile::TILE_PIXEL_HEIGHT * 6 };
 
 	// EDITの位置
-	static constexpr POINT EDIT_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 4) / 2, Tile::TILE_PIXEL_HEIGHT * 10 };
+	static constexpr POINT EDIT_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 4) / 2, Tile::TILE_PIXEL_HEIGHT * 9 };
+
+	// SCOREの位置
+	static constexpr POINT SCORE_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 5) / 2, Tile::TILE_PIXEL_HEIGHT * 12 };
 
 	// 点滅の間隔
 	static constexpr int BLINK_INTEVAL = 60;
@@ -55,6 +59,9 @@ private:
 
 	// Editの文字列
 	StringRenderer m_editStringRenderer;
+
+	// Scoreの文字列
+	StringRenderer m_scoreStringRenderer;
 
 	// モード
 	Mode m_mode;

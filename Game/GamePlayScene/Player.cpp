@@ -510,8 +510,16 @@ void Player::MoveUp()
 			m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
 			// Page1に書き込む
 			m_tilePosition.y--;
+
+			// ガードなら死亡
+			if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Guard)
+			{
+				SetAlive(false);
+			}
+
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Tile::Type::Player);
 		}
+
 
 		// 金塊が拾えるかチェック
 		CheckGoldPickedUp();
@@ -539,6 +547,13 @@ void Player::MoveDown()
 			m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
 			// Page1に書き込む
 			m_tilePosition.y++;
+
+			// ガードなら死亡
+			if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Guard)
+			{
+				SetAlive(false);
+			}
+
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Tile::Type::Player);
 		}
 
@@ -562,6 +577,7 @@ void Player::MoveLeft()
 		// 左向きに
 		m_faceDirection = Direction::Left;
 
+
 		// 左に移動する
 		m_adjustPosition.x--;
 		if (m_adjustPosition.x < 0)
@@ -571,6 +587,13 @@ void Player::MoveLeft()
 			m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
 			// Page1に書き込む
 			m_tilePosition.x--;
+
+			// ガードなら死亡
+			if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Guard)
+			{
+				SetAlive(false);
+			}
+
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Tile::Type::Player);
 		}
 
@@ -612,8 +635,16 @@ void Player::MoveRight()
 			m_pLevel->CopyPage2toPage1(m_tilePosition.x, m_tilePosition.y);
 			// Page1に書き込む
 			m_tilePosition.x++;
+
+			// ガードなら死亡
+			if (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Guard)
+			{
+				SetAlive(false);
+			}
+
 			m_pLevel->SetTilePage1(m_tilePosition.x, m_tilePosition.y, Tile::Type::Player);
 		}
+
 
 		// 金塊が拾えるかチェック
 		CheckGoldPickedUp();
