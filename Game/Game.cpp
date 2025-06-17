@@ -12,6 +12,8 @@
 #include "Game.h"
 
 #include "Game/Screen.h"
+#include <fstream>
+#include <sstream>
 
 
 
@@ -29,10 +31,11 @@ Game::Game()
 	, m_titleScene{ this }
 	, m_gamePlayScene{ this }
 	, m_levelEditScene{ this }
-	, m_highScoresScene{ this }
+	, m_scoreRankingScene{ this }
 	, m_ghScreen{ -1 }
 	, m_ghTileset{ -1 }
 	, m_irisWipe{}
+	, m_scores{}
 {
 	// 乱数の初期値を設定
 	SRand(static_cast<int>(time(nullptr)));
@@ -158,6 +161,48 @@ void Game::RequestSceneChange(SceneID nextSceneID)
 	m_requestedSceneID = nextSceneID;
 }
 
+// スコアデータの読み込み
+bool Game::LoadScore()
+{
+	// ファイルオープン
+	std::ifstream ifs(SCORE_DATA_FILENAME);
+	if (!ifs)
+	{
+		return false;
+	}
+
+	std::string line;
+
+	for (int i = 0; i < SCORE_ENTRY_MAX; i++)
+	{
+		if (!std::getline(ifs, line)) break;
+
+		std::stringstream ss(line);
+		std::string item;
+		Game::Score score;
+
+		// イニシャル
+		std::getline(ss, item, ',');
+		score.initial = item;
+
+		// レベル
+		std::getline(ss, item, ',');
+		score.level = std::stoi(item);
+
+		// スコア
+		std::getline(ss, item, ',');
+		score.score = std::stoi(item);
+
+		// スコア登録
+		SetScore(i, score);
+	}
+
+	//ファイルを閉じる
+	ifs.close();
+
+	return true;
+}
+
 // 開始シーンの設定
 void Game::SetStartScene(SceneID startSceneID)
 {
@@ -192,8 +237,8 @@ void Game::InitializeCurrentScene()
 	case SceneID::LevelEdit:	// ステージエディット
 		m_levelEditScene.Initialize();
 		break;
-	case SceneID::HighScores:	// スコアランキング
-		m_highScoresScene.Initialize();
+	case SceneID::ScoreRanking:	// スコアランキング
+		m_scoreRankingScene.Initialize();
 		break;
 	default:
 		break;
@@ -214,8 +259,8 @@ void Game::UpdateCurrentScene(int keyCondition, int keyTrigger)
 	case SceneID::LevelEdit:	// ステージエディット
 		m_levelEditScene.Update(keyCondition, keyTrigger);
 		break;
-	case SceneID::HighScores:	// スコアランキング
-		m_highScoresScene.Update(keyCondition, keyTrigger);
+	case SceneID::ScoreRanking:	// スコアランキング
+		m_scoreRankingScene.Update(keyCondition, keyTrigger);
 		break;
 	default:
 		break;
@@ -236,8 +281,8 @@ void Game::RenderCurrentScene()
 	case SceneID::LevelEdit:	// ステージエディット
 		m_levelEditScene.Render(m_ghTileset);
 		break;
-	case SceneID::HighScores:	// スコアランキング
-		m_highScoresScene.Render(m_ghTileset);
+	case SceneID::ScoreRanking:	// スコアランキング
+		m_scoreRankingScene.Render(m_ghTileset);
 		break;
 	default:
 		break;
@@ -259,8 +304,8 @@ void Game::FinalizeCurrentScene()
 	case SceneID::LevelEdit:	// ステージエディット
 		m_levelEditScene.Finalize();
 		break;
-	case SceneID::HighScores:	// スコアランキング
-		m_highScoresScene.Finalize();
+	case SceneID::ScoreRanking:	// スコアランキング
+		m_scoreRankingScene.Finalize();
 		break;
 	default:
 		break;

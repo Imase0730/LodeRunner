@@ -1,32 +1,35 @@
 //--------------------------------------------------------------------------------------
-// File: HighScoresScene.cpp
+// File: ScoreRankingScene.cpp
 //
 //--------------------------------------------------------------------------------------
-#include "HighScoresScene.h"
+#include "ScoreRankingScene.h"
 #include "Game/Game.h"
 
 // コンストラクタ
-HighScoresScene::HighScoresScene(Game* pGame)
+ScoreRankingScene::ScoreRankingScene(Game* pGame)
 	: m_pGame{ pGame }
 	, m_mode{ Mode::Game }
-	, m_stringRenderer{ POINT{ 0, 0 },"" }
+	, m_stringRenderer{ POINT{ 0, 0 }, "" }
 	, m_numberRenderer{ POINT{ 0, 0 }, 2, false }
+	, m_initialStringRenderer{ POINT{ 0, 0 }, "" }
+	, m_levelNumberRenderer{ POINT{0,0}, 3 }
+	, m_scoreNumberRenderer{ POINT{0,0}, 8 }
 {
 }
 
 // デストラクタ
-HighScoresScene::~HighScoresScene()
+ScoreRankingScene::~ScoreRankingScene()
 {
 }
 
 // 初期化処理
-void HighScoresScene::Initialize()
+void ScoreRankingScene::Initialize()
 {
-
+	m_pGame->LoadScore();
 }
 
 // 更新処理
-void HighScoresScene::Update(int keyCondition, int keyTrigger)
+void ScoreRankingScene::Update(int keyCondition, int keyTrigger)
 {
 	// Qキーでタイトルへ
 	if (keyTrigger & PAD_INPUT_7)
@@ -37,7 +40,7 @@ void HighScoresScene::Update(int keyCondition, int keyTrigger)
 }
 
 // 描画処理
-void HighScoresScene::Render(int ghTileset)
+void ScoreRankingScene::Render(int ghTileset)
 {
 	// タイトル
 	m_stringRenderer.SetString("LODE RUNNER HIGH SCORES");
@@ -61,7 +64,7 @@ void HighScoresScene::Render(int ghTileset)
 	}
 
 	// スコア
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < Game::SCORE_ENTRY_MAX; i++)
 	{
 		// 順位
 		m_numberRenderer.SetNumber(i + 1);
@@ -74,12 +77,31 @@ void HighScoresScene::Render(int ghTileset)
 			, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT
 			, ghTileset, TRUE);
 		
+		// スコアが登録されていれば
+		if (m_pGame->GetScore(i).level != 0)
+		{
+			// イニシャル
+			m_initialStringRenderer.SetString(m_pGame->GetScore(i).initial.c_str());
+			m_initialStringRenderer.SetPosition(POINT{ 7 * Tile::TILE_PIXEL_WIDTH, (5 + i) * Tile::TILE_PIXEL_HEIGHT });
+			m_initialStringRenderer.Render(ghTileset);
+
+			// レベル
+			m_levelNumberRenderer.SetNumber(m_pGame->GetScore(i).level);
+			m_levelNumberRenderer.SetPosition(POINT{ 14 * Tile::TILE_PIXEL_WIDTH, (5 + i) * Tile::TILE_PIXEL_HEIGHT });
+			m_levelNumberRenderer.Render(ghTileset);
+
+			// スコア
+			m_scoreNumberRenderer.SetNumber(m_pGame->GetScore(i).score);
+			m_scoreNumberRenderer.SetPosition(POINT{ 19 * Tile::TILE_PIXEL_WIDTH, (5 + i) * Tile::TILE_PIXEL_HEIGHT });
+			m_scoreNumberRenderer.Render(ghTileset);
+		}
 	}
 }
 
 // 終了処理
-void HighScoresScene::Finalize()
+void ScoreRankingScene::Finalize()
 {
 }
+
 
 

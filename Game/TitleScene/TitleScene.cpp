@@ -85,7 +85,7 @@ void TitleScene::Update(int keyCondition, int keyTrigger)
 			m_pGame->RequestSceneChange(Game::SceneID::LevelEdit);
 			break;
 		case TitleScene::Mode::Score:
-			m_pGame->RequestSceneChange(Game::SceneID::HighScores);
+			m_pGame->RequestSceneChange(Game::SceneID::ScoreRanking);
 			break;
 		default:
 			break;

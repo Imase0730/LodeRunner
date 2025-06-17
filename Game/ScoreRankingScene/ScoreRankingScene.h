@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-// File: HighScoresScene.h
+// File: ScoreRankingScene.h
 //
 //--------------------------------------------------------------------------------------
 #pragma once
@@ -12,7 +12,7 @@
 class Game;
 
 // ゲームプレイシーン
-class HighScoresScene
+class ScoreRankingScene
 {
 	// 列挙型の定義 -----------------------------------------------------
 public:
@@ -27,7 +27,6 @@ public:
 // クラス定数の宣言 -------------------------------------------------
 private:
 	
-
 // データメンバの宣言 -----------------------------------------------
 private:
 
@@ -43,14 +42,23 @@ private:
 	// 数字
 	NumberRenderer m_numberRenderer;
 
+	// イニシャルの文字
+	StringRenderer m_initialStringRenderer;
+
+	// レベルの数字
+	NumberRenderer m_levelNumberRenderer;
+
+	// スコアの数字
+	NumberRenderer m_scoreNumberRenderer;
+
 // メンバ関数の宣言 -------------------------------------------------
 public:
 
 	// コンストラクタ
-	HighScoresScene(Game* pGame);
+	ScoreRankingScene(Game* pGame);
 
 	// デストラクタ
-	~HighScoresScene();
+	~ScoreRankingScene();
 
 	// 初期化処理
 	void Initialize();

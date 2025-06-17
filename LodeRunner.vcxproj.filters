@@ -36,7 +36,7 @@
     <Filter Include="Game\LevelEditScene">
       <UniqueIdentifier>{527ce41d-cf4a-40c2-9fd9-002c7c5ae1b6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Game\HighScores">
+    <Filter Include="Game\ScoreRanking">
       <UniqueIdentifier>{b55db511-3910-4f2d-a79b-cdcaee45dfac}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -114,8 +114,8 @@
     <ClCompile Include="Game\GamePlayScene\Gurad.cpp">
       <Filter>Game\GamePlayScene</Filter>
     </ClCompile>
-    <ClCompile Include="Game\HighScoresScene\HighScoresScene.cpp">
-      <Filter>Game\HighScores</Filter>
+    <ClCompile Include="Game\ScoreRankingScene\ScoreRankingScene.cpp">
+      <Filter>Game\ScoreRanking</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,8 +161,8 @@
     <ClInclude Include="Game\Tile.h">
       <Filter>Game</Filter>
     </ClInclude>
-    <ClInclude Include="Game\HighScoresScene\HighScoresScene.h">
-      <Filter>Game\HighScores</Filter>
+    <ClInclude Include="Game\ScoreRankingScene\ScoreRankingScene.h">
+      <Filter>Game\ScoreRanking</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

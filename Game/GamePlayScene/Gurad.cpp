@@ -66,6 +66,14 @@ void Gurad::Update()
 		// 金塊保持タイマーを減算
 		m_goldTimer--;
 
+		// 穴の中なら落ちないように金塊保持タイマーを０にしないようにする
+		if ( (m_goldTimer == 0)
+		  && (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Blick)
+		   )
+		{
+			m_goldTimer++;
+		}
+
 		// 穴に落ちた直後、数フレームはアニメーションしない
 		if (m_goldTimer > HOLE_ANIMATION_START_FRAME) return;
 
@@ -311,9 +319,7 @@ void Gurad::Falling()
 		}
 
 		// 掘った穴なら
-		if ( (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Blick)
-		  && (m_pLevel->GetTilePage1(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Empty)
-		   )
+		if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Blick)
 		{
 			// 金塊を持っている
 			if (m_goldTimer < 0)

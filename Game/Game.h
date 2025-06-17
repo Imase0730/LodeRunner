@@ -19,7 +19,7 @@
 #include "TitleScene/TitleScene.h"
 #include "GamePlayScene/GamePlayScene.h"
 #include "LevelEditScene/LevelEditScene.h"
-#include "HighScoresScene/HighScoresScene.h"
+#include "ScoreRankingScene/ScoreRankingScene.h"
 
 #include "Game/IrisWipe.h"
 
@@ -44,13 +44,36 @@ public:
 		Title,			// タイトル
 		GamePlay,		// ゲームプレイ
 		LevelEdit,		// レベルエディット
-		HighScores,		// スコアランキング
+		ScoreRanking,	// スコアランキング
+		ScoreEntry,		// スコア登録
 	};
 
 // クラス定数の宣言 -------------------------------------------------
 public:
 	// システム関連
 	static constexpr const wchar_t* TITLE = L"Lode Runner";   ///< ゲームタイトル
+
+	// スコアデータ
+	static constexpr char SCORE_DATA_FILENAME[] = "Resources/ScoreData/score.csv";
+
+	// スコアの登録最大数
+	static constexpr int SCORE_ENTRY_MAX = 10;
+
+// 構造体の宣言 -----------------------------------------------
+public:
+
+	// スコア
+	struct Score
+	{
+		// イニシャル
+		std::string initial;
+
+		// レベル
+		int level;
+
+		// 得点
+		int score;
+	};
 
 // データメンバの宣言 -----------------------------------------------
 private:
@@ -62,10 +85,10 @@ private:
 	SceneID m_requestedSceneID;	// 変更要求のシーンID
 
 	// シーンオブジェクト
-	TitleScene m_titleScene;			// タイトルシーン
-	GamePlayScene m_gamePlayScene;		// ゲームプレイシーン
-	LevelEditScene m_levelEditScene;	// レベルエディットシーン
-	HighScoresScene m_highScoresScene;	// スコアランキングシーン
+	TitleScene m_titleScene;				// タイトルシーン
+	GamePlayScene m_gamePlayScene;			// ゲームプレイシーン
+	LevelEditScene m_levelEditScene;		// レベルエディットシーン
+	ScoreRankingScene m_scoreRankingScene;	// スコアランキングシーン
 
 	// 描画先のグラフィックハンドル
 	int m_ghScreen;
@@ -76,7 +99,10 @@ private:
 	// アイリスワイプ
 	IrisWipe m_irisWipe;
 
-	// メンバ関数の宣言 -------------------------------------------------
+	// スコア情報
+	Score m_scores[SCORE_ENTRY_MAX];
+
+// メンバ関数の宣言 -------------------------------------------------
 // コンストラクタ/デストラクタ
 public:
 	// コンストラクタ
@@ -105,6 +131,15 @@ public:
 
 	// アイリスワイプを取得する関数
 	IrisWipe* GetIrisWipe() { return &m_irisWipe; }
+
+	// スコアデータの読み込み
+	bool LoadScore();
+
+	// スコアを取得する関数
+	Score GetScore(int index) const { return m_scores[index]; }
+
+	// スコアを設定する関数
+	void SetScore(int index, Score score) { m_scores[index] = score; }
 
 private:
 
