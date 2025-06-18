@@ -31,7 +31,7 @@ private:
 private:
 
 	// プレイヤーの数
-	static constexpr int MEN_COUNT = 2;
+	static constexpr int MEN_COUNT = 1;
 
 	// 更新間隔（２フレームに１回更新）
 	static constexpr int UPDATE_INTERVAL = 2;

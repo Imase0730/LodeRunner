@@ -20,8 +20,8 @@ public:
 	// モード
 	enum class Mode
 	{
-		Game,		// ゲーム
-		Edit,		// エディット
+		Display,	// スコア表示
+		Entry,		// スコア登録
 	};
 
 // クラス定数の宣言 -------------------------------------------------
@@ -51,6 +51,12 @@ private:
 	// スコアの数字
 	NumberRenderer m_scoreNumberRenderer;
 
+	// スコア登録位置
+	int m_entryIndex;
+	
+	// 入力中の文字
+	char m_character;
+
 // メンバ関数の宣言 -------------------------------------------------
 public:
 
@@ -71,5 +77,10 @@ public:
 
 	// 終了処理
 	void Finalize();
+
+private:
+
+	// 登録する位置を取得する関数
+	int GetScoreIndex(int score);
 
 };

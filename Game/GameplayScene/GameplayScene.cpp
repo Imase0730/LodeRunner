@@ -51,6 +51,9 @@ GamePlayScene::~GamePlayScene()
 // 初期化処理
 void GamePlayScene::Initialize()
 {
+	// 登録するスコアの初期化
+	m_pGame->InitializeEntryScore();
+
 	// スコアの初期化
 	m_score = 0;
 	m_scoreNumberRenderer.SetNumber(m_score);
@@ -127,8 +130,19 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 		// 残機数が０なら
 		if (m_men == 0)
 		{
-			// タイトルへ
-			m_pGame->RequestSceneChange(Game::SceneID::Title);
+			// スコア登録可能？
+			if (m_score > m_pGame->GetScore(Game::SCORE_ENTRY_MAX - 1).score)
+			{
+				// スコア登録へ
+				Game::Score score{ "", m_levelId, m_score };
+				m_pGame->SetEntryScore(score);
+				m_pGame->RequestSceneChange(Game::SceneID::ScoreRanking);
+			}
+			else
+			{
+				// タイトルへ
+				m_pGame->RequestSceneChange(Game::SceneID::Title);
+			}
 		}
 		else
 		{

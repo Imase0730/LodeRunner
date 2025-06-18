@@ -36,6 +36,7 @@ Game::Game()
 	, m_ghTileset{ -1 }
 	, m_irisWipe{}
 	, m_scores{}
+	, m_entryScore{}
 {
 	// 乱数の初期値を設定
 	SRand(static_cast<int>(time(nullptr)));
@@ -65,6 +66,9 @@ Game::~Game()
  */
 void Game::Initialize()
 {
+	// スコアのロード
+	LoadScore();
+
 	// 絵のロード
 	m_ghTileset = LoadGraph(L"Resources/Textures/tileset.png");
 
@@ -161,7 +165,7 @@ void Game::RequestSceneChange(SceneID nextSceneID)
 	m_requestedSceneID = nextSceneID;
 }
 
-// スコアデータの読み込み
+// スコアデータのロード
 bool Game::LoadScore()
 {
 	// ファイルオープン
@@ -201,6 +205,46 @@ bool Game::LoadScore()
 	ifs.close();
 
 	return true;
+}
+
+// スコアデータのセーブ
+bool Game::SaveScore() const
+{
+	// ファイルオープン
+	std::ofstream ofs(SCORE_DATA_FILENAME);
+	if (!ofs)
+	{
+		return false;
+	}
+
+	for (int i = 0; i < SCORE_ENTRY_MAX; i++)
+	{
+		if (!m_scores[i].level) break;
+		ofs << m_scores[i].initial << "," << m_scores[i].level << "," << m_scores[i].score << "," << std::endl;
+	}
+
+	//ファイルを閉じる
+	ofs.close();
+
+	return false;
+}
+
+// 登録するスコアを初期化する関数
+void Game::InitializeEntryScore()
+{
+	m_entryScore.score = 0;
+}
+
+// 登録するスコアを設定する関数
+void Game::SetEntryScore(Score score)
+{
+	m_entryScore = score;
+}
+
+// 登録するスコアを取得する関数
+Game::Score Game::GetEntryScore() const
+{
+	return m_entryScore;
 }
 
 // 開始シーンの設定

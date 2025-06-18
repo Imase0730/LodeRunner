@@ -45,7 +45,6 @@ public:
 		GamePlay,		// ゲームプレイ
 		LevelEdit,		// レベルエディット
 		ScoreRanking,	// スコアランキング
-		ScoreEntry,		// スコア登録
 	};
 
 // クラス定数の宣言 -------------------------------------------------
@@ -102,6 +101,9 @@ private:
 	// スコア情報
 	Score m_scores[SCORE_ENTRY_MAX];
 
+	// 登録するスコア情報
+	Score m_entryScore;
+
 // メンバ関数の宣言 -------------------------------------------------
 // コンストラクタ/デストラクタ
 public:
@@ -132,14 +134,26 @@ public:
 	// アイリスワイプを取得する関数
 	IrisWipe* GetIrisWipe() { return &m_irisWipe; }
 
-	// スコアデータの読み込み
+	// スコアデータのロード
 	bool LoadScore();
+
+	// スコアデータのセーブ
+	bool SaveScore() const;
 
 	// スコアを取得する関数
 	Score GetScore(int index) const { return m_scores[index]; }
 
 	// スコアを設定する関数
 	void SetScore(int index, Score score) { m_scores[index] = score; }
+
+	// 登録するスコアを初期化する関数
+	void InitializeEntryScore();
+
+	// 登録するスコアを設定する関数
+	void SetEntryScore(Score score);
+
+	// 登録するスコアを取得する関数
+	Score GetEntryScore() const;
 
 private:
 
