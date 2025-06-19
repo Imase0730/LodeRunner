@@ -7,6 +7,7 @@
 #include "Game/Screen.h"
 #include "Game/StringRenderer.h"
 #include "Game/NumberRenderer.h"
+#include "Game/Blink.h"
 
 // クラスの前方宣言
 class Game;
@@ -26,7 +27,13 @@ public:
 
 // クラス定数の宣言 -------------------------------------------------
 private:
-	
+
+	// 点滅の間隔
+	static constexpr int BLINK_INTERVAL = 16;
+
+	// 画面切り替え時のウエイト
+	static constexpr int TRANSITION_DELAY_FRAMES = 180;
+
 // データメンバの宣言 -----------------------------------------------
 private:
 
@@ -53,9 +60,15 @@ private:
 
 	// スコア登録位置
 	int m_entryIndex;
-	
+
+	// 点滅
+	Blink m_blink;
+
 	// 入力中の文字
-	char m_character;
+	char m_inputCharacter;
+
+	// 終了時の画面切り替えウエイトタイマー
+	int m_waitTimer;
 
 // メンバ関数の宣言 -------------------------------------------------
 public:

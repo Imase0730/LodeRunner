@@ -18,7 +18,7 @@ void StringRenderer::Render(int ghTileset) const
 	// ”š‚Ì•\¦
 	for (int i = 0; i < m_string.length(); i++)
 	{
-		if ((m_string[i] >= 'A') && (m_string[i] <= 'Z'))
+		if ((m_string[i] >= 'A') && (m_string[i] <= '['))
 		{
 			int pos = m_string[i] - 'A';
 			DrawRectGraph(m_position.x + i * Tile::TILE_PIXEL_WIDTH, m_position.y

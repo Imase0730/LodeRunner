@@ -14,7 +14,7 @@ TitleScene::TitleScene(Game* pGame)
 	, m_editStringRenderer{ EDIT_POSITION, "EDIT" }
 	, m_scoreStringRenderer{ SCORE_POSITION, "SCORE" }
 	, m_mode{ Mode::Game }
-	, m_blink{ BLINK_INTEVAL }
+	, m_blink{ BLINK_INTERVAL }
 {
 }
 

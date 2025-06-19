@@ -15,7 +15,9 @@ ScoreRankingScene::ScoreRankingScene(Game* pGame)
 	, m_levelNumberRenderer{ POINT{0,0}, 3 }
 	, m_scoreNumberRenderer{ POINT{0,0}, 8 }
 	, m_entryIndex{ -1 }
-	, m_character{ 'A' }
+	, m_blink{ BLINK_INTERVAL }
+	, m_inputCharacter{ 'A' }
+	, m_waitTimer{ 0 }
 {
 }
 
@@ -27,6 +29,9 @@ ScoreRankingScene::~ScoreRankingScene()
 // 初期化処理
 void ScoreRankingScene::Initialize()
 {
+	// 表示モード
+	m_mode = Mode::Display;
+
 	// 登録するスコアがあるか？
 	int score = m_pGame->GetEntryScore().score;
 	if (score)
@@ -60,6 +65,20 @@ void ScoreRankingScene::Initialize()
 // 更新処理
 void ScoreRankingScene::Update(int keyCondition, int keyTrigger)
 {
+	// 点滅の更新
+	m_blink.Update();
+
+	// 画面切り替え時のウエイト
+	if (m_waitTimer > 0)
+	{
+		m_waitTimer--;
+		if (m_waitTimer == 0)
+		{
+			// タイトルへ
+			m_pGame->RequestSceneChange(Game::SceneID::Title);
+		}
+	}
+
 	// 表示モード
 	if (m_mode == Mode::Display)
 	{
@@ -73,32 +92,35 @@ void ScoreRankingScene::Update(int keyCondition, int keyTrigger)
 	{
 		// 登録モード
 
-		// 左右キーで文字選択
-		if (keyTrigger & PAD_INPUT_RIGHT)
+		// 左キーで文字選択
+		if (keyTrigger & PAD_INPUT_LEFT)
 		{
-			Game::Score score = m_pGame->GetScore(m_entryIndex);
-			if (m_character != 'Z')
-			{
-				m_character++;
-				score.initial[0] = m_character;
-				score.initial[1] = '\0';
-				m_pGame->SetScore(m_entryIndex, score);
-			}
+			if (m_inputCharacter != 'A') m_inputCharacter--;
 		}
 
+		// 右キーで文字選択
+		if (keyTrigger & PAD_INPUT_RIGHT)
+		{
+			if (m_inputCharacter != '[') m_inputCharacter++;
+		}
 
 		// Zキーで決定
 		if (keyTrigger & PAD_INPUT_1)
 		{
 			Game::Score score = m_pGame->GetScore(m_entryIndex);
-			score.initial += m_character;
+			score.initial += m_inputCharacter;
+			m_inputCharacter = 'A';
 			m_pGame->SetScore(m_entryIndex, score);
+
+			// 入力終了？
 			if (score.initial.size() == 3)
 			{
-				m_pGame->RequestSceneChange(Game::SceneID::Title);
+				// スコアのセーブ
+				m_pGame->SaveScore();
+				// 画面切り替え時のウエイト値を設定
+				m_waitTimer = TRANSITION_DELAY_FRAMES;
 			}
 		}
-
 	}
 }
 
@@ -159,13 +181,16 @@ void ScoreRankingScene::Render(int ghTileset)
 			m_scoreNumberRenderer.Render(ghTileset);
 		}
 
-		//// 入力中のイニシャルの表示
-		//if ((m_mode == Mode::Entry) && (i == m_entryIndex))
-		//{
-		//	m_initialStringRenderer.SetString(m_pGame->GetScore(i).initial.c_str());
-		//	m_initialStringRenderer.SetPosition(POINT{ 7 * Tile::TILE_PIXEL_WIDTH, (5 + i) * Tile::TILE_PIXEL_HEIGHT });
-		//	m_initialStringRenderer.Render(ghTileset);
-		//}
+		// 点滅する入力中の文字
+		if ((m_mode == Mode::Entry) && (m_blink.IsBlinkOn()) &&  (i == m_entryIndex) && (m_waitTimer == 0))
+		{
+			Game::Score score = m_pGame->GetScore(m_entryIndex);
+			int size = score.initial.size();
+			char str[]{ m_inputCharacter, '\0' };
+			m_initialStringRenderer.SetString(str);
+			m_initialStringRenderer.SetPosition(POINT{ (7 + size) * Tile::TILE_PIXEL_WIDTH, (5 + i) * Tile::TILE_PIXEL_HEIGHT });
+			m_initialStringRenderer.Render(ghTileset);
+		}
 	}
 }
 

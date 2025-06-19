@@ -43,7 +43,7 @@ private:
 	static constexpr POINT SCORE_POSITION{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 5) / 2, Tile::TILE_PIXEL_HEIGHT * 12 };
 
 	// 点滅の間隔
-	static constexpr int BLINK_INTEVAL = 60;
+	static constexpr int BLINK_INTERVAL = 60;
 
 // データメンバの宣言 -----------------------------------------------
 private:

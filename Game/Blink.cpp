@@ -8,6 +8,7 @@
 Blink::Blink(int intervalFrame)
 	: m_intervalFrame{ intervalFrame }
 	, m_timer{}
+	, m_isBlinkOn{ false }
 {
 }
 
@@ -17,6 +18,14 @@ void Blink::Update()
 	if (++m_timer > m_intervalFrame)
 	{
 		m_timer = 0;
+		if (m_isBlinkOn)
+		{
+			m_isBlinkOn = false;
+		}
+		else
+		{
+			m_isBlinkOn = true;
+		}
 	}
 }
 
@@ -30,3 +39,4 @@ float Blink::GetBlinkRate() const
 	}
 	return (m_intervalFrame - m_timer) / (m_intervalFrame / 2.0f);
 }
+

@@ -141,7 +141,7 @@ public:
 	bool SaveScore() const;
 
 	// スコアを取得する関数
-	Score GetScore(int index) const { return m_scores[index]; }
+	Score GetScore(int index) { return m_scores[index]; }
 
 	// スコアを設定する関数
 	void SetScore(int index, Score score) { m_scores[index] = score; }
