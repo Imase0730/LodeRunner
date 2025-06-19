@@ -30,6 +30,7 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	, m_startWaitTimer{ 0 }
 	, m_clearWaitTimer{ 0 }
 	, m_levelClearScore{ 0 }
+	, m_playerDeadWaitTimer{ 0 }
 {
 	// ガードを生成
 	for (int i = 0; i < Level::GUARD_MAX; i++)
@@ -87,6 +88,9 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	// 次のレベルへの移行処理
 	if (WipeToNextLevel()) return;
 
+	// プレイヤー死亡時の待ち時間の処理
+	if (WaitPlayerDead()) return;
+
 	// レベルクリア時の待ち時間の処理
 	if (WaitLevelClear()) return;
 
@@ -126,29 +130,8 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	{
 		// 残機数を減らす
 		m_menNumberRenderer.SetNumber(--m_men);
-
-		// 残機数が０なら
-		if (m_men == 0)
-		{
-			// スコア登録可能？
-			if (m_score > m_pGame->GetScore(Game::SCORE_ENTRY_MAX - 1).score)
-			{
-				// スコア登録へ
-				Game::Score score{ "", m_levelId, m_score };
-				m_pGame->SetEntryScore(score);
-				m_pGame->RequestSceneChange(Game::SceneID::ScoreRanking);
-			}
-			else
-			{
-				// タイトルへ
-				m_pGame->RequestSceneChange(Game::SceneID::Title);
-			}
-		}
-		else
-		{
-			// ワイプクローズ
-			m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Close);
-		}
+		// プレイヤー死亡時の待ち時間を設定
+		m_playerDeadWaitTimer = PLAYER_DEAD_WAIT_FRAME;
 	}
 
 	oldKey = keyCondition;
@@ -468,6 +451,43 @@ bool GamePlayScene::WaitLevelClear()
 		if (m_levelClearScore >= 0)
 		{
 			AddScore(score);
+		}
+		return true;
+	}
+	return false;
+}
+
+// プレイヤー死亡時の待ち時間の処理
+bool GamePlayScene::WaitPlayerDead()
+{
+	// 画面切り替え時のウエイト
+	if (m_playerDeadWaitTimer > 0)
+	{
+		m_playerDeadWaitTimer--;
+		if (m_playerDeadWaitTimer == 0)
+		{
+			// 残機数が０なら
+			if (m_men == 0)
+			{
+				// スコア登録可能？
+				if (m_score > m_pGame->GetScore(Game::SCORE_ENTRY_MAX - 1).score)
+				{
+					// スコア登録へ
+					Game::Score score{ "", m_levelId, m_score };
+					m_pGame->SetEntryScore(score);
+					m_pGame->RequestSceneChange(Game::SceneID::ScoreRanking);
+				}
+				else
+				{
+					// タイトルへ
+					m_pGame->RequestSceneChange(Game::SceneID::Title);
+				}
+			}
+			else
+			{
+				// ワイプクローズ
+				m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Close);
+			}
 		}
 		return true;
 	}

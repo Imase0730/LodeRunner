@@ -31,7 +31,7 @@ private:
 private:
 
 	// プレイヤーの数
-	static constexpr int MEN_COUNT = 1;
+	static constexpr int MEN_COUNT = 2;
 
 	// 更新間隔（２フレームに１回更新）
 	static constexpr int UPDATE_INTERVAL = 2;
@@ -71,6 +71,9 @@ private:
 
 	// ゲームクリア時のウエイト
 	static constexpr int CLEAR_WAIT_FRAME = 30;
+
+	// プレイヤーが死亡時のウエイト
+	static constexpr int PLAYER_DEAD_WAIT_FRAME = 30;
 
 public:
 
@@ -162,6 +165,9 @@ private:
 	// レベルクリア時のウエイトタイマー
 	int m_clearWaitTimer;
 
+	// プレイヤー死亡時のウエイトタイマー
+	int m_playerDeadWaitTimer;
+
 	// レベルクリア時の得点加算用
 	int m_levelClearScore;
 
@@ -211,6 +217,9 @@ private:
 
 	// レベルクリア時の待ち時間の処理
 	bool WaitLevelClear();
+
+	// プレイヤー死亡時の待ち時間の処理
+	bool WaitPlayerDead();
 
 public:
 

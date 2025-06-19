@@ -77,6 +77,7 @@ void ScoreRankingScene::Update(int keyCondition, int keyTrigger)
 			// タイトルへ
 			m_pGame->RequestSceneChange(Game::SceneID::Title);
 		}
+		return;
 	}
 
 	// 表示モード
@@ -182,10 +183,10 @@ void ScoreRankingScene::Render(int ghTileset)
 		}
 
 		// 点滅する入力中の文字
-		if ((m_mode == Mode::Entry) && (m_blink.IsBlinkOn()) &&  (i == m_entryIndex) && (m_waitTimer == 0))
+		Game::Score score = m_pGame->GetScore(m_entryIndex);
+		int size = score.initial.size();
+		if ((m_mode == Mode::Entry) && (m_blink.IsBlinkOn()) &&  (i == m_entryIndex) && (size < 3))
 		{
-			Game::Score score = m_pGame->GetScore(m_entryIndex);
-			int size = score.initial.size();
 			char str[]{ m_inputCharacter, '\0' };
 			m_initialStringRenderer.SetString(str);
 			m_initialStringRenderer.SetPosition(POINT{ (7 + size) * Tile::TILE_PIXEL_WIDTH, (5 + i) * Tile::TILE_PIXEL_HEIGHT });
