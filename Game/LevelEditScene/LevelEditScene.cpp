@@ -243,10 +243,25 @@ void LevelEditScene::SelectTile(int keyCondition, int keyRepeat)
 // セーブ
 void LevelEditScene::Save(int keyTrigger, int keyRepeat)
 {
+	// YesNoダイアログ表示中？
+	if (m_yesNoDialog.IsVisivle())
+	{
+		// Yesが選択された？
+		if ( (m_yesNoDialog.Update(keyTrigger) == true)
+		  && (m_yesNoDialog.GetYesNo() == YesNoDialog::YesNo::Yes)
+		   )
+		{
+				// セーブ
+				m_level.SaveLevel(m_levelId);
+		}
+		return;
+	}
+
 	// Zキーでセーブ
 	if (keyTrigger & PAD_INPUT_1)
 	{
-		m_level.SaveLevel(m_levelId);
+		// YesNoダイアログを起動
+		m_yesNoDialog.StartDialog();
 	}
 	// 上キーまたはWキーでレベル加算
 	if ((keyRepeat & PAD_INPUT_UP) || (keyRepeat & PAD_INPUT_8))
@@ -265,13 +280,25 @@ void LevelEditScene::Save(int keyTrigger, int keyRepeat)
 // ロード
 void LevelEditScene::Load(int keyTrigger, int keyRepeat)
 {
+	// YesNoダイアログ表示中？
+	if (m_yesNoDialog.IsVisivle())
+	{
+		// Yesが選択された？
+		if ((m_yesNoDialog.Update(keyTrigger) == true)
+			&& (m_yesNoDialog.GetYesNo() == YesNoDialog::YesNo::Yes)
+			)
+		{
+			// ロード
+			m_level.Initialize(m_levelId, Level::Mode::LevelEdit);
+		}
+		return;
+	}
+
 	// Zキーでロード
 	if (keyTrigger & PAD_INPUT_1)
 	{
-		if (m_levelId != m_level.GetLevel())
-		{
-			m_level.Initialize(m_levelId, Level::Mode::LevelEdit);
-		}
+		// YesNoダイアログを起動
+		m_yesNoDialog.StartDialog();
 	}
 	// 上キーまたはWキーでレベル加算
 	if ((keyRepeat & PAD_INPUT_UP) || (keyRepeat & PAD_INPUT_8))

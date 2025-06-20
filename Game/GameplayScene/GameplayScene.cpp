@@ -94,6 +94,13 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	// レベルクリア時の待ち時間の処理
 	if (WaitLevelClear()) return;
 
+	// Qキーでゲームをリスタート
+	if (keyTrigger & PAD_INPUT_7)
+	{
+		m_men++;
+		m_player.SetAlive(false);
+	}
+
 	// ステージの更新
 	m_level.Update();
 
