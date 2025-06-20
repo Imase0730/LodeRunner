@@ -10,6 +10,7 @@
 #include "Game/NumberRenderer.h"
 #include "Game/StringRenderer.h"
 #include "Game/Tile.h"
+#include "YesNoDialog.h"
 
 // クラスの前方宣言
 class Game;
@@ -78,6 +79,9 @@ private:
 
 	// レベル表示
 	NumberRenderer m_levelNumberRenderer;
+
+	// YesNoダイアログ
+	YesNoDialog m_yesNoDialog;
 
 // メンバ関数の宣言 -------------------------------------------------
 public:

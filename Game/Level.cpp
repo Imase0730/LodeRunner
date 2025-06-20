@@ -30,10 +30,14 @@ Level::~Level()
 }
 
 // 初期化処理
-void Level::Initialize(int levelNo, Mode mode)
+bool Level::Initialize(int levelNo, Mode mode)
 {
 	// レベルが違っていればレベルをロードする
-	if (levelNo != m_levelId) LoadLevel(levelNo, mode);
+	if (levelNo != m_levelId)
+	{
+		// ファイルからレベルデータを読み込む
+		if (!LoadLevel(levelNo, mode)) return false;
+	}
 
 	// ステージデータの初期化
 	for (int i = 0; i < MAX_GAME_ROW + 1; i++)
@@ -98,6 +102,8 @@ void Level::Initialize(int levelNo, Mode mode)
 			}
 		}
 	}
+
+	return true;
 }
 
 // 更新処理
@@ -239,7 +245,7 @@ bool Level::LoadLevel(int level, Mode mode)
 	// レベルを設定
 	m_levelId = level;
 
-	return false;
+	return true;
 }
 
 // 隠しハシゴを出現する関数

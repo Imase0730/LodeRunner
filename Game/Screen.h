@@ -36,5 +36,5 @@ public:
 	static constexpr int GAME_WIDTH = 280;			// ゲーム画面の幅
 	static constexpr int GAME_HEIGHT = 192;			// ゲーム画面の高さ
 
-	static constexpr float ZOOM_RATIO = 3.0f;		// ゲーム画面の拡大率
+	static constexpr float ZOOM_RATIO = 3.5f;		// ゲーム画面の拡大率
 };

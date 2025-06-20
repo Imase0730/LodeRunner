@@ -146,6 +146,7 @@
     <ClCompile Include="Game\GamePlayScene\Player.cpp" />
     <ClCompile Include="Game\IrisWipe.cpp" />
     <ClCompile Include="Game\LevelEditScene\LevelEditScene.cpp" />
+    <ClCompile Include="Game\LevelEditScene\YesNoDialog.cpp" />
     <ClCompile Include="Game\NumberRenderer.cpp" />
     <ClCompile Include="Game\Level.cpp" />
     <ClCompile Include="Game\ScoreRankingScene\ScoreRankingScene.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Game\GamePlayScene\Player.h" />
     <ClInclude Include="Game\IrisWipe.h" />
     <ClInclude Include="Game\LevelEditScene\LevelEditScene.h" />
+    <ClInclude Include="Game\LevelEditScene\YesNoDialog.h" />
     <ClInclude Include="Game\NumberRenderer.h" />
     <ClInclude Include="Game\ScoreRankingScene\ScoreRankingScene.h" />
     <ClInclude Include="Game\Screen.h" />

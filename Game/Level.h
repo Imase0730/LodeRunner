@@ -103,7 +103,7 @@ public:
 	~Level();
 
 	// ‰Šú‰»
-	void Initialize(int levelNo, Mode mode);
+	bool Initialize(int levelNo, Mode mode);
 
 	// XVˆ—
 	void Update();

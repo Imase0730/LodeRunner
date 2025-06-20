@@ -18,6 +18,7 @@ LevelEditScene::LevelEditScene(Game* pGame)
 	, m_loadStringRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 15 , Level::INFOMATION_Y }, "LOAD" }
 	, m_levelStringRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 20 , Level::INFOMATION_Y }, "LEVEL" }
 	, m_levelNumberRenderer{ POINT{ Tile::TILE_PIXEL_WIDTH * 25, Level::INFOMATION_Y }, 3 }
+	, m_yesNoDialog{}
 {
 
 }
@@ -143,6 +144,8 @@ void LevelEditScene::Render(int ghTileset)
 
 	// ì_ñ≈Çé~ÇﬂÇÈ
 	SetDrawBright(255, 255, 255);
+
+	m_yesNoDialog.Render(ghTileset);
 }
 
 // èIóπèàóù

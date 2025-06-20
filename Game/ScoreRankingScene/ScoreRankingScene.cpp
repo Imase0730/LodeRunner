@@ -182,15 +182,19 @@ void ScoreRankingScene::Render(int ghTileset)
 			m_scoreNumberRenderer.Render(ghTileset);
 		}
 
-		// 点滅する入力中の文字
-		Game::Score score = m_pGame->GetScore(m_entryIndex);
-		int size = score.initial.size();
-		if ((m_mode == Mode::Entry) && (m_blink.IsBlinkOn()) &&  (i == m_entryIndex) && (size < 3))
+		// スコアエントリーなら
+		if (m_mode == Mode::Entry)
 		{
-			char str[]{ m_inputCharacter, '\0' };
-			m_initialStringRenderer.SetString(str);
-			m_initialStringRenderer.SetPosition(POINT{ (7 + size) * Tile::TILE_PIXEL_WIDTH, (5 + i) * Tile::TILE_PIXEL_HEIGHT });
-			m_initialStringRenderer.Render(ghTileset);
+			// 点滅する入力中の文字
+			Game::Score score = m_pGame->GetScore(m_entryIndex);
+			int size = score.initial.size();
+			if ((m_blink.IsBlinkOn()) && (i == m_entryIndex) && (size < 3))
+			{
+				char str[]{ m_inputCharacter, '\0' };
+				m_initialStringRenderer.SetString(str);
+				m_initialStringRenderer.SetPosition(POINT{ (7 + size) * Tile::TILE_PIXEL_WIDTH, (5 + i) * Tile::TILE_PIXEL_HEIGHT });
+				m_initialStringRenderer.Render(ghTileset);
+			}
 		}
 	}
 }

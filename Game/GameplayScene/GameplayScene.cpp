@@ -198,8 +198,14 @@ void GamePlayScene::GameInitialize()
 		m_levelNumberRenderer.SetNumber(++m_levelId);
 	}
 
-	// ステージのロード
-	m_level.Initialize(m_levelId, Level::Mode::GamePlay);
+	// ステージデータの読み込み
+	if (!m_level.Initialize(m_levelId, Level::Mode::GamePlay))
+	{
+		// ステージデータ読み込みエラーのためステージ１に戻る
+		m_levelId = 1;
+		m_levelNumberRenderer.SetNumber(m_levelId);
+		m_level.Initialize(m_levelId, Level::Mode::GamePlay);
+	}
 
 	// 掘ったレンガを情報の初期化
 	for (int i = 0; i < DIG_BRICK_MAX; i++)
@@ -407,8 +413,10 @@ bool GamePlayScene::WipeToNextLevel()
 		return true;
 	}
 
-	// ワイプが終了したら
-	if (m_pGame->GetIrisWipe()->GetMode() == IrisWipe::Mode::None)
+	// ワイプが終了したら数フレームプレイヤーを点滅させてからゲームを開始する
+	if ( (m_pGame->GetIrisWipe()->GetMode() == IrisWipe::Mode::None)
+	  && (m_startWaitTimer != 0)
+	   )
 	{
 		// ゲームスタート時のウエイト
 		if (m_startWaitTimer > 0) m_startWaitTimer--;
@@ -427,6 +435,7 @@ bool GamePlayScene::WipeToNextLevel()
 		}
 		else
 		{
+			// 点滅終了後、プレイヤーを表示(ON)
 			m_player.SetVisible(true);
 		}
 	}
