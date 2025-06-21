@@ -37,6 +37,7 @@ Game::Game()
 	, m_irisWipe{}
 	, m_scores{}
 	, m_entryScore{}
+	, m_sound{}
 {
 	// 乱数の初期値を設定
 	SRand(static_cast<int>(time(nullptr)));

@@ -22,6 +22,7 @@
 #include "ScoreRankingScene/ScoreRankingScene.h"
 
 #include "Game/IrisWipe.h"
+#include "Game/Sound.h"
 
 // クラスの宣言 ===============================================================
 
@@ -104,6 +105,9 @@ private:
 	// 登録するスコア情報
 	Score m_entryScore;
 
+	// 効果音
+	Sound m_sound;
+
 // メンバ関数の宣言 -------------------------------------------------
 // コンストラクタ/デストラクタ
 public:
@@ -154,6 +158,9 @@ public:
 
 	// 登録するスコアを取得する関数
 	Score GetEntryScore() const;
+
+	// 効果音を取得する関数
+	const Sound& GetSound() { return m_sound; }
 
 private:
 

@@ -82,9 +82,26 @@ void Player::Update(int keyCondition, int keyTrigger)
 	// —Ž‰º’†‚©
 	if (IsFalling())
 	{
+		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Fall);
+		if (!CheckSoundMem(shHandle))
+		{
+			// Œø‰Ê‰¹‚ð–Â‚ç‚·
+			PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+		}
+
 		// —Ž‰º’†
 		Falling();
 		return;
+	}
+
+	int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Fall);
+	if (CheckSoundMem(shHandle))
+	{
+		// Œø‰Ê‰¹‚ðŽ~‚ß‚é
+		StopSoundMem(shHandle);
+		// Œø‰Ê‰¹‚ð–Â‚ç‚·i’…’n‰¹j
+		shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Land);
+		PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
 	}
 
 	// ãƒL[‚ª‰Ÿ‚³‚ê‚½
@@ -225,6 +242,20 @@ void Player::Render(int ghTileset) const
 				, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, FALSE);
 		}
 
+	}
+}
+
+// ¶‚«‚Ä‚¢‚é‚©Ý’è‚·‚éŠÖ”
+void Player::SetAlive(bool alive)
+{
+	m_isAlive = alive;
+
+	// Ž€–S‚È‚ç
+	if (!alive)
+	{
+		// Œø‰Ê‰¹‚ð–Â‚ç‚·
+		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dead);
+		PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
 	}
 }
 
@@ -404,7 +435,13 @@ void Player::DigLeft()
 		AjustRow();
 
 		// ƒvƒŒƒCƒ„[‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ðÝ’èiŒ@‚Á‚Ä‚¢‚é“r’†‚ÅŠG‚ð•Ï‚¦‚Ä‚¢‚éj
-		if (m_digAnimationState == DigAnimationState::Dig01) m_playerAnimationState = PlayerAnimationState::Dig_L;
+		if (m_digAnimationState == DigAnimationState::Dig01)
+		{
+			m_playerAnimationState = PlayerAnimationState::Dig_L;
+			// Œø‰Ê‰¹‚ð–Â‚ç‚·
+			int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dig);
+			PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+		}
 		if (m_digAnimationState == DigAnimationState::Dig06) m_playerAnimationState = PlayerAnimationState::Run01_L;
 
 		// Œ@‚èI‚í‚Á‚½H
@@ -423,6 +460,10 @@ void Player::DigLeft()
 		// Œ@‚éŽ–‚ðƒLƒƒƒ“ƒZƒ‹
 		m_digDirection = DigDirection::NotDigging;
 		m_digAnimationState = DigAnimationState::NotDigging;
+		// Œø‰Ê‰¹‚ðŽ~‚ß‚é
+		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dig);
+		StopSoundMem(shHandle);
+
 	}
 }
 
@@ -438,7 +479,13 @@ void Player::DigRight()
 		AjustRow();
 
 		// ƒvƒŒƒCƒ„[‚ÌƒAƒjƒ[ƒVƒ‡ƒ“‚ðÝ’èiŒ@‚Á‚Ä‚¢‚é“r’†‚ÅŠG‚ð•Ï‚¦‚Ä‚¢‚éj
-		if (m_digAnimationState == DigAnimationState::Dig01) m_playerAnimationState = PlayerAnimationState::Dig_R;
+		if (m_digAnimationState == DigAnimationState::Dig01)
+		{
+			m_playerAnimationState = PlayerAnimationState::Dig_R;
+			// Œø‰Ê‰¹‚ð–Â‚ç‚·
+			int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dig);
+			PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+		}
 		if (m_digAnimationState == DigAnimationState::Dig06) m_playerAnimationState = PlayerAnimationState::Run01_R;
 
 		// Œ@‚èI‚í‚Á‚½H
@@ -457,6 +504,9 @@ void Player::DigRight()
 		// Œ@‚éŽ–‚ðƒLƒƒƒ“ƒZƒ‹
 		m_digDirection = DigDirection::NotDigging;
 		m_digAnimationState = DigAnimationState::NotDigging;
+		// Œø‰Ê‰¹‚ðŽ~‚ß‚é
+		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dig);
+		StopSoundMem(shHandle);
 	}
 }
 
@@ -715,6 +765,9 @@ void Player::CheckGoldPickedUp()
 		m_pLevel->LostGold();
 		// “¾“_‚ð‰ÁŽZi‚Q‚T‚O“_j
 		m_pGamePlayScene->AddScore(GamePlayScene::GOLD_SCORE);
+		// Œø‰Ê‰¹‚ð–Â‚ç‚·
+		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::PickupGold);
+		PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
 	}
 }
 

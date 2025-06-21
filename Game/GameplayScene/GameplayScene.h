@@ -10,6 +10,7 @@
 #include "Game/NumberRenderer.h"
 #include "Player.h"
 #include "Gurad.h"
+#include "Game/Sound.h"
 
 // クラスの前方宣言
 class Game;
@@ -222,6 +223,9 @@ private:
 	bool WaitPlayerDead();
 
 public:
+
+	// 効果音のハンドルを取得する関数
+	int GetSoundHandle(Sound::SoundID soundID);
 
 	// 得点を加算する関数
 	void AddScore(int score);

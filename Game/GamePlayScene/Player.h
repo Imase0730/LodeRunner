@@ -194,7 +194,7 @@ public:
 	bool IsActive() const { return m_isActive; }
 
 	// ¶‚«‚Ä‚¢‚é‚©İ’è‚·‚éŠÖ”
-	void SetAlive(bool alive) { m_isAlive = alive; }
+	void SetAlive(bool alive);
 
 	// ¶‘¶‚µ‚Ä‚¢‚é‚©’²‚×‚éŠÖ”
 	bool IsAlive() const { return m_isAlive; }

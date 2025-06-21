@@ -131,6 +131,9 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 			m_clearWaitTimer = CLEAR_WAIT_FRAME;
 			// レベルクリア時の加算するスコアを設定
 			m_levelClearScore = LEVEL_CLEAR_SCORE;
+			// 効果音を鳴らす
+			int shHandle = GetSoundHandle(Sound::SoundID::Clear);
+			PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
 		}
 	}
 	else
@@ -290,6 +293,9 @@ void GamePlayScene::ResurrectionGuards()
 				{
 					m_level.SetTilePage1(pos.x, pos.y, Tile::Type::Empty);
 					m_pGurad[i]->Initialize(m_pGurad[i]->GetTilePosition(), m_pGurad[i]->GetAdjustPosition());
+					// 効果音を鳴らす
+					int shHandle = GetSoundHandle(Sound::SoundID::Resurrection);
+					PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
 				}
 			}
 			else
@@ -508,6 +514,12 @@ bool GamePlayScene::WaitPlayerDead()
 		return true;
 	}
 	return false;
+}
+
+// 効果音のハンドルを取得する関数
+int GamePlayScene::GetSoundHandle(Sound::SoundID soundID)
+{
+	return m_pGame->GetSound().GetSoundHandle(soundID);
 }
 
 // 得点を加算する関数
