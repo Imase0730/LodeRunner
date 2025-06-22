@@ -38,12 +38,16 @@ void LevelEditScene::Initialize()
 	m_levelId = m_pGame->GetTestPlayLevel();
 	m_mode = Mode::SelectTile;
 
+	// レベルの初期化
+	if (m_levelId == 0)
+	{
+		m_levelId = 1;
+		m_level.LoadLevel(m_levelId);
+		m_level.Initialize(Level::Mode::LevelEdit);
+	}
+
 	// レベルの数字の表示
 	m_levelNumberRenderer.SetNumber(m_levelId);
-
-	// レベルの初期化
-	m_level.LoadLevel(m_levelId);
-	m_level.Initialize(Level::Mode::LevelEdit);
 }
 
 // 更新処理
@@ -62,6 +66,21 @@ void LevelEditScene::Update(int keyCondition, int keyTrigger)
 	// 点滅の更新
 	m_blink.Update();
 
+	// Z + Cキーでテストプレイ
+	if ((keyCondition & PAD_INPUT_1) && (keyCondition & PAD_INPUT_3))
+	{
+		// プレイデータとして問題がないかチェックする
+		if (m_level.CheckLevelData())
+		{
+			m_yesNoDialog.CloseDialog();
+			Tile::Type(*type)[Level::MAX_GAME_ROW + 1][Level::MAX_GAME_COLMUN + 1] = m_level.GetPage2();
+			m_pGame->SetTestPlayLevel(m_levelId);
+			m_pGame->SetTestPlayData(*type);
+			m_pGame->RequestSceneChange(Game::SceneID::TestPlay);
+			return;
+		}
+	}
+
 	// スペースキーでモード変更
 	if (keyTrigger & PAD_INPUT_10)
 	{
@@ -71,7 +90,7 @@ void LevelEditScene::Update(int keyCondition, int keyTrigger)
 			// YesNoダイアログを閉じる
 			m_yesNoDialog.CloseDialog();
 		}
-
+		// モードを変更
 		switch (m_mode)
 		{
 		case Mode::SelectTile:
@@ -213,15 +232,6 @@ void LevelEditScene::SelectTile(int keyCondition, int keyRepeat)
 	if (keyCondition & PAD_INPUT_5)
 	{
 		m_level.SetTilePage2(m_cursorEdit.x, m_cursorEdit.y, Tile::Type::Empty);
-	}
-
-	// Z + Cキーでテストプレイ
-	if ((keyCondition & PAD_INPUT_1) && (keyCondition & PAD_INPUT_3))
-	{
-		Tile::Type(*type)[Level::MAX_GAME_ROW + 1][Level::MAX_GAME_COLMUN + 1] = m_level.GetPage2();
-		m_pGame->SetTestPlayLevel(m_levelId);
-		m_pGame->SetTestPlayData(*type);
-		m_pGame->RequestSceneChange(Game::SceneID::TestPlay);
 	}
 }
 

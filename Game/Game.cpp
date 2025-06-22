@@ -38,7 +38,7 @@ Game::Game()
 	, m_scores{}
 	, m_entryScore{}
 	, m_sound{}
-	, m_testPlaylevel{ 1 }
+	, m_testPlaylevel{ 0 }
 {
 	// 乱数の初期値を設定
 	SRand(static_cast<int>(time(nullptr)));

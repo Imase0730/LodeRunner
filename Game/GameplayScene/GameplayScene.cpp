@@ -659,8 +659,5 @@ void GamePlayScene::InitializeTestPlay()
 
 	// ゲームスタート時の初期化
 	GameInitialize();
-
-	// ワイプオープン
-	m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Open);
 }
 
