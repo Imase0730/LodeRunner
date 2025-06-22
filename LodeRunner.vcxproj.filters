@@ -176,5 +176,8 @@
     <ClInclude Include="Game\Sound.h">
       <Filter>Game</Filter>
     </ClInclude>
+    <ClInclude Include="Game\KeyRepeat.h">
+      <Filter>Game</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -362,9 +362,8 @@ void Gurad::Falling()
 				// “¾“_‚ð‰ÁŽZi‚V‚T“_j
 				m_pGamePlayScene->AddScore(GamePlayScene::GUARD_HOLE_SCORE);
 
-				// Œø‰Ê‰¹‚ð–Â‚ç‚·
-				int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::InHole);
-				PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+				// Œø‰Ê‰¹‚ð–Â‚ç‚·iŒŠ‚É—Ž‚¿‚é‰¹j
+				m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::InHole);
 			}
 		}
 	}

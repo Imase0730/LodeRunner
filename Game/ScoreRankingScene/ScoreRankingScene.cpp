@@ -4,6 +4,7 @@
 //--------------------------------------------------------------------------------------
 #include "ScoreRankingScene.h"
 #include "Game/Game.h"
+#include "Game/KeyRepeat.h"
 
 // コンストラクタ
 ScoreRankingScene::ScoreRankingScene(Game* pGame)
@@ -93,14 +94,17 @@ void ScoreRankingScene::Update(int keyCondition, int keyTrigger)
 	{
 		// 登録モード
 
+		// キーリピートを取得
+		int keyRepeat = KeyRepeat::GetKey(keyCondition);
+
 		// 左キーで文字選択
-		if (keyTrigger & PAD_INPUT_LEFT)
+		if (keyRepeat & PAD_INPUT_LEFT)
 		{
 			if (m_inputCharacter != 'A') m_inputCharacter--;
 		}
 
 		// 右キーで文字選択
-		if (keyTrigger & PAD_INPUT_RIGHT)
+		if (keyRepeat & PAD_INPUT_RIGHT)
 		{
 			if (m_inputCharacter != '[') m_inputCharacter++;
 		}
@@ -217,5 +221,20 @@ int ScoreRankingScene::GetScoreIndex(int score)
 	return i;
 }
 
+// デバッグ情報を表示する関数
+void ScoreRankingScene::DisplayDebugInformation(int offsetX, int offsetY) const
+{
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 0, GetColor(255, 255, 255)
+		, L"<< Keys >>");
 
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 2, GetColor(255, 255, 255)
+		, L"QUIT   Q");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 5, GetColor(255, 255, 255)
+		, L"<Score Entry>");
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 7, GetColor(255, 255, 255)
+		, L"←  →");
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 9, GetColor(255, 255, 255)
+		, L"ENTER   Z");
+}
 

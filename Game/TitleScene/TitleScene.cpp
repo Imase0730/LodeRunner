@@ -140,4 +140,20 @@ void TitleScene::Finalize()
 {
 }
 
+// デバッグ情報を表示する関数
+void TitleScene::DisplayDebugInformation(int offsetX, int offsetY) const
+{
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 0, GetColor(255, 255, 255)
+		, L"<< Keys >>");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 2, GetColor(255, 255, 255)
+		, L"       ↑");
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 3, GetColor(255, 255, 255)
+		, L"MOVE     ");
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 4, GetColor(255, 255, 255)
+		, L"       ↓");
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 6, GetColor(255, 255, 255)
+		, L"ENTER   Z");
+}
+
 

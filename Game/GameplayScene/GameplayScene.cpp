@@ -64,7 +64,7 @@ void GamePlayScene::Initialize()
 	m_menNumberRenderer.SetNumber(m_men);
 
 	// レベルの初期化
-	m_levelId = 1;
+	m_levelId = 13;
 	m_levelNumberRenderer.SetNumber(m_levelId);
 
 	// ゲームスタート時の初期化
@@ -131,9 +131,8 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 			m_clearWaitTimer = CLEAR_WAIT_FRAME;
 			// レベルクリア時の加算するスコアを設定
 			m_levelClearScore = LEVEL_CLEAR_SCORE;
-			// 効果音を鳴らす
-			int shHandle = GetSoundHandle(Sound::SoundID::Clear);
-			PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+			// 効果音を鳴らす（クリア音）
+			GetSound().PlaySound(Sound::SoundID::Clear);
 		}
 	}
 	else
@@ -293,9 +292,8 @@ void GamePlayScene::ResurrectionGuards()
 				{
 					m_level.SetTilePage1(pos.x, pos.y, Tile::Type::Empty);
 					m_pGurad[i]->Initialize(m_pGurad[i]->GetTilePosition(), m_pGurad[i]->GetAdjustPosition());
-					// 効果音を鳴らす
-					int shHandle = GetSoundHandle(Sound::SoundID::Resurrection);
-					PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+					// 効果音を鳴らす（復活する音）
+					GetSound().PlaySound(Sound::SoundID::Resurrection);
 				}
 			}
 			else
@@ -516,10 +514,10 @@ bool GamePlayScene::WaitPlayerDead()
 	return false;
 }
 
-// 効果音のハンドルを取得する関数
-int GamePlayScene::GetSoundHandle(Sound::SoundID soundID)
+// サウンドを取得する関数
+const Sound& GamePlayScene::GetSound()
 {
-	return m_pGame->GetSound().GetSoundHandle(soundID);
+	return m_pGame->GetSound();
 }
 
 // 得点を加算する関数
@@ -584,5 +582,26 @@ POINT GamePlayScene::GetResurrectPosition(int colmun)
 	}
 
 	return POINT{ -1, -1 };
+}
+
+// デバッグ情報を表示する関数
+void GamePlayScene::DisplayDebugInformation(int offsetX, int offsetY) const
+{
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 0, GetColor(255, 255, 255)
+		, L"<< Keys >>");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 2, GetColor(255, 255, 255)
+		, L"       ↑");
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 3, GetColor(255, 255, 255)
+		, L"MOVE ←　→");
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 4, GetColor(255, 255, 255)
+		, L"       ↓");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 6, GetColor(255, 255, 255)
+		, L"DIG   Z  X");
+	
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 8, GetColor(255, 255, 255)
+		, L"RETRY  Q");
+
 }
 

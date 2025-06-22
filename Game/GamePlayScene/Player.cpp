@@ -57,7 +57,10 @@ void Player::Initialize(POINT tilePosition, POINT ajustPosition)
 void Player::Update(int keyCondition, int keyTrigger)
 {
 	// Ž€‚ñ‚Å‚¢‚é‚È‚ç‰½‚à‚µ‚È‚¢
-	if (!m_isAlive) return;
+	if (!m_isAlive)
+	{
+		return;
+	}
 
 	// ¶Œü‚«‚ÉŒ@‚Á‚Ä‚¢‚é
 	if (m_digDirection == DigDirection::Left)
@@ -79,30 +82,8 @@ void Player::Update(int keyCondition, int keyTrigger)
 		return;
 	}
 
-	// —Ž‰º’†‚©
-	if (IsFalling())
-	{
-		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Fall);
-		if (!CheckSoundMem(shHandle))
-		{
-			// Œø‰Ê‰¹‚ð–Â‚ç‚·
-			PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
-		}
-
-		// —Ž‰º’†
-		Falling();
-		return;
-	}
-
-	int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Fall);
-	if (CheckSoundMem(shHandle))
-	{
-		// Œø‰Ê‰¹‚ðŽ~‚ß‚é
-		StopSoundMem(shHandle);
-		// Œø‰Ê‰¹‚ð–Â‚ç‚·i’…’n‰¹j
-		shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Land);
-		PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
-	}
+	// —Ž‚¿‚éˆ—
+	if (Fall()) return;
 
 	// ãƒL[‚ª‰Ÿ‚³‚ê‚½
 	if (keyCondition & PAD_INPUT_UP)
@@ -253,9 +234,14 @@ void Player::SetAlive(bool alive)
 	// Ž€–S‚È‚ç
 	if (!alive)
 	{
-		// Œø‰Ê‰¹‚ð–Â‚ç‚·
-		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dead);
-		PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+		// —Ž‰º‰¹‚ª–Â‚Á‚Ä‚¢‚½‚çŽ~‚ß‚é
+		if (m_pGamePlayScene->GetSound().CheckSound(Sound::SoundID::Fall))
+		{
+			// Œø‰Ê‰¹‚ðŽ~‚ß‚éi—Ž‰º‰¹j
+			m_pGamePlayScene->GetSound().StopSound(Sound::SoundID::Fall);
+		}
+		// Œø‰Ê‰¹‚ð–Â‚ç‚·iŽ€–S‰¹j
+		m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::Dead);
 	}
 }
 
@@ -423,6 +409,36 @@ bool Player::IsMovableRight()
 	return IsMovableTileULR(m_pLevel->GetTilePage1(m_tilePosition.x + 1, m_tilePosition.y));
 }
 
+// —Ž‚¿‚é
+// –ß‚è’l‚ªtrue —Ž‰º’†
+bool Player::Fall()
+{
+	// —Ž‰º’†‚©
+	if (IsFalling())
+	{
+		// —Ž‰º‰¹‚ª–Â‚Á‚Ä‚¢‚È‚©‚Á‚½‚ç–Â‚ç‚·
+		if (!m_pGamePlayScene->GetSound().CheckSound(Sound::SoundID::Fall))
+		{
+			// Œø‰Ê‰¹‚ð–Â‚ç‚·i—Ž‰º‰¹j
+			m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::Fall);
+		}
+		// —Ž‰º’†
+		Falling();
+		return true;
+	}
+
+	// —Ž‰º‰¹‚ª–Â‚Á‚Ä‚¢‚½‚çŽ~‚ß‚é
+	if (m_pGamePlayScene->GetSound().CheckSound(Sound::SoundID::Fall))
+	{
+		// Œø‰Ê‰¹‚ðŽ~‚ß‚éi—Ž‰º‰¹j
+		m_pGamePlayScene->GetSound().StopSound(Sound::SoundID::Fall);
+		// Œø‰Ê‰¹‚ð–Â‚ç‚·i’…’n‰¹j
+		m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::Land);
+	}
+
+	return false;
+}
+
 // ¶‚ÉŒ@‚é
 void Player::DigLeft()
 {
@@ -438,9 +454,8 @@ void Player::DigLeft()
 		if (m_digAnimationState == DigAnimationState::Dig01)
 		{
 			m_playerAnimationState = PlayerAnimationState::Dig_L;
-			// Œø‰Ê‰¹‚ð–Â‚ç‚·
-			int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dig);
-			PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+			// Œø‰Ê‰¹‚ð–Â‚ç‚·iŒ@‚é‰¹j
+			m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::Dig);
 		}
 		if (m_digAnimationState == DigAnimationState::Dig06) m_playerAnimationState = PlayerAnimationState::Run01_L;
 
@@ -460,10 +475,8 @@ void Player::DigLeft()
 		// Œ@‚éŽ–‚ðƒLƒƒƒ“ƒZƒ‹
 		m_digDirection = DigDirection::NotDigging;
 		m_digAnimationState = DigAnimationState::NotDigging;
-		// Œø‰Ê‰¹‚ðŽ~‚ß‚é
-		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dig);
-		StopSoundMem(shHandle);
-
+		// Œø‰Ê‰¹‚ðŽ~‚ß‚éiŒ@‚é‰¹j
+		m_pGamePlayScene->GetSound().StopSound(Sound::SoundID::Dig);
 	}
 }
 
@@ -482,9 +495,8 @@ void Player::DigRight()
 		if (m_digAnimationState == DigAnimationState::Dig01)
 		{
 			m_playerAnimationState = PlayerAnimationState::Dig_R;
-			// Œø‰Ê‰¹‚ð–Â‚ç‚·
-			int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dig);
-			PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+			// Œø‰Ê‰¹‚ð–Â‚ç‚·iŒ@‚é‰¹j
+			m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::Dig);
 		}
 		if (m_digAnimationState == DigAnimationState::Dig06) m_playerAnimationState = PlayerAnimationState::Run01_R;
 
@@ -504,9 +516,8 @@ void Player::DigRight()
 		// Œ@‚éŽ–‚ðƒLƒƒƒ“ƒZƒ‹
 		m_digDirection = DigDirection::NotDigging;
 		m_digAnimationState = DigAnimationState::NotDigging;
-		// Œø‰Ê‰¹‚ðŽ~‚ß‚é
-		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::Dig);
-		StopSoundMem(shHandle);
+		// Œø‰Ê‰¹‚ðŽ~‚ß‚éiŒ@‚é‰¹j
+		m_pGamePlayScene->GetSound().StopSound(Sound::SoundID::Dig);
 	}
 }
 
@@ -765,9 +776,8 @@ void Player::CheckGoldPickedUp()
 		m_pLevel->LostGold();
 		// “¾“_‚ð‰ÁŽZi‚Q‚T‚O“_j
 		m_pGamePlayScene->AddScore(GamePlayScene::GOLD_SCORE);
-		// Œø‰Ê‰¹‚ð–Â‚ç‚·
-		int shHandle = m_pGamePlayScene->GetSoundHandle(Sound::SoundID::PickupGold);
-		PlaySoundMem(shHandle, DX_PLAYTYPE_BACK);
+		// Œø‰Ê‰¹‚ð–Â‚ç‚·i‹à‰ò‚ðŽæ‚é‰¹j
+		m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::PickupGold);
 	}
 }
 

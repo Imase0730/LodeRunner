@@ -143,6 +143,12 @@ void Game::Render()
 	int x = Screen::WIDTH / 2 - width / 2;
 	int y = Screen::HEIGHT / 2 - height / 2;
 	DrawExtendGraph(x, y, x + width, y + height, m_ghScreen, false);
+
+#if defined(_DEBUG)
+	// デバッグ情報の表示
+	DisplayDebugInformation(20, 60);
+#endif
+
 }
 
 
@@ -351,6 +357,28 @@ void Game::FinalizeCurrentScene()
 		break;
 	case SceneID::ScoreRanking:	// スコアランキング
 		m_scoreRankingScene.Finalize();
+		break;
+	default:
+		break;
+	}
+}
+
+// デバッグ情報を表示する関数
+void Game::DisplayDebugInformation(int offsetX, int offsetY) const
+{
+	switch (m_currentSceneID)
+	{
+	case SceneID::Title:		// タイトル
+		m_titleScene.DisplayDebugInformation(offsetX, offsetY);
+		break;
+	case SceneID::GamePlay:		// ゲームプレイ
+		m_gamePlayScene.DisplayDebugInformation(offsetX, offsetY);
+		break;
+	case SceneID::LevelEdit:	// ステージエディット
+		m_levelEditScene.DisplayDebugInformation(offsetX, offsetY);
+		break;
+	case SceneID::ScoreRanking:	// スコアランキング
+		m_scoreRankingScene.DisplayDebugInformation(offsetX, offsetY);
 		break;
 	default:
 		break;

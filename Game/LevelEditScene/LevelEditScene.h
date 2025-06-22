@@ -31,9 +31,6 @@ public:
 
 // クラス定数の宣言 -------------------------------------------------
 private:
-	
-	// キーリピートの間隔
-	static constexpr int KEY_REPEAT_INTEVAL = 10;
 
 	// 点滅の間隔
 	static constexpr int BLINK_INTEVAL = 60;
@@ -106,9 +103,6 @@ public:
 
 private:
 
-	// 簡易キーリピート
-	int KeyRepeat(int keyCondition);
-
 	// タイル選択
 	void SelectTile(int keyCondition, int keyRepeat);
 
@@ -117,5 +111,10 @@ private:
 
 	// ロード
 	void Load(int keyTrigger, int keyRepeat);
+
+public:
+
+	// デバッグ情報を表示する関数
+	void DisplayDebugInformation(int offsetX, int offsetY) const;
 
 };

@@ -224,8 +224,8 @@ private:
 
 public:
 
-	// 効果音のハンドルを取得する関数
-	int GetSoundHandle(Sound::SoundID soundID);
+	// サウンドを取得する関数
+	const Sound& GetSound();
 
 	// 得点を加算する関数
 	void AddScore(int score);
@@ -241,5 +241,8 @@ public:
 
 	// ガードの復活位置を取得する関数
 	POINT GetResurrectPosition(int colmun);
+
+	// デバッグ情報を表示する関数
+	void DisplayDebugInformation(int offsetX, int offsetY) const;
 
 };

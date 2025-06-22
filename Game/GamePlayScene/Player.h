@@ -237,6 +237,9 @@ private:
 	// ‰E‚ÉˆÚ“®‰Â”\‚©’²‚×‚éŠÖ”
 	bool IsMovableRight();
 
+	// —‚¿‚é
+	bool Fall();
+
 	// ¶‚ÉŒ@‚é
 	void DigLeft();
 

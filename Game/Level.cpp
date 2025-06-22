@@ -255,6 +255,7 @@ void Level::AppearLadder()
 	{
 		POINT pos = m_invisibleLadderPosition[i];
 		m_page2[pos.y][pos.x] = Tile::Type::Ladder;
+		m_page1[pos.y][pos.x] = Tile::Type::Ladder;
 	}
 }
 

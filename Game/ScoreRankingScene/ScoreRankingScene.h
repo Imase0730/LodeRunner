@@ -96,4 +96,9 @@ private:
 	// 登録する位置を取得する関数
 	int GetScoreIndex(int score);
 
+public:
+
+	// デバッグ情報を表示する関数
+	void DisplayDebugInformation(int offsetX, int offsetY) const;
+
 };

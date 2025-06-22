@@ -4,6 +4,7 @@
 //--------------------------------------------------------------------------------------
 #include "LevelEditScene.h"
 #include "Game/Game.h"
+#include "Game/KeyRepeat.h"
 
 // コンストラクタ
 LevelEditScene::LevelEditScene(Game* pGame)
@@ -55,7 +56,7 @@ void LevelEditScene::Update(int keyCondition, int keyTrigger)
 	}
 
 	// 簡易キーリピート
-	int keyRepeat = KeyRepeat(keyCondition);
+	int keyRepeat = KeyRepeat::GetKey(keyCondition);
 
 	// 点滅の更新
 	m_blink.Update();
@@ -63,6 +64,13 @@ void LevelEditScene::Update(int keyCondition, int keyTrigger)
 	// スペースキーでモード変更
 	if (keyTrigger & PAD_INPUT_10)
 	{
+		// YesNoダイアログ表示中？
+		if (m_yesNoDialog.IsVisivle())
+		{
+			// YesNoダイアログを閉じる
+			m_yesNoDialog.CloseDialog();
+		}
+
 		switch (m_mode)
 		{
 		case Mode::SelectTile:
@@ -151,39 +159,6 @@ void LevelEditScene::Render(int ghTileset)
 // 終了処理
 void LevelEditScene::Finalize()
 {
-}
-
-// 簡易キーリピート
-int LevelEditScene::KeyRepeat(int keyCondition)
-{
-	// キーが押されたフレーム数
-	static int elapseFrame = 0;
-	// １フレーム前のキー情報
-	static int oldKey = 0;
-
-	int keyTrigger = ~oldKey & keyCondition;
-	int keyRepeat = 0;
-
-	// キーが押されている
-	if (keyCondition)
-	{
-		// キーが押された瞬間はキー情報を反映する
-		if (keyTrigger)
-		{
-			keyRepeat = keyCondition;
-			elapseFrame = 0;
-		}
-		// リピート間隔を超えた
-		if (++elapseFrame >= KEY_REPEAT_INTEVAL)
-		{
-			elapseFrame = 0;
-			keyRepeat = keyCondition;
-		}
-	}
-
-	oldKey = keyCondition;
-
-	return keyRepeat;
 }
 
 // タイル選択
@@ -314,4 +289,39 @@ void LevelEditScene::Load(int keyTrigger, int keyRepeat)
 	m_levelNumberRenderer.SetNumber(m_levelId);
 }
 
+// デバッグ情報を表示する関数
+void LevelEditScene::DisplayDebugInformation(int offsetX, int offsetY) const
+{
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 0, GetColor(255, 255, 255)
+		, L"<< Keys >>");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 2, GetColor(255, 255, 255)
+		, L"         ↑");
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 3, GetColor(255, 255, 255)
+		, L"CURSOR ←　→");
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 4, GetColor(255, 255, 255)
+		, L"         ↓");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 6, GetColor(255, 255, 255)
+		, L"PUT TILE   A");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 8, GetColor(255, 255, 255)
+		, L"DEL TILE   S");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 10, GetColor(255, 255, 255)
+		, L"<Tile Select>");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 12, GetColor(255, 255, 255)
+		, L"W or D + ← →");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 16, GetColor(255, 255, 255)
+		, L"MODE SpaceKey");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 18, GetColor(255, 255, 255)
+		, L"SAVE LOAD  Z");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 21, GetColor(255, 255, 255)
+		, L"QUIT Q");
+
+}
 

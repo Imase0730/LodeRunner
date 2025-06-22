@@ -162,6 +162,7 @@
     <ClInclude Include="Game\GamePlayScene\Gurad.h" />
     <ClInclude Include="Game\GamePlayScene\Player.h" />
     <ClInclude Include="Game\IrisWipe.h" />
+    <ClInclude Include="Game\KeyRepeat.h" />
     <ClInclude Include="Game\LevelEditScene\LevelEditScene.h" />
     <ClInclude Include="Game\LevelEditScene\YesNoDialog.h" />
     <ClInclude Include="Game\NumberRenderer.h" />

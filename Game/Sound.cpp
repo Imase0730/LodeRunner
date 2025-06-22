@@ -1,5 +1,10 @@
+//--------------------------------------------------------------------------------------
+// File: Sound.cpp
+//
+//--------------------------------------------------------------------------------------
 #include "Sound.h"
 
+// コンストラクタ
 Sound::Sound()
 {
 	// 効果音のロード
@@ -13,6 +18,7 @@ Sound::Sound()
 	m_shHandle[static_cast<int>(SoundID::Land)] = LoadSoundMem(L"Resources/Sounds/land.wav");
 }
 
+// デストラクタ
 Sound::~Sound()
 {
 	// サウンドハンドルの削除
@@ -20,4 +26,21 @@ Sound::~Sound()
 	{
 		DeleteSoundMem(m_shHandle[i]);
 	}
+}
+
+// 効果音を鳴らす関数
+void Sound::PlaySound(SoundID soundID) const
+{
+	PlaySoundMem(GetSoundHandle(soundID), DX_PLAYTYPE_BACK);
+}
+
+// 効果音を止める関数
+void Sound::StopSound(SoundID soundID) const
+{
+	StopSoundMem(GetSoundHandle(soundID));
+}
+
+bool Sound::CheckSound(SoundID soundID) const
+{
+	return CheckSoundMem(GetSoundHandle(soundID));
 }

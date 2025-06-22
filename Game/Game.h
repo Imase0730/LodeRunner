@@ -53,6 +53,9 @@ public:
 	// システム関連
 	static constexpr const wchar_t* TITLE = L"Lode Runner";   ///< ゲームタイトル
 
+	// 文字のサイズ
+	static constexpr int FONT_SIZE = 20;
+
 	// スコアデータ
 	static constexpr char SCORE_DATA_FILENAME[] = "Resources/ScoreData/score.csv";
 
@@ -181,5 +184,8 @@ private:
 
 	// 現在のシーンの終了処理
 	void FinalizeCurrentScene();
+
+	// デバッグ情報を表示する関数
+	void DisplayDebugInformation(int offsetX, int offsetY) const;
 
 };

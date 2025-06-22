@@ -49,6 +49,9 @@ public:
 	// 表示しているか調べる関数
 	bool IsVisivle() const { return m_isVisible; }
 
+	// ダイアログを閉じる関数
+	void CloseDialog() { m_isVisible = false; }
+
 	// ダイアログを起動する関数
 	void StartDialog(POINT position = POINT{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 6) / 2, Tile::TILE_PIXEL_HEIGHT * 7 });
 

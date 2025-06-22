@@ -90,4 +90,9 @@ public:
 	// 終了処理
 	void Finalize();
 
+public:
+
+	// デバッグ情報を表示する関数
+	void DisplayDebugInformation(int offsetX, int offsetY) const;
+
 };
