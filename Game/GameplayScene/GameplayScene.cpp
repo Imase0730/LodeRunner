@@ -64,7 +64,7 @@ void GamePlayScene::Initialize()
 	m_menNumberRenderer.SetNumber(m_men);
 
 	// レベルの初期化
-	m_levelId = 13;
+	m_levelId = 1;
 	m_levelNumberRenderer.SetNumber(m_levelId);
 
 	// ゲームスタート時の初期化

@@ -57,116 +57,129 @@ void Player::Initialize(POINT tilePosition, POINT ajustPosition)
 void Player::Update(int keyCondition, int keyTrigger)
 {
 	// 死んでいるなら何もしない
-	if (!m_isAlive)
-	{
-		return;
-	}
+	if (!m_isAlive) return;
 
-	// 左向きに掘っている
+	// 掘り中の処理
+	if (HandleDigging()) return;
+
+	// 落下処理
+	if (HandleFalling()) return;
+
+	// 上下移動処理（↑↓）
+	if (HandleVerticalMovement(keyCondition)) return;
+
+	// 掘り開始処理（Z、X）
+	if (HandleDigKeyInput(keyTrigger)) return;
+
+	// 左右移動処理（←→）
+	if (HandleHorizontalMovement(keyCondition)) return;
+}
+
+// 掘り中の処理
+bool Player::HandleDigging()
+{
+	// 左向き
 	if (m_digDirection == DigDirection::Left)
 	{
-		// アニメーションを更新する
 		UpdateDigAnimation();
-		// 左に掘る
 		DigLeft();
-		return;
+		return true;
 	}
-
-	// 右向きに掘っている
+	// 右向き
 	if (m_digDirection == DigDirection::Right)
 	{
-		// アニメーションを更新する
 		UpdateDigAnimation();
-		// 右に掘る
 		DigRight();
-		return;
+		return true;
+	}
+	return false;
+}
+
+// 落下処理
+bool Player::HandleFalling()
+{
+	// 落下中か
+	if (IsFalling())
+	{
+		// 落下音が鳴っていなかったら鳴らす
+		if (!m_pGamePlayScene->GetSound().CheckSound(Sound::SoundID::Fall))
+		{
+			// 効果音を鳴らす（落下音）
+			m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::Fall);
+		}
+		// 落下中
+		Falling();
+		return true;
 	}
 
-	// 落ちる処理
-	if (Fall()) return;
+	// 落下音が鳴っていたら止める
+	if (m_pGamePlayScene->GetSound().CheckSound(Sound::SoundID::Fall))
+	{
+		// 効果音を止める（落下音）
+		m_pGamePlayScene->GetSound().StopSound(Sound::SoundID::Fall);
+		// 効果音を鳴らす（着地音）
+		m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::Land);
+	}
 
+	return false;
+}
+
+// 上下移動処理（↑↓）
+bool Player::HandleVerticalMovement(int keyCondition)
+{
 	// 上キーが押された
 	if (keyCondition & PAD_INPUT_UP)
 	{
-		// 上に移動
 		MoveUp();
-		return;
+		return true;
 	}
-
 	// 下キーが押された
 	if (keyCondition & PAD_INPUT_DOWN)
 	{
-		// 下に移動
 		MoveDown();
-		return;
+		return true;
 	}
+	return false;
+}
 
-	// 掘っていないなら
-	if (m_digDirection == DigDirection::NotDigging)
+// 掘り開始処理（Z、X）
+bool Player::HandleDigKeyInput(int keyTrigger)
+{
+	// Zキーが押されかつ掘っていないなら左側を掘る
+	if ((keyTrigger & PAD_INPUT_1) && m_digDirection == DigDirection::NotDigging)
 	{
-		// Zキーが押された左側を掘る
-		if (keyTrigger & PAD_INPUT_1)
-		{
-			// 左方向に掘る
-			m_digDirection = DigDirection::Left;
-			// 掘りアニメーション設定
-			m_digAnimationState = DigAnimationState::Dig01;
-			// 左に掘る
-			DigLeft();
-			return;
-		}
-
-		// Xキーが押された右側を掘る
-		if (keyTrigger & PAD_INPUT_2)
-		{
-			// 右方向に掘る
-			m_digDirection = DigDirection::Right;
-			// 掘りアニメーション設定
-			m_digAnimationState = DigAnimationState::Dig01;
-			// 右に掘る
-			DigRight();
-			return;
-		}
-	}
-
-	if ((keyTrigger & PAD_INPUT_1) && (m_digDirection == DigDirection::NotDigging))
-	{
-		// 左方向に掘る
 		m_digDirection = DigDirection::Left;
-		// 掘りアニメーション設定
 		m_digAnimationState = DigAnimationState::Dig01;
-		// 左に掘る
 		DigLeft();
-		return;
+		return true;
 	}
-
-	// Xキーが押されたかつ掘っていないなら右側を掘る
-	if ((keyTrigger & PAD_INPUT_2) && (m_digDirection == DigDirection::NotDigging))
+	// Xキーが押されかつ掘っていないなら右側を掘る
+	if ((keyTrigger & PAD_INPUT_2) && m_digDirection == DigDirection::NotDigging)
 	{
-		// 右方向に掘る
 		m_digDirection = DigDirection::Right;
-		// 掘りアニメーション設定
 		m_digAnimationState = DigAnimationState::Dig01;
-		// 右に掘る
 		DigRight();
-		return;
+		return true;
 	}
+	return false;
+}
 
+// 左右移動処理（←→）
+bool Player::HandleHorizontalMovement(int keyCondition)
+{
 	// 左キーが押された
 	if (keyCondition & PAD_INPUT_LEFT)
 	{
-		// 左に移動
 		MoveLeft();
-		return;
+		return true;
 	}
-
 	// 右キーが押された
 	if (keyCondition & PAD_INPUT_RIGHT)
 	{
-		// 右に移動
 		MoveRight();
-		return;
+		return true;
 	}
+	return false;
 }
 
 // 描画処理
@@ -333,6 +346,7 @@ bool Player::IsMovableUp()
 	return false;
 }
 
+// 下に移動可能か調べる関数
 bool Player::IsMovableDown()
 {
 	// 少し上にいるので下に移動可能
@@ -407,36 +421,6 @@ bool Player::IsMovableRight()
 
 	// 移動先タイルが移動可能か調べる
 	return IsMovableTileULR(m_pLevel->GetTilePage1(m_tilePosition.x + 1, m_tilePosition.y));
-}
-
-// 落ちる
-// 戻り値がtrue 落下中
-bool Player::Fall()
-{
-	// 落下中か
-	if (IsFalling())
-	{
-		// 落下音が鳴っていなかったら鳴らす
-		if (!m_pGamePlayScene->GetSound().CheckSound(Sound::SoundID::Fall))
-		{
-			// 効果音を鳴らす（落下音）
-			m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::Fall);
-		}
-		// 落下中
-		Falling();
-		return true;
-	}
-
-	// 落下音が鳴っていたら止める
-	if (m_pGamePlayScene->GetSound().CheckSound(Sound::SoundID::Fall))
-	{
-		// 効果音を止める（落下音）
-		m_pGamePlayScene->GetSound().StopSound(Sound::SoundID::Fall);
-		// 効果音を鳴らす（着地音）
-		m_pGamePlayScene->GetSound().PlaySound(Sound::SoundID::Land);
-	}
-
-	return false;
 }
 
 // 左に掘る

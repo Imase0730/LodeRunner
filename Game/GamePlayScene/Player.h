@@ -210,6 +210,21 @@ public:
 
 private:
 
+	// 掘り中の処理
+	bool HandleDigging();
+
+	// 落下処理
+	bool HandleFalling();
+
+	// 上下移動処理（↑↓）
+	bool HandleVerticalMovement(int keyCondition);
+
+	// 掘り開始処理（Z、X）
+	bool HandleDigKeyInput(int keyTrigger);
+
+	// 左右移動処理（←→）
+	bool HandleHorizontalMovement(int keyCondition);
+
 	// 位置を列に調整する関数
 	void AjustCloumn();
 
@@ -236,9 +251,6 @@ private:
 
 	// 右に移動可能か調べる関数
 	bool IsMovableRight();
-
-	// 落ちる
-	bool Fall();
 
 	// 左に掘る
 	void DigLeft();
