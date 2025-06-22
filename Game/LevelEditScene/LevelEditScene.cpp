@@ -35,14 +35,15 @@ void LevelEditScene::Initialize()
 	// 各変数の初期化
 	m_cursorEdit = POINT{ 0, 0 };
 	m_selectTile = Tile::Type::Blick;
-	m_levelId = 1;
+	m_levelId = m_pGame->GetTestPlayLevel();
 	m_mode = Mode::SelectTile;
 
 	// レベルの数字の表示
 	m_levelNumberRenderer.SetNumber(m_levelId);
 
 	// レベルの初期化
-	m_level.Initialize(m_levelId, Level::Mode::LevelEdit);
+	m_level.LoadLevel(m_levelId);
+	m_level.Initialize(Level::Mode::LevelEdit);
 }
 
 // 更新処理
@@ -213,6 +214,15 @@ void LevelEditScene::SelectTile(int keyCondition, int keyRepeat)
 	{
 		m_level.SetTilePage2(m_cursorEdit.x, m_cursorEdit.y, Tile::Type::Empty);
 	}
+
+	// Z + Cキーでテストプレイ
+	if ((keyCondition & PAD_INPUT_1) && (keyCondition & PAD_INPUT_3))
+	{
+		Tile::Type(*type)[Level::MAX_GAME_ROW + 1][Level::MAX_GAME_COLMUN + 1] = m_level.GetPage2();
+		m_pGame->SetTestPlayLevel(m_levelId);
+		m_pGame->SetTestPlayData(*type);
+		m_pGame->RequestSceneChange(Game::SceneID::TestPlay);
+	}
 }
 
 // セーブ
@@ -264,7 +274,8 @@ void LevelEditScene::Load(int keyTrigger, int keyRepeat)
 			)
 		{
 			// ロード
-			m_level.Initialize(m_levelId, Level::Mode::LevelEdit);
+			m_level.LoadLevel(m_levelId);
+			m_level.Initialize(Level::Mode::LevelEdit);
 		}
 		return;
 	}
@@ -321,6 +332,9 @@ void LevelEditScene::DisplayDebugInformation(int offsetX, int offsetY) const
 		, L"SAVE LOAD  Z");
 
 	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 21, GetColor(255, 255, 255)
+		, L"PLAY Z + C");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 23, GetColor(255, 255, 255)
 		, L"QUIT Q");
 
 }

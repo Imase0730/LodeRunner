@@ -103,7 +103,7 @@ public:
 	~Level();
 
 	// 初期化
-	bool Initialize(int levelNo, Mode mode);
+	bool Initialize(Mode mode);
 
 	// 更新処理
 	void Update();
@@ -127,10 +127,10 @@ public:
 	Tile::Type GetTilePage2(int x, int y) const { return m_page2[y][x]; }
 
 	// 指定レベルをセーブする関数
-	bool SaveLevel(int level) const;
+	bool SaveLevel(int level);
 
 	// 指定レベルをロードする関数
-	bool LoadLevel(int level, Mode mode);
+	bool LoadLevel(int level);
 
 	// 隠しハシゴを出現する関数
 	void AppearLadder();
@@ -152,6 +152,15 @@ public:
 
 	// Page2の内容をPage1に指定位置のタイルをコピーする関数
 	void CopyPage2toPage1(int x, int y);
+
+	// レベルデータが適正か調べる関数
+	bool CheckLevelData() const;
+
+	// Page2を取得する関数（Page2）
+	Tile::Type (*GetPage2())[Level::MAX_GAME_ROW + 1][Level::MAX_GAME_COLMUN + 1];
+
+	// ロードデータの設定する関数
+	void SetLoadData(Tile::Type data[][Level::MAX_GAME_COLMUN + 1]);
 
 };
 

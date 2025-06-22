@@ -38,6 +38,7 @@ Game::Game()
 	, m_scores{}
 	, m_entryScore{}
 	, m_sound{}
+	, m_testPlaylevel{ 1 }
 {
 	// 乱数の初期値を設定
 	SRand(static_cast<int>(time(nullptr)));
@@ -254,6 +255,24 @@ Game::Score Game::GetEntryScore() const
 	return m_entryScore;
 }
 
+// テストプレイデータの設定関数
+void Game::SetTestPlayData(Tile::Type data[][Level::MAX_GAME_COLMUN + 1])
+{
+	for (int i = 0; i < Level::MAX_GAME_ROW + 1; i++)
+	{
+		for (int j = 0; j < Level::MAX_GAME_COLMUN + 1; j++)
+		{
+			m_testPlayData[i][j] = data[i][j];
+		}
+	}
+}
+
+// テストプレイデータの取得関数
+Tile::Type(*Game::GetTestPlayData())[Level::MAX_GAME_ROW + 1][Level::MAX_GAME_COLMUN + 1]
+{
+	return &m_testPlayData;
+}
+
 // 開始シーンの設定
 void Game::SetStartScene(SceneID startSceneID)
 {
@@ -291,6 +310,9 @@ void Game::InitializeCurrentScene()
 	case SceneID::ScoreRanking:	// スコアランキング
 		m_scoreRankingScene.Initialize();
 		break;
+	case SceneID::TestPlay:		// テストプレイ
+		m_gamePlayScene.InitializeTestPlay();
+		break;
 	default:
 		break;
 	}
@@ -313,6 +335,9 @@ void Game::UpdateCurrentScene(int keyCondition, int keyTrigger)
 	case SceneID::ScoreRanking:	// スコアランキング
 		m_scoreRankingScene.Update(keyCondition, keyTrigger);
 		break;
+	case SceneID::TestPlay:		// テストプレイ
+		m_gamePlayScene.Update(keyCondition, keyTrigger);
+		break;
 	default:
 		break;
 	}
@@ -334,6 +359,9 @@ void Game::RenderCurrentScene()
 		break;
 	case SceneID::ScoreRanking:	// スコアランキング
 		m_scoreRankingScene.Render(m_ghTileset);
+		break;
+	case SceneID::TestPlay:		// テストプレイ
+		m_gamePlayScene.Render(m_ghTileset);
 		break;
 	default:
 		break;
@@ -358,6 +386,9 @@ void Game::FinalizeCurrentScene()
 	case SceneID::ScoreRanking:	// スコアランキング
 		m_scoreRankingScene.Finalize();
 		break;
+	case SceneID::TestPlay:		// テストプレイ
+		m_gamePlayScene.Finalize();
+		break;
 	default:
 		break;
 	}
@@ -379,6 +410,9 @@ void Game::DisplayDebugInformation(int offsetX, int offsetY) const
 		break;
 	case SceneID::ScoreRanking:	// スコアランキング
 		m_scoreRankingScene.DisplayDebugInformation(offsetX, offsetY);
+		break;
+	case SceneID::TestPlay:		// テストプレイ
+		m_gamePlayScene.DisplayDebugInformation(offsetX, offsetY);
 		break;
 	default:
 		break;

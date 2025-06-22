@@ -23,6 +23,7 @@
 
 #include "Game/IrisWipe.h"
 #include "Game/Sound.h"
+#include "Game/Level.h"
 
 // クラスの宣言 ===============================================================
 
@@ -46,6 +47,7 @@ public:
 		GamePlay,		// ゲームプレイ
 		LevelEdit,		// レベルエディット
 		ScoreRanking,	// スコアランキング
+		TestPlay,		// テストプレイ
 	};
 
 // クラス定数の宣言 -------------------------------------------------
@@ -111,6 +113,12 @@ private:
 	// 効果音
 	Sound m_sound;
 
+	// テストプレイレベル
+	int m_testPlaylevel;
+
+	// テストプレイ用のレベルデータ
+	Tile::Type m_testPlayData[Level::MAX_GAME_ROW + 1][Level::MAX_GAME_COLMUN + 1];
+
 // メンバ関数の宣言 -------------------------------------------------
 // コンストラクタ/デストラクタ
 public:
@@ -164,6 +172,18 @@ public:
 
 	// 効果音を取得する関数
 	const Sound& GetSound() { return m_sound; }
+
+	// テストプレイレベルの設定関数
+	void SetTestPlayLevel(int level) { m_testPlaylevel = level; }
+
+	// テストプレイレベルの取得関数
+	int GetTestPlayLevel() { return m_testPlaylevel; }
+
+	// テストプレイデータの設定関数
+	void SetTestPlayData(Tile::Type data[][Level::MAX_GAME_COLMUN + 1]);
+
+	// テストプレイデータの取得関数
+	Tile::Type (*GetTestPlayData())[Level::MAX_GAME_ROW + 1][Level::MAX_GAME_COLMUN + 1];
 
 private:
 

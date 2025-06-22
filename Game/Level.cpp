@@ -30,15 +30,8 @@ Level::~Level()
 }
 
 // 初期化処理
-bool Level::Initialize(int levelNo, Mode mode)
+bool Level::Initialize(Mode mode)
 {
-	// レベルが違っていればレベルをロードする
-	if (levelNo != m_levelId)
-	{
-		// ファイルからレベルデータを読み込む
-		if (!LoadLevel(levelNo, mode)) return false;
-	}
-
 	// ステージデータの初期化
 	for (int i = 0; i < MAX_GAME_ROW + 1; i++)
 	{
@@ -183,7 +176,7 @@ void Level::Render(int ghTileset) const
 }
 
 // 指定レベルをセーブする関数
-bool Level::SaveLevel(int level) const
+bool Level::SaveLevel(int level)
 {
 	char fileName[MAX_PATH];
 
@@ -208,12 +201,18 @@ bool Level::SaveLevel(int level) const
 	//ファイルを閉じる
 	ofs.close();
 
+	// 現在のレベルをリセット
+	m_levelId = 0;
+
 	return true;
 }
 
 // 指定レベルをロードする関数
-bool Level::LoadLevel(int level, Mode mode)
+bool Level::LoadLevel(int level)
 {
+	// 既にロード済みなのでロードしない
+	if (level == m_levelId) return true;
+
 	char fileName[MAX_PATH];
 
 	snprintf(fileName, MAX_PATH, "%slevel_%03d.csv", LEVEL_DATA_PATH, level);
@@ -270,6 +269,60 @@ void Level::CopyPage2toPage1(int x, int y)
 	else
 	{
 		m_page1[y][x] = m_page2[y][x];
+	}
+}
+
+// レベルデータが適正か調べる関数
+bool Level::CheckLevelData() const
+{
+	int player = 0;
+	int guard = 0;
+	int ladder = 0;
+
+	for (int i = 0; i < MAX_GAME_ROW + 1; i++)
+	{
+		for (int j = 0; j < MAX_GAME_COLMUN + 1; j++)
+		{
+			Tile::Type type = m_page2[i][j];
+			switch (type)
+			{
+			case Tile::Type::InvisibleLadder:
+				ladder++;
+				break;
+			case Tile::Type::Guard:
+				guard++;
+				break;
+			case Tile::Type::Player:
+				player++;
+				break;
+			default:
+				break;
+			}
+		}
+	}
+
+	if (player != 1) return false;
+	if (guard > GUARD_MAX) return false;
+	if (ladder > INVISIBLE_LADDER_MAX) return false;
+
+	return true;
+}
+
+// Page2を取得する関数（Page2）
+Tile::Type(*Level::GetPage2())[Level::MAX_GAME_ROW + 1][Level::MAX_GAME_COLMUN + 1]
+{
+	return &m_page2;
+}
+
+// ロードデータの設定する関数
+void Level::SetLoadData(Tile::Type data[][Level::MAX_GAME_COLMUN + 1])
+{
+	for (int i = 0; i < Level::MAX_GAME_ROW + 1; i++)
+	{
+		for (int j = 0; j < Level::MAX_GAME_COLMUN + 1; j++)
+		{
+			m_loadData[i][j] = data[i][j];
+		}
 	}
 }
 

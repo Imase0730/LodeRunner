@@ -31,6 +31,7 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	, m_clearWaitTimer{ 0 }
 	, m_levelClearScore{ 0 }
 	, m_playerDeadWaitTimer{ 0 }
+	, m_isTestPlay{ false }
 {
 	// ガードを生成
 	for (int i = 0; i < Level::GUARD_MAX; i++)
@@ -52,6 +53,9 @@ GamePlayScene::~GamePlayScene()
 // 初期化処理
 void GamePlayScene::Initialize()
 {
+	// テストプレイ中ではない
+	m_isTestPlay = false;
+
 	// 登録するスコアの初期化
 	m_pGame->InitializeEntryScore();
 
@@ -127,6 +131,13 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 		// レベルクリアなら得点を１５００点加算する
 		if (IsLevelCleared())
 		{
+			// テストプレイ時
+			if (m_isTestPlay)
+			{
+				// レベルエディタへ
+				m_pGame->RequestSceneChange(Game::SceneID::LevelEdit);
+			}
+
 			// レベルクリア時の待ち時間を設定
 			m_clearWaitTimer = CLEAR_WAIT_FRAME;
 			// レベルクリア時の加算するスコアを設定
@@ -137,6 +148,13 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	}
 	else
 	{
+		// テストプレイ時
+		if (m_isTestPlay)
+		{
+			// レベルエディタへ
+			m_pGame->RequestSceneChange(Game::SceneID::LevelEdit);
+		}
+
 		// 残機数を減らす
 		m_menNumberRenderer.SetNumber(--m_men);
 		// プレイヤー死亡時の待ち時間を設定
@@ -197,6 +215,9 @@ void GamePlayScene::GameInitialize()
 	// ゲームクリア時の待ち時間を初期化
 	m_clearWaitTimer = 0;
 
+	// プレイヤー死亡時の待ち時間を初期化
+	m_playerDeadWaitTimer = 0;
+
 	// プレイヤーが生きている
 	if (m_player.IsAlive())
 	{
@@ -207,14 +228,27 @@ void GamePlayScene::GameInitialize()
 		m_levelNumberRenderer.SetNumber(++m_levelId);
 	}
 
-	// ステージデータの読み込み
-	if (!m_level.Initialize(m_levelId, Level::Mode::GamePlay))
+	// テストプレイ時
+	if (m_isTestPlay)
 	{
-		// ステージデータ読み込みエラーのためステージ１に戻る
-		m_levelId = 1;
-		m_levelNumberRenderer.SetNumber(m_levelId);
-		m_level.Initialize(m_levelId, Level::Mode::GamePlay);
+		// テストプレイ用
+		Tile::Type (*type)[Level::MAX_GAME_ROW + 1][Level::MAX_GAME_COLMUN + 1] = m_pGame->GetTestPlayData();
+		m_level.SetLoadData(*type);
 	}
+	else
+	{
+		// レベルデータの読み込み
+		if(!m_level.LoadLevel(m_levelId))
+		{
+			// レベルデータ読み込みエラーのためステージ１に戻る
+			m_levelId = 1;
+			m_levelNumberRenderer.SetNumber(m_levelId);
+			m_level.LoadLevel(m_levelId);
+		}
+	}
+
+	// レベルの初期化
+	m_level.Initialize(Level::Mode::GamePlay);
 
 	// 掘ったレンガを情報の初期化
 	for (int i = 0; i < DIG_BRICK_MAX; i++)
@@ -603,5 +637,30 @@ void GamePlayScene::DisplayDebugInformation(int offsetX, int offsetY) const
 	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 8, GetColor(255, 255, 255)
 		, L"RETRY  Q");
 
+}
+
+// テストプレイ時の初期化
+void GamePlayScene::InitializeTestPlay()
+{
+	// テストプレイ中
+	m_isTestPlay = true;
+
+	// スコアの初期化
+	m_score = 0;
+	m_scoreNumberRenderer.SetNumber(m_score);
+
+	// プレイヤーの数の初期化
+	m_men = 1;
+	m_menNumberRenderer.SetNumber(m_men);
+
+	// レベルの初期化
+	m_levelId = m_pGame->GetTestPlayLevel();
+	m_levelNumberRenderer.SetNumber(m_levelId);
+
+	// ゲームスタート時の初期化
+	GameInitialize();
+
+	// ワイプオープン
+	m_pGame->GetIrisWipe()->Start(IrisWipe::Mode::Open);
 }
 

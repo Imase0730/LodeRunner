@@ -172,6 +172,9 @@ private:
 	// レベルクリア時の得点加算用
 	int m_levelClearScore;
 
+	// テストプレイ中フラグ
+	bool m_isTestPlay;
+
 // メンバ関数の宣言 -------------------------------------------------
 public:
 
@@ -244,5 +247,8 @@ public:
 
 	// デバッグ情報を表示する関数
 	void DisplayDebugInformation(int offsetX, int offsetY) const;
+
+	// テストプレイ時の初期化
+	void InitializeTestPlay();
 
 };
