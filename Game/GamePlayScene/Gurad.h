@@ -91,9 +91,6 @@ private:
 		{ 9, 10 },
 	};
 
-	// 金塊保持タイマーの初期値
-	static constexpr int GOLD_TIMER_START_VALUE = 0x26;
-
 	// 穴に落ちた時に揺れるアニメーションのスタートフレーム
 	static constexpr int HOLE_ANIMATION_START_FRAME = 11;
 
@@ -102,6 +99,9 @@ private:
 
 	// 穴に落ちた時に横に揺れるアニメーションテーブル（Xの揺れ幅）
 	static constexpr int HOLE_ANIMATION_TABLE[HOLE_ANIMATION_TABLE_SIZE] = { 2, 1, 2, 3, 2 };
+
+	// 復活するまでの時間
+	static constexpr int RESURRECTION_TIME = 0x26;
 
 	// 復活アニメーション用
 	static constexpr int RESURRECTION_ANIME_TIME_NONE = 20;
@@ -138,14 +138,11 @@ private:
 	// アニメーションステート
 	GuradAnimationState m_guardAnimationState;
 
-	// 金塊保持タイマー
-	int m_goldTimer;
+	// 行動タイマー（＋：穴に落ちているタイマー　０：通常　ー：金塊の保持しているタイマー）
+	int m_actionStateTimer;
 
 	// 復活タイマー
 	int m_resurrectionTimer;
-
-	// 移動方向
-	MoveDirection m_moveDirection;
 
 	// メンバ関数の宣言 -------------------------------------------------
 public:
@@ -195,11 +192,11 @@ public:
 	// タイル内の位置を取得する関数
 	POINT GetAdjustPosition() const { return m_adjustPosition; }
 
-	// 金塊保持タイマーを設定する関数
-	void SetGoldTimer(int goldTimer) { m_goldTimer = goldTimer; }
+	// 行動タイマーを設定する関数
+	void SetActionStateTimer(int goldTimer) { m_actionStateTimer = goldTimer; }
 
-	// 金塊保持タイマーを取得する関数
-	int GetGoldTimer() const { return m_goldTimer; }
+	// 行動タイマーを取得する関数
+	int GetActionStateTimer() const { return m_actionStateTimer; }
 
 	// 復活タイマーの設定関数
 	void SetResurrectionTimer(int timer) { m_resurrectionTimer = timer; }
@@ -251,7 +248,7 @@ private:
 	// 右に移動
 	void MoveRight();
 
-	// ガードアニメーションステートの設定
+	// アニメーションステートの設定
 	void SetGuradAnimationState(GuradAnimationState start, GuradAnimationState end);
 
 	// 金塊が拾えるか調べる関数
@@ -290,7 +287,7 @@ private:
 	// 移動可能なタイルか調べる関数（落下）
 	bool IsMovableTileFall(Tile::Type page1, Tile::Type page2);
 
-	// 金塊保持タイマーを更新して金塊を落とす処理
+	//ステートを更新して金塊を落とす処理
 	void UpdateGoldDropTimer();
 
 	// 移動可能なタイルか調べる関数（上左右）
@@ -298,6 +295,16 @@ private:
 
 	// 移動可能なタイルか調べる関数（下）
 	static bool IsMovableTileD(Tile::Type tile);
+	
+	// 穴に落ちた時の処理
+	bool HandleFallingInHole();
 
+	// 落下処理
+	bool HandlFalling();
 
+	// 移動処理
+	void HandleMovement();
+
+	// 穴の中か調べる関数
+	bool IsInHole() const;
 };

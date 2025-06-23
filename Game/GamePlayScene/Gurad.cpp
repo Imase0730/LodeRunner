@@ -18,9 +18,8 @@ Gurad::Gurad(GamePlayScene* pScene, Level* pLevel)
 	, m_adjustPosition{ 0, 0 }
 	, m_faceDirection{ Direction::Left }
 	, m_guardAnimationState{ GuradAnimationState::Run01_L }
-	, m_goldTimer{ 0 }
+	, m_actionStateTimer{ 0 }
 	, m_resurrectionTimer{ 0 }
-	, m_moveDirection{ MoveDirection::None }
 {
 }
 
@@ -51,56 +50,76 @@ void Gurad::Initialize(POINT tilePosition, POINT ajustPosition)
 	// 各変数の初期化
 	m_faceDirection = Direction::Left;
 	m_guardAnimationState = GuradAnimationState::Run01_L;
-	m_goldTimer = 0;
+	m_actionStateTimer = 0;
 	m_resurrectionTimer = 0;
-	m_moveDirection = MoveDirection::None;
 }
 
 // 更新処理
 void Gurad::Update()
 {
-	// 金塊保持タイマーが０より大きい場合は穴に落ちてる
-	// 金塊保持タイマーが－の場合は金塊保持中（カウンターとして使用）
-	if (m_goldTimer > 0)
-	{
-		// 金塊保持タイマーを減算
-		m_goldTimer--;
+	// 穴に落ちた時の処理
+	if (HandleFallingInHole()) return;
 
-		// 穴の中なら落ちないように金塊保持タイマーを０にしないようにする
-		if ( (m_goldTimer == 0)
+	// 落下処理
+	if (HandlFalling()) return;
+
+	// 移動処理
+	HandleMovement();
+}
+
+// 穴に落ちた時の処理
+bool Gurad::HandleFallingInHole()
+{
+	// 穴の中？
+	if (IsInHole())
+	{
+		// 穴に落ちているタイマーを減算
+		m_actionStateTimer--;
+
+		// 穴の中なら落ちないようにタイマーを０にしないようにする
+		if ( (m_actionStateTimer == 0)
 		  && (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Blick)
 		   )
 		{
-			m_goldTimer++;
+			m_actionStateTimer++;
 		}
 
 		// 穴に落ちた直後、数フレームはアニメーションしない
-		if (m_goldTimer > HOLE_ANIMATION_START_FRAME) return;
+		if (m_actionStateTimer > HOLE_ANIMATION_START_FRAME) return true;
 
 		// 横に揺れるアニメーション
-		int idx = m_goldTimer - (HOLE_ANIMATION_START_FRAME - HOLE_ANIMATION_TABLE_SIZE + 1);
+		int idx = m_actionStateTimer - (HOLE_ANIMATION_START_FRAME - HOLE_ANIMATION_TABLE_SIZE + 1);
 		if (idx >= 0)
 		{
 			m_adjustPosition.x = HOLE_ANIMATION_TABLE[idx];
-			return;
+			return true;
 		}
 	}
-	else
+	return false;
+}
+
+// 落下処理
+bool Gurad::HandlFalling()
+{
+	// 穴に落ちている最中は落下せず、這い上がるため落ちないようにする
+	if (!IsInHole())
 	{
 		// 落下中か
 		if (IsFalling())
 		{
 			// 落下中
 			Falling();
-			return;
+			return true;
 		}
 	}
+	return false;
+}
 
+// 移動処理
+void Gurad::HandleMovement()
+{
 	// 移動方向を決める
-	m_moveDirection = DecideMoveDirection();
-
-	// 移動
-	switch (m_moveDirection)
+	switch (DecideMoveDirection())
 	{
 	case Gurad::MoveDirection::UP:
 		MoveUp();
@@ -117,6 +136,13 @@ void Gurad::Update()
 	default:
 		break;
 	}
+}
+
+// 穴の中か調べる関数
+bool Gurad::IsInHole() const
+{
+	if (m_actionStateTimer > 0) return true;
+	return false;
 }
 
 // 描画処理
@@ -322,10 +348,10 @@ void Gurad::Falling()
 		if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Blick)
 		{
 			// 金塊を持っている
-			if (m_goldTimer < 0)
+			if (m_actionStateTimer < 0)
 			{
 				// 金塊を落とす
-				m_goldTimer = 0;
+				m_actionStateTimer = 0;
 				// 金塊が置けるか？
 				if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y - 1) == Tile::Type::Empty)
 				{
@@ -354,10 +380,10 @@ void Gurad::Falling()
 			if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Blick)
 			{
 				// 金塊を持っていればロストする
-				if (m_goldTimer < 0) m_pLevel->LostGold();
+				if (m_actionStateTimer < 0) m_pLevel->LostGold();
 
-				// 金塊保持タイマー設定（復活用に使用する）
-				m_goldTimer = GOLD_TIMER_START_VALUE;
+				// 行動タイマー設定（復活用に使用する）
+				m_actionStateTimer = RESURRECTION_TIME;
 
 				// 得点を加算（７５点）
 				m_pGamePlayScene->AddScore(GamePlayScene::GUARD_HOLE_SCORE);
@@ -384,7 +410,7 @@ Gurad::MoveDirection Gurad::DecideMoveDirection()
 {
 	// 穴の中
 	if ( (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Blick)
-	  && (m_goldTimer > 0)	// 穴に落ちている
+	  && (m_actionStateTimer > 0)	// 穴に落ちている
 	   )
 	{
 		// 上へ
@@ -468,7 +494,7 @@ void Gurad::MoveUp()
 	// 金塊が拾えるかチェック
 	CheckGoldPickedUp();
 
-	// 金塊保持タイマーを更新して金塊を落とす処理
+	//ステートを更新して金塊を落とす処理
 	UpdateGoldDropTimer();
 
 	// ハシゴを登るアニメーション
@@ -505,7 +531,7 @@ void Gurad::MoveDown()
 	// 金塊が拾えるかチェック
 	CheckGoldPickedUp();
 
-	// 金塊保持タイマーを更新して金塊を落とす処理
+	//ステートを更新して金塊を落とす処理
 	UpdateGoldDropTimer();
 
 	// ハシゴを登るアニメーション
@@ -545,7 +571,7 @@ void Gurad::MoveLeft()
 	// 金塊が拾えるかチェック
 	CheckGoldPickedUp();
 
-	// 金塊保持タイマーを更新して金塊を落とす処理
+	//ステートを更新して金塊を落とす処理
 	UpdateGoldDropTimer();
 
 	// ロープの場合
@@ -594,7 +620,7 @@ void Gurad::MoveRight()
 	// 金塊が拾えるかチェック
 	CheckGoldPickedUp();
 
-	// 金塊保持タイマーを更新して金塊を落とす処理
+	//ステートを更新して金塊を落とす処理
 	UpdateGoldDropTimer();
 
 	// ロープの場合
@@ -610,7 +636,7 @@ void Gurad::MoveRight()
 	}
 }
 
-// ガードアニメーションステートの設定
+// アニメーションステートの設定
 void Gurad::SetGuradAnimationState(GuradAnimationState beginAnimState, GuradAnimationState endAnimState)
 {
 	int begin = static_cast<int>(beginAnimState);
@@ -644,10 +670,10 @@ void Gurad::CheckGoldPickedUp()
 	if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) != Tile::Type::Gold) return;
 
 	// 既に金塊を持っている
-	if (m_goldTimer < 0) return;
+	if (m_actionStateTimer < 0) return;
 
 	// 金塊があれば金塊を拾う（金塊保持タイマーを設定）
-	m_goldTimer = -0x53;
+	m_actionStateTimer = -0x53;
 
 	// 空白にする
 	m_pLevel->SetTilePage2(m_tilePosition.x, m_tilePosition.y, Tile::Type::Empty);
@@ -1017,14 +1043,14 @@ bool Gurad::IsMovableTileFall(Tile::Type page1, Tile::Type page2)
 	return true;
 }
 
-// 金塊保持タイマーを更新して金塊を落とす処理
+//ステートを更新して金塊を落とす処理
 void Gurad::UpdateGoldDropTimer()
 {
-	// 金塊保持タイマーが０になったら落とす
-	if (m_goldTimer < 0)
+	// 行動タイマーが０になったら落とす
+	if (m_actionStateTimer < 0)
 	{
-		m_goldTimer++;
-		if (m_goldTimer == 0)
+		m_actionStateTimer++;
+		if (m_actionStateTimer == 0)
 		{
 			// 空白なら金塊を落とす
 			if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Empty)
@@ -1034,7 +1060,7 @@ void Gurad::UpdateGoldDropTimer()
 			else
 			{
 				// 次の機会を待つ
-				m_goldTimer--;
+				m_actionStateTimer--;
 			}
 		}
 	}

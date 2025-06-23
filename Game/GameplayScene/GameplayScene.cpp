@@ -315,8 +315,8 @@ void GamePlayScene::ResurrectionGuards()
 		int timer = m_pGurad[i]->GetResurrectionTimer();
 		if (timer > 0)
 		{
-			// 金塊保持タイマーに大きな値を入れて動かないようにする
-			m_pGurad[i]->SetGoldTimer(0x7f);
+			//ステートに大きな値を入れて動かないようにする
+			m_pGurad[i]->SetActionStateTimer(0x7f);
 			timer--;
 			if (timer == 0)
 			{
@@ -409,12 +409,12 @@ void GamePlayScene::RestoreDigBrick()
 					// 死んだガードを見つける
 					Gurad* gurad = GetGurad(m_digBrick[i].position.x, m_digBrick[i].position.y);
 					// 死んだガードが金塊をもっていたら
-					if (gurad->GetGoldTimer())
+					if (gurad->GetActionStateTimer())
 					{
 						// 金塊の数を減らす
 
-						// 金塊保持タイマーに大きな値を入れて動かないようにする
-						gurad->SetGoldTimer(0x7f);
+						//ステートに大きな値を入れて動かないようにする
+						gurad->SetActionStateTimer(0x7f);
 					}
 					// 復活位置を取得
 					POINT pos = GetResurrectPosition(m_guardResurrectColmun);
