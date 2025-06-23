@@ -151,28 +151,6 @@ void Level::Render(int ghTileset) const
 		DrawRectGraph(j * Tile::TILE_PIXEL_WIDTH, Level::MAX_GAME_ROW * Tile::TILE_PIXEL_HEIGHT + 6
 			, Tile::TILE_PIXEL_WIDTH * 7, Tile::TILE_PIXEL_HEIGHT * 3, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
 	}
-
-	//// ステージの描画
-	//for (int i = 0; i < MAX_GAME_ROW + 1; i++)
-	//{
-	//	for (int j = 0; j < MAX_GAME_COLMUN + 1; j++)
-	//	{
-	//		// 描画位置
-	//		int x = j * Tile::TILE_PIXEL_WIDTH;
-	//		int y = i * Tile::TILE_PIXEL_HEIGHT;
-
-	//		// ページ２のタイルを描画対象にする
-	//		Tile::Type tile = m_page1[i][j];
-
-	//		// タイルの絵の位置
-	//		POINT pos = TILE_SPRITES[static_cast<int>(tile)];
-	//		// タイルを描画
-	//		DrawRectGraph(x, y
-	//			, Tile::TILE_PIXEL_WIDTH * pos.x, Tile::TILE_PIXEL_HEIGHT * pos.y
-	//			, Tile::TILE_PIXEL_WIDTH, Tile::TILE_PIXEL_HEIGHT, ghTileset, TRUE);
-	//	}
-	//}
-
 }
 
 // 指定レベルをセーブする関数

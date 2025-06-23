@@ -146,7 +146,7 @@ bool Player::HandleVerticalMovement(int keyCondition)
 bool Player::HandleDigKeyInput(int keyTrigger)
 {
 	// Zキーが押されかつ掘っていないなら左側を掘る
-	if ((keyTrigger & PAD_INPUT_1) && m_digDirection == DigDirection::NotDigging)
+	if ((keyTrigger & PAD_INPUT_1) && (m_digDirection == DigDirection::NotDigging))
 	{
 		m_digDirection = DigDirection::Left;
 		m_digAnimationState = DigAnimationState::Dig01;
@@ -154,7 +154,7 @@ bool Player::HandleDigKeyInput(int keyTrigger)
 		return true;
 	}
 	// Xキーが押されかつ掘っていないなら右側を掘る
-	if ((keyTrigger & PAD_INPUT_2) && m_digDirection == DigDirection::NotDigging)
+	if ((keyTrigger & PAD_INPUT_2) && (m_digDirection == DigDirection::NotDigging))
 	{
 		m_digDirection = DigDirection::Right;
 		m_digAnimationState = DigAnimationState::Dig01;
@@ -791,9 +791,9 @@ bool Player::IsMovableTileFall(Tile::Type page1, Tile::Type page2)
 // 移動可能なタイルか調べる関数（上左右）
 bool Player::IsMovableTileULR(Tile::Type tile)
 {
-	if ( (tile == Tile::Type::Blick)	// page1:レンガ
-	  || (tile == Tile::Type::Stone)	// page1:石
-	  || (tile == Tile::Type::Trap)	// page1:罠
+	if ( (tile == Tile::Type::Blick)	// レンガ
+	  || (tile == Tile::Type::Stone)	// 石
+	  || (tile == Tile::Type::Trap)		// 罠
 	   )
 	{
 		// 移動不可
@@ -806,8 +806,8 @@ bool Player::IsMovableTileULR(Tile::Type tile)
 // 移動可能なタイルか調べる関数（下）
 bool Player::IsMovableTileDown(Tile::Type tile)
 {
-	if ( (tile == Tile::Type::Blick)	// page1:レンガ
-	  || (tile == Tile::Type::Stone)	// page1:石
+	if ( (tile == Tile::Type::Blick)	// レンガ
+	  || (tile == Tile::Type::Stone)	// 石
 	   )
 	{
 		// 移動不可

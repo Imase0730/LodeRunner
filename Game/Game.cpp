@@ -145,10 +145,10 @@ void Game::Render()
 	int y = Screen::HEIGHT / 2 - height / 2;
 	DrawExtendGraph(x, y, x + width, y + height, m_ghScreen, false);
 
-#if defined(_DEBUG)
+//#if defined(_DEBUG)
 	// デバッグ情報の表示
 	DisplayDebugInformation(20, 60);
-#endif
+//#endif
 
 }
 
