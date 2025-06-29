@@ -59,7 +59,7 @@ public:
 	static constexpr int FONT_SIZE = 20;
 
 	// スコアデータ
-	static constexpr char SCORE_DATA_FILENAME[] = "Resources/ScoreData/score.csv";
+	static constexpr char SCORE_DATA_FILENAME[] = "Resources/SaveData/score.csv";
 
 	// スコアの登録最大数
 	static constexpr int SCORE_ENTRY_MAX = 10;

@@ -117,10 +117,10 @@
     <ClCompile Include="Game\ScoreRankingScene\ScoreRankingScene.cpp">
       <Filter>Game\ScoreRanking</Filter>
     </ClCompile>
-    <ClCompile Include="Game\LevelEditScene\YesNoDialog.cpp">
-      <Filter>Game\LevelEditScene</Filter>
-    </ClCompile>
     <ClCompile Include="Game\Sound.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\YesNoDialog.cpp">
       <Filter>Game</Filter>
     </ClCompile>
   </ItemGroup>
@@ -170,13 +170,13 @@
     <ClInclude Include="Game\ScoreRankingScene\ScoreRankingScene.h">
       <Filter>Game\ScoreRanking</Filter>
     </ClInclude>
-    <ClInclude Include="Game\LevelEditScene\YesNoDialog.h">
-      <Filter>Game\LevelEditScene</Filter>
-    </ClInclude>
     <ClInclude Include="Game\Sound.h">
       <Filter>Game</Filter>
     </ClInclude>
     <ClInclude Include="Game\KeyRepeat.h">
+      <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\YesNoDialog.h">
       <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>

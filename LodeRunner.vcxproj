@@ -146,13 +146,13 @@
     <ClCompile Include="Game\GamePlayScene\Player.cpp" />
     <ClCompile Include="Game\IrisWipe.cpp" />
     <ClCompile Include="Game\LevelEditScene\LevelEditScene.cpp" />
-    <ClCompile Include="Game\LevelEditScene\YesNoDialog.cpp" />
     <ClCompile Include="Game\NumberRenderer.cpp" />
     <ClCompile Include="Game\Level.cpp" />
     <ClCompile Include="Game\ScoreRankingScene\ScoreRankingScene.cpp" />
     <ClCompile Include="Game\Sound.cpp" />
     <ClCompile Include="Game\StringRenderer.cpp" />
     <ClCompile Include="Game\TitleScene\TitleScene.cpp" />
+    <ClCompile Include="Game\YesNoDialog.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader>Create</PrecompiledHeader>
     </ClCompile>
@@ -164,7 +164,6 @@
     <ClInclude Include="Game\IrisWipe.h" />
     <ClInclude Include="Game\KeyRepeat.h" />
     <ClInclude Include="Game\LevelEditScene\LevelEditScene.h" />
-    <ClInclude Include="Game\LevelEditScene\YesNoDialog.h" />
     <ClInclude Include="Game\NumberRenderer.h" />
     <ClInclude Include="Game\ScoreRankingScene\ScoreRankingScene.h" />
     <ClInclude Include="Game\Screen.h" />
@@ -173,6 +172,7 @@
     <ClInclude Include="Game\StringRenderer.h" />
     <ClInclude Include="Game\Tile.h" />
     <ClInclude Include="Game\TitleScene\TitleScene.h" />
+    <ClInclude Include="Game\YesNoDialog.h" />
     <ClInclude Include="pch.h" />
     <!-- メイン -->
     <ClCompile Include="WinMain.cpp" />

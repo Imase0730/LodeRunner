@@ -23,8 +23,11 @@ private:
 	// 表示フラグ
 	bool m_isVisible;
 
-	// 表示位置
-	POINT m_position;
+	// タイトルの文字列
+	std::string m_title;
+
+	// タイトルの文字
+	StringRenderer m_titleString;
 
 	// YESの文字
 	StringRenderer m_yesString;
@@ -53,7 +56,7 @@ public:
 	void CloseDialog() { m_isVisible = false; }
 
 	// ダイアログを起動する関数
-	void StartDialog(POINT position = POINT{ (Screen::GAME_WIDTH - Tile::TILE_PIXEL_WIDTH * 6) / 2, Tile::TILE_PIXEL_HEIGHT * 7 });
+	void StartDialog(std::string title = "");
 
 	// どちらが選択されたか取得する関数
 	YesNo GetYesNo() const { return m_yesNo; }

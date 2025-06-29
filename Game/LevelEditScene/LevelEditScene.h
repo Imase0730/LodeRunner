@@ -10,7 +10,7 @@
 #include "Game/NumberRenderer.h"
 #include "Game/StringRenderer.h"
 #include "Game/Tile.h"
-#include "YesNoDialog.h"
+#include "Game/YesNoDialog.h"
 
 // ƒNƒ‰ƒX‚Ì‘O•ûéŒ¾
 class Game;

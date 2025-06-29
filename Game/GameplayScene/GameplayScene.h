@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "Gurad.h"
 #include "Game/Sound.h"
+#include "Game/YesNoDialog.h"
 
 // クラスの前方宣言
 class Game;
@@ -26,6 +27,15 @@ private:
 	enum class FillAnimationState
 	{
 		EMPTY, Fill01, Fill02,
+	};
+
+	// Yes/Noダイアログのタイプ
+	enum class DialogType
+	{
+		None,
+		Retry,
+		Save,
+		Load,
 	};
 
 	// クラス定数の宣言 -------------------------------------------------
@@ -75,6 +85,9 @@ private:
 
 	// プレイヤーが死亡時のウエイト
 	static constexpr int PLAYER_DEAD_WAIT_FRAME = 30;
+
+	// セーブデータ
+	static constexpr char SAVE_DATA_FILENAME[] = "Resources/SaveData/saveData.csv";
 
 public:
 
@@ -133,6 +146,9 @@ private:
 	// スコア
 	int m_score;
 
+	// セーブ用スコア（ステージ開始時のスコア）
+	int m_saveScore;
+
 	// 残機数
 	int m_men;
 
@@ -174,6 +190,12 @@ private:
 
 	// テストプレイ中フラグ
 	bool m_isTestPlay;
+
+	// YesNoダイアログ
+	YesNoDialog m_yesNoDialog;
+
+	// ダイアログのタイプ
+	DialogType m_dialogType;
 
 // メンバ関数の宣言 -------------------------------------------------
 public:
@@ -250,5 +272,16 @@ public:
 
 	// テストプレイ時の初期化
 	void InitializeTestPlay();
+
+private:
+
+	// セーブ
+	bool Save();
+
+	// ロード
+	bool Load();
+
+	// ダイアログが表示されている時の処理
+	bool HandleDialogState(int keyTrigger);
 
 };

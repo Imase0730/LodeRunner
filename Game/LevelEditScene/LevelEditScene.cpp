@@ -173,6 +173,7 @@ void LevelEditScene::Render(int ghTileset)
 	// 点滅を止める
 	SetDrawBright(255, 255, 255);
 
+	// Yes/Noダイアログの描画
 	m_yesNoDialog.Render(ghTileset);
 }
 
@@ -256,7 +257,7 @@ void LevelEditScene::Save(int keyTrigger, int keyRepeat)
 	if (keyTrigger & PAD_INPUT_1)
 	{
 		// YesNoダイアログを起動
-		m_yesNoDialog.StartDialog();
+		m_yesNoDialog.StartDialog("SAVE");
 	}
 	// 上キーまたはWキーでレベル加算
 	if ((keyRepeat & PAD_INPUT_UP) || (keyRepeat & PAD_INPUT_8))
@@ -294,7 +295,7 @@ void LevelEditScene::Load(int keyTrigger, int keyRepeat)
 	if (keyTrigger & PAD_INPUT_1)
 	{
 		// YesNoダイアログを起動
-		m_yesNoDialog.StartDialog();
+		m_yesNoDialog.StartDialog("LOAD");
 	}
 	// 上キーまたはWキーでレベル加算
 	if ((keyRepeat & PAD_INPUT_UP) || (keyRepeat & PAD_INPUT_8))

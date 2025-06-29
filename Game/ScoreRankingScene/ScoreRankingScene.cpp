@@ -191,7 +191,7 @@ void ScoreRankingScene::Render(int ghTileset)
 		{
 			// “_–Å‚·‚é“ü—Í’†‚Ì•¶Žš
 			Game::Score score = m_pGame->GetScore(m_entryIndex);
-			int size = score.initial.size();
+			int size = static_cast<int>(score.initial.size());
 			if ((m_blink.IsBlinkOn()) && (i == m_entryIndex) && (size < 3))
 			{
 				char str[]{ m_inputCharacter, '\0' };

@@ -5,6 +5,8 @@
 #include "GamePlayScene.h"
 #include "Game/Game.h"
 #include "Game/Tile.h"
+#include <fstream>
+#include <sstream>
 
 // コンストラクタ
 GamePlayScene::GamePlayScene(Game* pGame)
@@ -32,6 +34,9 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	, m_levelClearScore{ 0 }
 	, m_playerDeadWaitTimer{ 0 }
 	, m_isTestPlay{ false }
+	, m_yesNoDialog{}
+	, m_dialogType{ DialogType::None }
+	, m_saveScore{ 0 }
 {
 	// ガードを生成
 	for (int i = 0; i < Level::GUARD_MAX; i++)
@@ -60,7 +65,7 @@ void GamePlayScene::Initialize()
 	m_pGame->InitializeEntryScore();
 
 	// スコアの初期化
-	m_score = 0;
+	m_score = m_saveScore = 0;
 	m_scoreNumberRenderer.SetNumber(m_score);
 
 	// プレイヤーの数の初期化
@@ -98,11 +103,32 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	// レベルクリア時の待ち時間の処理
 	if (WaitLevelClear()) return;
 
-	// Qキーでゲームをリスタート
+	// Yes/Noダイアログが表示中の処理
+	if (HandleDialogState(keyTrigger))
+	{
+		oldKey = keyCondition;
+		return;
+	}
+
+	// Qキーでゲームをリトライ
 	if (keyTrigger & PAD_INPUT_7)
 	{
-		m_men++;
-		m_player.SetAlive(false);
+		m_dialogType = DialogType::Retry;
+		m_yesNoDialog.StartDialog("RETRY");
+	}
+
+	// F1キーでセーブ
+	if (CheckHitKey(KEY_INPUT_F1))
+	{
+		m_dialogType = DialogType::Save;
+		m_yesNoDialog.StartDialog("SAVE");
+	}
+
+	// F2キーでロード
+	if (CheckHitKey(KEY_INPUT_F2))
+	{
+		m_dialogType = DialogType::Load;
+		m_yesNoDialog.StartDialog("LOAD");
 	}
 
 	// ステージの更新
@@ -199,6 +225,9 @@ void GamePlayScene::Render(int ghTileset)
 
 	// レベルの表示
 	m_levelNumberRenderer.Render(ghTileset);
+
+	// Yes/Noダイアログの描画
+	m_yesNoDialog.Render(ghTileset);
 }
 
 // 終了処理
@@ -218,15 +247,23 @@ void GamePlayScene::GameInitialize()
 	// プレイヤー死亡時の待ち時間を初期化
 	m_playerDeadWaitTimer = 0;
 
+	// セーブ用スコアの更新
+	m_saveScore = m_score;
+
 	// プレイヤーが生きている
 	if (m_player.IsAlive())
 	{
 		// 残機数を増やす
-		m_menNumberRenderer.SetNumber(++m_men);
+		m_men++;
 
 		// 次のレベルへ
-		m_levelNumberRenderer.SetNumber(++m_levelId);
+		m_levelId++;
 	}
+
+	// 文字列の更新
+	m_scoreNumberRenderer.SetNumber(m_score);
+	m_menNumberRenderer.SetNumber(m_men);
+	m_levelNumberRenderer.SetNumber(m_levelId);
 
 	// テストプレイ時
 	if (m_isTestPlay)
@@ -637,6 +674,12 @@ void GamePlayScene::DisplayDebugInformation(int offsetX, int offsetY) const
 	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 8, GetColor(255, 255, 255)
 		, L"RETRY  Q");
 
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 10, GetColor(255, 255, 255)
+		, L"SAVE  F1");
+
+	DrawFormatString(offsetX, offsetY + Game::FONT_SIZE * 12, GetColor(255, 255, 255)
+		, L"LOAD  F2");
+
 }
 
 // テストプレイ時の初期化
@@ -659,5 +702,87 @@ void GamePlayScene::InitializeTestPlay()
 
 	// ゲームスタート時の初期化
 	GameInitialize();
+}
+
+// セーブ
+bool GamePlayScene::Save()
+{
+	std::ofstream ofs(SAVE_DATA_FILENAME);
+
+	if (!ofs)
+	{
+		return false;
+	}
+
+	// レベル、残機数、スコア
+	ofs << m_levelId << "," << m_men << "," << m_saveScore << "," << std::endl;
+
+	//ファイルを閉じる
+	ofs.close();
+
+	return true;
+}
+
+// ロード
+bool GamePlayScene::Load()
+{
+	std::ifstream ifs(SAVE_DATA_FILENAME);
+
+	if (!ifs)
+	{
+		return false;
+	}
+
+	// レベル、残機数、スコアの読み込み
+	std::string line;
+	getline(ifs, line);
+	std::istringstream iss(line);
+	std::string item;
+	getline(iss, item, ',');
+	m_levelId = std::stoi(item);
+	getline(iss, item, ',');
+	m_men = std::stoi(item);
+	getline(iss, item, ',');
+	m_saveScore = std::stoi(item);
+
+	//ファイルを閉じる
+	ifs.close();
+
+	return true;
+}
+
+// ダイアログが表示されている時の処理
+bool GamePlayScene::HandleDialogState(int keyTrigger)
+{
+	// YesNoダイアログ表示中？
+	if (m_yesNoDialog.IsVisivle())
+	{
+		// Yesが選択された？
+		if ((m_yesNoDialog.Update(keyTrigger) == true)
+			&& (m_yesNoDialog.GetYesNo() == YesNoDialog::YesNo::Yes)
+			)
+		{
+			switch (m_dialogType)
+			{
+			case DialogType::Load:
+				if (!Load()) break;
+			case DialogType::Retry:
+				// プレイヤー死亡時の待ち時間を設定
+				m_playerDeadWaitTimer = PLAYER_DEAD_WAIT_FRAME;
+				// スコアを戻す
+				m_score = m_saveScore;
+				// プレイヤーを殺す
+				m_player.SetAlive(false);
+				break;
+			case DialogType::Save:
+				Save();
+				break;
+			default:
+				break;
+			}
+		}
+		return true;
+	}
+	return false;
 }
 
