@@ -9,7 +9,7 @@
 #include "Game/StringRenderer.h"
 #include "Game/NumberRenderer.h"
 #include "Player.h"
-#include "Gurad.h"
+#include "Guard.h"
 #include "Game/Sound.h"
 #include "Game/YesNoDialog.h"
 
@@ -159,16 +159,16 @@ private:
 	Player m_player;
 
 	// ガード
-	Gurad* m_pGurad[Level::GUARD_MAX];
+	Guard* m_pGuard[Level::GUARD_MAX];
 
 	// ガードの行動人数のパターン
-	int m_guradPattern[GUARD_PHASE_COUNT];
+	int m_GuardPattern[GUARD_PHASE_COUNT];
 
 	// ガードの行動人数のフェーズ（0～2）
-	int m_guradPhase;
+	int m_GuardPhase;
 
 	// 行動中のガードの番号
-	int m_guradNumber;
+	int m_GuardNumber;
 
 	// 掘ったレンガの情報記録用
 	DigBrick m_digBrick[DIG_BRICK_MAX];
@@ -227,7 +227,7 @@ private:
 	bool IsLevelCleared();
 
 	// ガードの更新処理
-	void UpdateGurads();
+	void UpdateGuards();
 
 	// ガードの復活処理
 	void ResurrectionGuards();
@@ -259,7 +259,7 @@ public:
 	Player* GetPlayer() { return &m_player; }
 
 	// ガードを取得する関数
-	Gurad* GetGurad(int colmun, int row);
+	Guard* GetGuard(int colmun, int row);
 
 	// 指定位置のレンガを復元する
 	void SetFillBrick(int x, int y);

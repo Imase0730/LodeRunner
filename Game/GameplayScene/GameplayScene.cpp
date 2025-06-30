@@ -23,10 +23,10 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	, m_men{ 0 }
 	, m_levelId{ 0 }
 	, m_player{ this, &m_level }
-	, m_pGurad{}
-	, m_guradPattern{ 0, 0, 0 }
-	, m_guradPhase{ 0 }
-	, m_guradNumber{ 0 }
+	, m_pGuard{}
+	, m_GuardPattern{ 0, 0, 0 }
+	, m_GuardPhase{ 0 }
+	, m_GuardNumber{ 0 }
 	, m_digBrick{}
 	, m_guardResurrectColmun{ 0 }
 	, m_startWaitTimer{ 0 }
@@ -41,7 +41,7 @@ GamePlayScene::GamePlayScene(Game* pGame)
 	// ガードを生成
 	for (int i = 0; i < Level::GUARD_MAX; i++)
 	{
-		m_pGurad[i] = new Gurad(this, &m_level);
+		m_pGuard[i] = new Guard(this, &m_level);
 	}
 }
 
@@ -51,7 +51,7 @@ GamePlayScene::~GamePlayScene()
 	// メモリを解放
 	for (int i = 0; i < Level::GUARD_MAX; i++)
 	{
-		delete m_pGurad[i];
+		delete m_pGuard[i];
 	}
 }
 
@@ -138,7 +138,7 @@ void GamePlayScene::Update(int keyCondition, int keyTrigger)
 	m_player.Update(keyCondition, keyTrigger);
 
 	// ガードの更新
-	UpdateGurads();
+	UpdateGuards();
 
 	// ----- タイマー関係の処理 ----- //
 
@@ -205,7 +205,7 @@ void GamePlayScene::Render(int ghTileset)
 	// ガードの描画
 	for (int i = 0; i < m_level.GetGuardCount(); i++)
 	{
-		m_pGurad[i]->Render(ghTileset);
+		m_pGuard[i]->Render(ghTileset);
 	}
 
 	// 『SCORE』の文字の表示
@@ -304,14 +304,14 @@ void GamePlayScene::GameInitialize()
 	// ガードの人数に応じて行動可能人数のテーブルを設定する
 	for (int i = 0; i < GUARD_PHASE_COUNT; i++)
 	{
-		m_guradPattern[i] = GUARD_PATTERNS_LIST[m_level.GetGuardCount() * GUARD_PHASE_COUNT + i];
+		m_GuardPattern[i] = GUARD_PATTERNS_LIST[m_level.GetGuardCount() * GUARD_PHASE_COUNT + i];
 	}
 
 	// ガードの位置を設定
 	for (int i = 0; i < m_level.GetGuardCount(); i++)
 	{
 		POINT pos = m_level.GetGuardPosition(i);
-		m_pGurad[i]->Initialize(POINT{ pos.x, pos.y }
+		m_pGuard[i]->Initialize(POINT{ pos.x, pos.y }
 		, POINT{ Tile::TILE_CENTER_X, Tile::TILE_CENTER_Y });
 	}
 }
@@ -330,18 +330,18 @@ bool GamePlayScene::IsLevelCleared()
 }
 
 // ガードの更新処理
-void GamePlayScene::UpdateGurads()
+void GamePlayScene::UpdateGuards()
 {
 	// １フレームに行動できるガードの人数分ループ
-	for (int i = 0; i < m_guradPattern[m_guradPhase]; i++)
+	for (int i = 0; i < m_GuardPattern[m_GuardPhase]; i++)
 	{
 		// ガードがアクティブなら更新
-		if (m_pGurad[m_guradNumber]->IsActive()) m_pGurad[m_guradNumber]->Update();
+		if (m_pGuard[m_GuardNumber]->IsActive()) m_pGuard[m_GuardNumber]->Update();
 		// 次の行動するガード番号へ
-		m_guradNumber = (m_guradNumber + 1) % m_level.GetGuardCount();
+		m_GuardNumber = (m_GuardNumber + 1) % m_level.GetGuardCount();
 	}
 	// 次の行動可能人数へ
-	m_guradPhase = (m_guradPhase + 1) % GUARD_PHASE_COUNT;
+	m_GuardPhase = (m_GuardPhase + 1) % GUARD_PHASE_COUNT;
 }
 
 // ガードの復活処理
@@ -349,20 +349,20 @@ void GamePlayScene::ResurrectionGuards()
 {
 	for (int i = 0; i < Level::GUARD_MAX; i++)
 	{
-		int timer = m_pGurad[i]->GetResurrectionTimer();
+		int timer = m_pGuard[i]->GetResurrectionTimer();
 		if (timer > 0)
 		{
 			//ステートに大きな値を入れて動かないようにする
-			m_pGurad[i]->SetActionStateTimer(0x7f);
+			m_pGuard[i]->SetActionStateTimer(0x7f);
 			timer--;
 			if (timer == 0)
 			{
 				// 復活場所にガードがいなければ復活する
-				POINT pos = m_pGurad[i]->GetTilePosition();
+				POINT pos = m_pGuard[i]->GetTilePosition();
 				if (m_level.GetTilePage1(pos.x, pos.y) == Tile::Type::Empty)
 				{
 					m_level.SetTilePage1(pos.x, pos.y, Tile::Type::Empty);
-					m_pGurad[i]->Initialize(m_pGurad[i]->GetTilePosition(), m_pGurad[i]->GetAdjustPosition());
+					m_pGuard[i]->Initialize(m_pGuard[i]->GetTilePosition(), m_pGuard[i]->GetAdjustPosition());
 					// 効果音を鳴らす（復活する音）
 					GetSound().PlaySound(Sound::SoundID::Resurrection);
 				}
@@ -370,7 +370,7 @@ void GamePlayScene::ResurrectionGuards()
 			else
 			{
 				// 復活タイマー減算
-				m_pGurad[i]->SetResurrectionTimer(timer);
+				m_pGuard[i]->SetResurrectionTimer(timer);
 			}
 		}
 	}
@@ -444,20 +444,20 @@ void GamePlayScene::RestoreDigBrick()
 				if (page1 == Tile::Type::Guard)
 				{
 					// 死んだガードを見つける
-					Gurad* gurad = GetGurad(m_digBrick[i].position.x, m_digBrick[i].position.y);
+					Guard* Guard = GetGuard(m_digBrick[i].position.x, m_digBrick[i].position.y);
 					// 死んだガードが金塊をもっていたら
-					if (gurad->GetActionStateTimer())
+					if (Guard->GetActionStateTimer())
 					{
 						// 金塊の数を減らす
 
 						//ステートに大きな値を入れて動かないようにする
-						gurad->SetActionStateTimer(0x7f);
+						Guard->SetActionStateTimer(0x7f);
 					}
 					// 復活位置を取得
 					POINT pos = GetResurrectPosition(m_guardResurrectColmun);
 
 					// ガードの復活設定
-					gurad->Resurrection(pos.x, pos.y);
+					Guard->Resurrection(pos.x, pos.y);
 
 					// 得点を加算（７５点）
 					AddScore(GamePlayScene::GUARD_KILL_SCORE);
@@ -599,15 +599,15 @@ void GamePlayScene::AddScore(int score)
 }
 
 // ガードを取得する関数
-Gurad* GamePlayScene::GetGurad(int colmun, int row)
+Guard* GamePlayScene::GetGuard(int colmun, int row)
 {
 	for (int i = 0; i < Level::GUARD_MAX; i++)
 	{
 		// 指定位置にいるガードへのポインタを返す
-		POINT pos = m_pGurad[i]->GetTilePosition();
+		POINT pos = m_pGuard[i]->GetTilePosition();
 		if ((pos.x == colmun) && (pos.y == row))
 		{
-			return m_pGurad[i];
+			return m_pGuard[i];
 		}
 	}
 	return nullptr;

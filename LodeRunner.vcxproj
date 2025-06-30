@@ -142,7 +142,7 @@
     <ClCompile Include="Game\Blink.cpp" />
     <ClCompile Include="Game\Game.cpp" />
     <ClCompile Include="Game\GamePlayScene\GamePlayScene.cpp" />
-    <ClCompile Include="Game\GamePlayScene\Gurad.cpp" />
+    <ClCompile Include="Game\GamePlayScene\Guard.cpp" />
     <ClCompile Include="Game\GamePlayScene\Player.cpp" />
     <ClCompile Include="Game\IrisWipe.cpp" />
     <ClCompile Include="Game\LevelEditScene\LevelEditScene.cpp" />
@@ -159,7 +159,7 @@
     <ClInclude Include="Game\Blink.h" />
     <ClInclude Include="Game\Game.h" />
     <ClInclude Include="Game\GamePlayScene\GamePlayScene.h" />
-    <ClInclude Include="Game\GamePlayScene\Gurad.h" />
+    <ClInclude Include="Game\GamePlayScene\Guard.h" />
     <ClInclude Include="Game\GamePlayScene\Player.h" />
     <ClInclude Include="Game\IrisWipe.h" />
     <ClInclude Include="Game\KeyRepeat.h" />

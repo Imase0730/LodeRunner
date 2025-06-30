@@ -1,5 +1,5 @@
 //--------------------------------------------------------------------------------------
-// File: Gurad.h
+// File: Guard.h
 //
 //--------------------------------------------------------------------------------------
 #pragma once
@@ -10,7 +10,7 @@
 class GamePlayScene;
 
 // ガードクラス
-class Gurad
+class Guard
 {
 public:
 
@@ -32,7 +32,7 @@ public:
 	};
 
 	// アニメーションインデックス
-	enum class GuradAnimationState
+	enum class GuardAnimationState
 	{
 		AnimNone,						// 表示しない
 		Run01_L, Run02_L, Run03_L,		// 走り（左向き）
@@ -136,7 +136,7 @@ private:
 	Direction m_faceDirection;
 
 	// アニメーションステート
-	GuradAnimationState m_guardAnimationState;
+	GuardAnimationState m_guardAnimationState;
 
 	// 行動タイマー（＋：穴に落ちているタイマー　０：通常　ー：金塊の保持しているタイマー）
 	int m_actionStateTimer;
@@ -148,10 +148,10 @@ private:
 public:
 
 	// コンストラクタ
-	Gurad(GamePlayScene* pScene, Level* pLevel);
+	Guard(GamePlayScene* pScene, Level* pLevel);
 
 	// デストラクタ
-	~Gurad();
+	~Guard();
 
 	// 初期化関数
 	void Initialize(POINT tilePosition, POINT ajustPosition);
@@ -249,7 +249,7 @@ private:
 	void MoveRight();
 
 	// アニメーションステートの設定
-	void SetGuradAnimationState(GuradAnimationState start, GuradAnimationState end);
+	void SetGuardAnimationState(GuardAnimationState start, GuardAnimationState end);
 
 	// 金塊が拾えるか調べる関数
 	void CheckGoldPickedUp();
@@ -273,10 +273,10 @@ private:
 	int GetPsuedoDistance(int row);
 
 	// 上下へ移動するか調べる関数
-	Gurad::MoveDirection SelectMoveUpAndDown(int* bestGuradDistance);
+	Guard::MoveDirection SelectMoveUpAndDown(int* bestGuardDistance);
 
 	// 左へ移動するか調べる関数
-	Gurad::MoveDirection SelectMoveLeftAndRight(int* bestGuradDistance, int leftColmunLimit, Direction direction);
+	Guard::MoveDirection SelectMoveLeftAndRight(int* bestGuardDistance, int leftColmunLimit, Direction direction);
 
 	// 下に移動可能なタイルか調べる関数
 	bool IsMovableDown(int colmun, int row);
