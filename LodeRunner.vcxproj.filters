@@ -111,9 +111,6 @@
     <ClCompile Include="Game\GamePlayScene\Player.cpp">
       <Filter>Game\GamePlayScene</Filter>
     </ClCompile>
-    <ClCompile Include="Game\GamePlayScene\Gurad.cpp">
-      <Filter>Game\GamePlayScene</Filter>
-    </ClCompile>
     <ClCompile Include="Game\ScoreRankingScene\ScoreRankingScene.cpp">
       <Filter>Game\ScoreRanking</Filter>
     </ClCompile>
@@ -122,6 +119,9 @@
     </ClCompile>
     <ClCompile Include="Game\YesNoDialog.cpp">
       <Filter>Game</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\GamePlayScene\Guard.cpp">
+      <Filter>Game\GamePlayScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -161,9 +161,6 @@
     <ClInclude Include="Game\GamePlayScene\Player.h">
       <Filter>Game\GamePlayScene</Filter>
     </ClInclude>
-    <ClInclude Include="Game\GamePlayScene\Gurad.h">
-      <Filter>Game\GamePlayScene</Filter>
-    </ClInclude>
     <ClInclude Include="Game\Tile.h">
       <Filter>Game</Filter>
     </ClInclude>
@@ -178,6 +175,9 @@
     </ClInclude>
     <ClInclude Include="Game\YesNoDialog.h">
       <Filter>Game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\GamePlayScene\Guard.h">
+      <Filter>Game\GamePlayScene</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

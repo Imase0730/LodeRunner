@@ -709,8 +709,10 @@ bool Guard::IsMovableColumn(int column)
 			continue;
 		}
 		// °‚ª‹ó”’‚©ã©‚Å‚È‚¢‚È‚çˆÚ“®‰Â”\
-		if ( (m_pLevel->GetTilePage2(guardColumn, guardRow + 1) != Tile::Type::Empty)
-		  && (m_pLevel->GetTilePage2(guardColumn, guardRow + 1) != Tile::Type::Trap)
+		if ( (guardRow == Level::MAX_GAME_ROW)
+		  || ( (m_pLevel->GetTilePage2(guardColumn, guardRow + 1) != Tile::Type::Empty)
+		    && (m_pLevel->GetTilePage2(guardColumn, guardRow + 1) != Tile::Type::Trap)
+		     )
 		   )
 		{
 			continue;
