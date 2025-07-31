@@ -66,7 +66,7 @@ bool Level::Initialize(Mode mode)
 			if (type == Tile::Type::Player) m_playerPosition = POINT{ j, i };
 
 			// ガードなら
-			if ((type == Tile::Type::Guard) && (m_guardCount < GUARD_MAX - 1))
+			if ((type == Tile::Type::Guard) && (m_guardCount < GUARD_MAX))
 			{
 				// ガードの位置を記憶
 				m_guardPosition[m_guardCount] = POINT{ j, i };
