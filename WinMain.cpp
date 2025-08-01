@@ -53,16 +53,17 @@ int APIENTRY wWinMain(_In_     HINSTANCE hInstance,
     // デバッグ情報用ログファイルの出力の抑制
     SetOutApplicationLogValidFlag(FALSE);
 
-
-    // 起動モードの設定
-#if defined(_DEBUG)
-    ChangeWindowMode(TRUE);	           // ウインドウモードで実行
-    SetMainWindowText(Game::TITLE);    // ウインドウタイトルの設定
-    SetWindowIconID(IDI_ICON1);        // ウインドウアイコンの設定
-#else
-    ChangeWindowMode(FALSE);	      // フルスクリーンで実行
-#endif
-
+    // 画面モード選択
+    if (MessageBox(NULL, L"フルスクリーンにしますか？", L"画面モード設定", MB_YESNO) == IDYES)
+    {
+        ChangeWindowMode(FALSE);	      // フルスクリーンで実行
+    }
+    else
+    {
+        ChangeWindowMode(TRUE);	           // ウインドウモードで実行
+        SetMainWindowText(Game::TITLE);    // ウインドウタイトルの設定
+        SetWindowIconID(IDI_ICON1);        // ウインドウアイコンの設定
+    }
 
     // 初期状態の画面モードの設定
     SetGraphMode(Screen::WIDTH, Screen::HEIGHT, 32);
