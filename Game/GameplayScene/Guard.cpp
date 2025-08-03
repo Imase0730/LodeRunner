@@ -1054,8 +1054,12 @@ void Guard::UpdateGoldDropTimer()
 		m_actionStateTimer++;
 		if (m_actionStateTimer == 0)
 		{
+			// ƒ^ƒCƒ‹‚Ì’†S‚Å‚È‚¯‚ê‚Î—Ž‚Æ‚³‚È‚¢
 			// ‹ó”’‚È‚ç‹à‰ò‚ð—Ž‚Æ‚·
-			if (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Empty)
+			if ( (m_adjustPosition.x == Tile::TILE_CENTER_X)
+			  && (m_adjustPosition.y == Tile::TILE_CENTER_Y)
+			  && (m_pLevel->GetTilePage2(m_tilePosition.x, m_tilePosition.y) == Tile::Type::Empty)
+			   )
 			{
 				m_pLevel->SetTilePage2(m_tilePosition.x, m_tilePosition.y, Tile::Type::Gold);
 			}
