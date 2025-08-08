@@ -78,7 +78,7 @@ bool Level::Initialize(Mode mode)
 			if (type == Tile::Type::Gold) m_goldCount++;
 
 			// ‰B‚µƒnƒVƒS‚È‚ç
-			if ((type == Tile::Type::InvisibleLadder) && (m_invisibleLadderCount < INVISIBLE_LADDER_MAX - 1))
+			if ((type == Tile::Type::InvisibleLadder) && (m_invisibleLadderCount < INVISIBLE_LADDER_MAX))
 			{
 				// ‰B‚µƒnƒVƒS‚ÌˆÊ’u‚ð‹L‰¯‚·‚é
 				m_invisibleLadderPosition[m_invisibleLadderCount] = POINT{ j, i };
